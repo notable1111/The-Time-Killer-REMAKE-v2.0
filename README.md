@@ -20,3 +20,9 @@ A 2.5D survival-horror game built in **Unity 6000.4.10f1**.
 - Scene objects are created by editor setup scripts (menu **TimeKiller → Setup**) — never wire scenes by hand if a setup script exists.
 - `main` must always be in a working state: test in the Editor before pushing.
 - See [ARCHITECTURE.md](ARCHITECTURE.md) for how the systems connect and [CHANGELOG.md](CHANGELOG.md) for what changed recently.
+
+## Asset credits (dev assets)
+
+- Player character: [New_Leaf — Top-Down 8-Direction Character](https://new-leaf.itch.io/top-down-8-direction-character-animated-sprite-pack) (free version, credit required)
+- Previous dev character: [xzany — Adventurer 2D Top-Down](https://xzany.itch.io/top-down-adventurer-character) (kept in Outsource as fallback)
+- Footstep sounds: [Kenney — RPG Audio](https://kenney.nl/assets/rpg-audio) (CC0)

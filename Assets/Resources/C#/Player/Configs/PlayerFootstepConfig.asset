@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2e69a72830ee794da5bd97752668501, type: 3}
+  m_Name: PlayerFootstepConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Player.PlayerFootstepConfig
+  stepClips:
+  - {fileID: 8300000, guid: 5c74d39f6092d6d47b25b458c5509ac5, type: 3}
+  - {fileID: 8300000, guid: eb4d35a6b306ff9438ee03d2b2621411, type: 3}
+  - {fileID: 8300000, guid: c7e653ff740909c4fa8550b2d519ffea, type: 3}
+  - {fileID: 8300000, guid: f7a81c653f522fc48a97475a391895c1, type: 3}
+  - {fileID: 8300000, guid: d9e69855ce2e03a45aa4a4965169a3aa, type: 3}
+  - {fileID: 8300000, guid: c5f00424a64a00346bbb50efa4e87628, type: 3}
+  - {fileID: 8300000, guid: 5ee32b8290f7a5741a06d92babf59e86, type: 3}
+  - {fileID: 8300000, guid: 16fb82d7cf69a774b8730c7d20d9dbc6, type: 3}
+  - {fileID: 8300000, guid: 81be3031e4b3c864fade466e500e5b48, type: 3}
+  - {fileID: 8300000, guid: bb480457a816fe541b906d4f261324e6, type: 3}
+  walkLoudness: 0.3
+  runLoudness: 0.85
+  pitchJitter: 0.08

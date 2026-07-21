@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 493d842b14b3c60478780612fd4b8712, type: 3}
+  m_Name: PlayerAnimationSet
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Player.PlayerAnimationSet
+  idle:
+  - {fileID: 11400000, guid: 310007a4931bdbf4cb55d48438e80a7d, type: 2}
+  - {fileID: 11400000, guid: 5119b57576193474183d8a8e71f7ce06, type: 2}
+  - {fileID: 11400000, guid: c7f33d29ebe8d3b4987f36d89fd72b29, type: 2}
+  - {fileID: 11400000, guid: 5a7bcc9d4114ee3469bc67ff3712d12d, type: 2}
+  - {fileID: 11400000, guid: 69defca39ecefa54f85dc680f857a313, type: 2}
+  - {fileID: 11400000, guid: 9774b9422ec75f24d97f2065082d39f9, type: 2}
+  - {fileID: 11400000, guid: 1b226b3a5e16bbc409277cc6a0860609, type: 2}
+  - {fileID: 11400000, guid: e9a22800530461a4f94b5c58c7d7b311, type: 2}
+  run:
+  - {fileID: 11400000, guid: 631c105128516f04fba4d2a6f34716da, type: 2}
+  - {fileID: 11400000, guid: 43b89cfbbe951b143b18118e6ee31855, type: 2}
+  - {fileID: 11400000, guid: 5ec07ce0a6487ae4ea5ffb51e5032d8a, type: 2}
+  - {fileID: 11400000, guid: dca33bfa692ed8e4ead0c76d241ba0cd, type: 2}
+  - {fileID: 11400000, guid: aafaaafea547ac44982b5939df154a0c, type: 2}
+  - {fileID: 11400000, guid: 6c790f6d5920ffe40ab0b88a0d9a4388, type: 2}
+  - {fileID: 11400000, guid: e1ba049e894bc1a48b823a568088d0fa, type: 2}
+  - {fileID: 11400000, guid: 0f59f7f648789b445834312fcbce0095, type: 2}
+  minAnimationSpeed: 0.35

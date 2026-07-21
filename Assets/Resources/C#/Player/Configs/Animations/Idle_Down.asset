@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85738f08ff23ea640a9e0c32f69a7e87, type: 3}
+  m_Name: Idle_Down
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Core.SpriteAnimationClip
+  frames:
+  - {fileID: -3179086527763344619, guid: 864602965b37f4843b26f52ec4da39c6, type: 3}
+  - {fileID: -5200784569896086079, guid: 864602965b37f4843b26f52ec4da39c6, type: 3}
+  - {fileID: 1228898269458052363, guid: 864602965b37f4843b26f52ec4da39c6, type: 3}
+  - {fileID: 2992251800916271633, guid: 864602965b37f4843b26f52ec4da39c6, type: 3}
+  framesPerSecond: 5
+  loop: 1
+  eventFrames: 

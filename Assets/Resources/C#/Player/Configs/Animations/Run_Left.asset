@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85738f08ff23ea640a9e0c32f69a7e87, type: 3}
+  m_Name: Run_Left
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Core.SpriteAnimationClip
+  frames:
+  - {fileID: -1434785375236430797, guid: 198c70240766ce74b988c66c124fedf4, type: 3}
+  - {fileID: 6319260297894029850, guid: 198c70240766ce74b988c66c124fedf4, type: 3}
+  - {fileID: 8436220048561841084, guid: 198c70240766ce74b988c66c124fedf4, type: 3}
+  - {fileID: 5296086042559558373, guid: 198c70240766ce74b988c66c124fedf4, type: 3}
+  - {fileID: -3114733354050858506, guid: 198c70240766ce74b988c66c124fedf4, type: 3}
+  - {fileID: -8335602785128601983, guid: 198c70240766ce74b988c66c124fedf4, type: 3}
+  - {fileID: -4875748501393882190, guid: 198c70240766ce74b988c66c124fedf4, type: 3}
+  - {fileID: 2730557625741917101, guid: 198c70240766ce74b988c66c124fedf4, type: 3}
+  framesPerSecond: 14
+  loop: 1
+  eventFrames: 0100000005000000
