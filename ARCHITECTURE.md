@@ -42,8 +42,21 @@ Flow: `IInputSource` → states → `PlayerMotor` → `Rigidbody2D`.
 - Animation playback speed follows real velocity (`PlayerAnimationDriver.Update`), facing uses stickiness hysteresis (`PlayerFacing`) to prevent diagonal flicker. Camera: tight horror framing (ortho 2.4), follow deliberately deferred.
 - Setup: menu `TimeKiller/Setup/6 - Setup Footsteps + Tight Camera` (after 4 and 5).
 
+### Camera (`C#/Camera/`, namespace `TimeKiller.CameraSystem`)
+- **CameraFollow** — smooth-follow v1 (SmoothDamp in LateUpdate). Look-ahead/room-lock/shake planned. Tuning: `CameraConfig.asset`. Setup: menu `TimeKiller/Setup/10`.
+
+### Lighting & depth (`C#/Lighting/`, namespace `TimeKiller.Lighting`)
+- URP runs the **2D Renderer** (`URP_2DRenderer.asset`) with Y-axis transparency sorting: same-order sprites sort by world Y — lower on screen renders in front. Player and props share order 0 under SortingGroups, so walking behind/in front of objects just works.
+- **Light2D setup** (menu `TimeKiller/Setup/11`): dark global ambient, warm flickering torch lights (`FlickerLight2D` — layered Perlin noise), soft player glow. All sprites use Sprite-Lit-Default; shadow/shade sprites stay unlit so light can't wash them out.
+- **Contact shadows**: baked gradient strips at wall bases + blob shadows under props.
+
+### Environment
+- **Castle hall (active test space)** — fully dressed 2.5D hall from the RF Castle pack (user-imported, `Assets/RF Castle`): layered tilemaps (Floor -20, Rug -15, WallFace -10, WallDecor -9, Overhead +10 — the south band renders over the player), arched door, stained-glass window, banner, animated torches, box colliders. Built by `TimeKiller/Setup/9` (`CastleHallSetup.cs`) — pieces are sheet regions addressed as (col, row-from-top); rebuild = delete `CastleHall` + rerun menu.
+- **Catacombs room builder** (`Setup/8`) — retired as test space, kept for future underground levels (floor-rect + auto-wall technique in `CatacombsRoomSetup.cs`).
+- Tiles generated to `C#/Environment/Configs/`.
+
 ## Planned
 
 - `Player` — stamina / health / sanity
+- Environment — darkness + player light (deferred by choice), side-wall trims, more hall variety
 - `Core` — dev cheat hotkeys (god mode, refill stats) once stats exist
-- Environment — Rogue Fantasy Castle tilemap test map (user imports via Package Manager)

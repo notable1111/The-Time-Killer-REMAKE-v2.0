@@ -13,6 +13,9 @@ namespace TimeKiller.Core
     {
         public event Action<int> FrameReached;
 
+        [Tooltip("Optional clip that starts playing automatically (used by ambient props like torches)")]
+        [SerializeField] SpriteAnimationClip playOnStart;
+
         SpriteRenderer spriteRenderer;
         SpriteAnimationClip clip;
         float speedMultiplier = 1f;
@@ -21,7 +24,11 @@ namespace TimeKiller.Core
 
         public SpriteAnimationClip CurrentClip => clip;
 
-        void Awake() => spriteRenderer = GetComponent<SpriteRenderer>();
+        void Awake()
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+            if (playOnStart != null) Play(playOnStart);
+        }
 
         /// preservePhase: keep the current animation time instead of restarting
         /// at frame 0 — used when only the direction of a clip changes.
