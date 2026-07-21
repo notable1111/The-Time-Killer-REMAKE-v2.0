@@ -2,6 +2,11 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-22 (later) — Camera distance slider
+
+- CameraConfig gains "Distance (zoom)" slider (1.5 near … 8 far, default 2.4) — tunable live in edit AND play mode; value persists (config asset, not scene state).
+- CameraFollow applies the config distance every frame (ExecuteAlways); position-follow stays play-mode-only.
+
 ## 2026-07-22 (later) — Hall wall & collider detail pass
 
 - Side walls and south band rebuilt as real brick (matching the north treatment) with pillar accent edges — no more black voids.
