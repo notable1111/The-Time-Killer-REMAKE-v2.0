@@ -2,6 +2,13 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-22 (later) — Hall wall & collider detail pass
+
+- Side walls and south band rebuilt as real brick (matching the north treatment) with pillar accent edges — no more black voids.
+- Wall colliders aligned to the visible brick edges.
+- Props: per-item colliders — each pot/barrel is its own small round obstacle with walkable gaps (Setup/11 builds these automatically).
+- Final collider tuning done by hand in the scene (do not re-run Setup/9/11 on the existing hall — it would overwrite the manual tuning).
+
 ## 2026-07-22 — Environment era: 2.5D castle hall, lighting, camera
 
 - Castle hall showcase room (RF Castle pack): layered tilemaps (floor/rug/wall face/decor/overhead-over-player), arched doorway, stained-glass window, banner, pillar-colonnade side walls, animated torches. Menu: Setup/9. **Map is WIP — more rooms/layout to come.**

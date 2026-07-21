@@ -70,22 +70,23 @@ namespace TimeKiller.EditorTools
                 Set(wallFace, mainLookup, 6 + (x % 10), 0, x, 17);
             }
 
-            // --- Side walls: pillar colonnade strips (capital→shaft→base cycling,
-            // sheet col 18 rows 6..11) so the edges read as WALL, not void.
+            // --- Side walls: same brick texture as the (approved) north wall,
+            // two columns thick, with a pillar strip as the inner accent edge.
             for (int y = -3; y <= 17; y++)
             {
-                foreach (int x in new[] { -1, HallW })
-                    Set(wallFace, mainLookup, 18, 6 + Mod(17 - y, 6), x, y);
-                foreach (int x in new[] { -2, HallW + 1 })
-                    Set(wallFace, mainLookup, 10, 2, x, y); // dark backing column
+                foreach (int x in new[] { -2, -1, HallW, HallW + 1 })
+                    Set(wallFace, mainLookup, 7 + Mod(x, 2), 8 + Mod(y, 4), x, y);
+                Set(wallDecor, mainLookup, 18, 6 + Mod(17 - y, 6), -1, y);
+                Set(wallDecor, mainLookup, 18, 6 + Mod(17 - y, 6), HallW, y);
             }
 
-            // --- South band, drawn over the player: top trim + dark mass below.
+            // --- South band, drawn over the player: crenellated trim on top of
+            // real brick rows — reads as WALL, matching the north treatment.
             for (int x = -2; x <= HallW + 1; x++)
             {
                 Set(overhead, mainLookup, 6 + (Mod(x, 10)), 0, x, -1);
-                Set(overhead, mainLookup, 10, 2, x, -2);
-                Set(overhead, mainLookup, 10, 2, x, -3);
+                Set(overhead, mainLookup, 6 + (Mod(x, 10)), 8, x, -2);
+                Set(overhead, mainLookup, 6 + (Mod(x, 10)), 9, x, -3);
             }
 
             // --- Window centered on the north wall face.
@@ -176,10 +177,10 @@ namespace TimeKiller.EditorTools
         {
             var holder = new GameObject("Colliders");
             holder.transform.SetParent(root, false);
-            AddBox(holder, new Vector2(HallW / 2f, 10.5f), new Vector2(HallW + 4, 1f)); // north (at wall face base)
-            AddBox(holder, new Vector2(HallW / 2f, -0.5f), new Vector2(HallW + 4, 1f)); // south
-            AddBox(holder, new Vector2(-0.5f, 7f), new Vector2(1f, 24f));               // west
-            AddBox(holder, new Vector2(HallW + 0.5f, 7f), new Vector2(1f, 24f));        // east
+            AddBox(holder, new Vector2(HallW / 2f, 10.5f), new Vector2(HallW + 4, 1f));  // north (at wall face base)
+            AddBox(holder, new Vector2(HallW / 2f, -0.55f), new Vector2(HallW + 4, 1.3f)); // south (blocks before the brick band)
+            AddBox(holder, new Vector2(-0.45f, 7f), new Vector2(1.3f, 24f));             // west (matches visible wall edge)
+            AddBox(holder, new Vector2(HallW + 0.45f, 7f), new Vector2(1.3f, 24f));      // east
         }
 
         static void AddBox(GameObject holder, Vector2 center, Vector2 size)

@@ -159,12 +159,15 @@ namespace TimeKiller.EditorTools
             MakeProp(props.transform, lookup, litMat, unlitMat, blob, "Pillar", 29, 27, 2, 4, new Vector2(12.5f, 5f));
 
             // Barrels and pots as real objects: collidable, Y-sorted, shadowed.
-            MakeProp(props.transform, deco, litMat, unlitMat, blob, "Barrels", 5, 8, 3, 3, new Vector2(13.8f, 7.4f));
-            MakeProp(props.transform, deco, litMat, unlitMat, blob, "Pots", 1, 8, 3, 3, new Vector2(1.4f, 0.7f));
+            // perItemColliders: every occupied column gets its OWN small collider,
+            // so you can pass through the gaps between individual pots/barrels.
+            MakeProp(props.transform, deco, litMat, unlitMat, blob, "Barrels", 5, 8, 3, 3, new Vector2(13.8f, 7.4f), perItemColliders: true);
+            MakeProp(props.transform, deco, litMat, unlitMat, blob, "Pots", 1, 8, 3, 3, new Vector2(1.4f, 0.7f), perItemColliders: true);
         }
 
         static void MakeProp(Transform parent, Dictionary<string, Sprite> lookup, Material litMat,
-            Material unlitMat, Sprite blob, string name, int colTL, int rowTL, int w, int h, Vector2 basePos)
+            Material unlitMat, Sprite blob, string name, int colTL, int rowTL, int w, int h, Vector2 basePos,
+            bool perItemColliders = false)
         {
             var prop = new GameObject(name);
             prop.transform.SetParent(parent, false);
@@ -197,9 +200,27 @@ namespace TimeKiller.EditorTools
                 sr.sharedMaterial = unlitMat;
             }
 
-            var box = prop.AddComponent<BoxCollider2D>();
-            box.size = new Vector2(w * 0.7f, 0.5f);
-            box.offset = new Vector2(0f, 0.25f);
+            if (perItemColliders)
+            {
+                // One small round collider per occupied column — matches each
+                // individual pot/barrel and leaves the gaps walkable.
+                for (int i = 0; i < w; i++)
+                {
+                    bool occupied = false;
+                    for (int j = 0; j < h && !occupied; j++)
+                        occupied = lookup.ContainsKey($"{colTL + i},{rowTL + j}");
+                    if (!occupied) continue;
+                    var circle = prop.AddComponent<CircleCollider2D>();
+                    circle.radius = 0.3f;
+                    circle.offset = new Vector2(i - w / 2f + 0.5f, 0.3f);
+                }
+            }
+            else
+            {
+                var box = prop.AddComponent<BoxCollider2D>();
+                box.size = new Vector2(w * 0.7f, 0.5f);
+                box.offset = new Vector2(0f, 0.25f);
+            }
         }
 
         // ---------- 4. Contact shadows ----------
