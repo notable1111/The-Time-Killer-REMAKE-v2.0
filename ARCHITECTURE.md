@@ -54,6 +54,7 @@ Flow: `IInputSource` → states → `PlayerMotor` → `Rigidbody2D`.
 
 ### Environment
 - **Castle hall (active test space)** — fully dressed 2.5D hall from the RF Castle pack (user-imported, `Assets/RF Castle`): layered tilemaps (Floor -20, Rug -15, WallFace -10, WallDecor -9, Overhead +10 — the south band renders over the player), arched door, stained-glass window, banner, animated torches, box colliders. Built by `TimeKiller/Setup/9` (`CastleHallSetup.cs`) — pieces are sheet regions addressed as (col, row-from-top); rebuild = delete `CastleHall` + rerun menu.
+- **Castle wing / map v1** (`Setup/14`, `CastleWingSetup.cs`) — LOOP: Hall → east corridor → Guardroom (B) → dark north corridor → Great Chamber (C) → corridor → Chapel (D) → dark south corridor → Hall west door. Floor plan = `NewAreas` rects; walls raise GENERICALLY from floor adjacency (north faces, overhead south bands, 2-thick side columns) so openings are automatic. Collision = per-cell boxes merged in `WingColliders` composite. Camera = per-zone boxes in `CameraBounds` composite (Confiner2D). Hall's protected colliders: east/west boxes split around the doorways (approved), values preserved. Vertical connector corridors are deliberately UNLIT.
 - **Catacombs room builder** (`Setup/8`) — retired as test space, kept for future underground levels (floor-rect + auto-wall technique in `CatacombsRoomSetup.cs`).
 - Tiles generated to `C#/Environment/Configs/`.
 

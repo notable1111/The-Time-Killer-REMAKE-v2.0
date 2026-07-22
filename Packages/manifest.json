@@ -6,9 +6,17 @@
       "scopes": [
         "com.kyrylokuzyk"
       ]
+    },
+    {
+      "name": "OpenUPM",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.cammin.ldtkunity"
+      ]
     }
   ],
   "dependencies": {
+    "com.cammin.ldtkunity": "6.12.3",
     "com.kyrylokuzyk.primetween": "1.4.11",
     "com.unity.cinemachine": "3.1.2",
     "com.unity.collab-proxy": "2.12.4",
