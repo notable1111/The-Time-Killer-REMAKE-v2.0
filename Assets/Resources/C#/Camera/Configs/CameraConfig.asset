@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a7529873d3056d45a07d0b28a2f8b8a, type: 3}
   m_Name: CameraConfig
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.CameraSystem.CameraConfig
+  viewSize: 3.37
   smoothTime: 0.18
