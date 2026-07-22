@@ -58,6 +58,12 @@ Flow: `IInputSource` → states → `PlayerMotor` → `Rigidbody2D`.
 - **Catacombs room builder** (`Setup/8`) — retired as test space, kept for future underground levels (floor-rect + auto-wall technique in `CatacombsRoomSetup.cs`).
 - Tiles generated to `C#/Environment/Configs/`.
 
+### LDtk map pipeline (side-by-side, awaiting switch approval)
+- **Source of truth: `Assets/Resources/Assets/Maps/CastleWing.ldtk`** — tile layers + `Collision` IntGrid layer (1=Wall; rule: every non-floor cell adjacent to floor, 100% coverage) + `CameraZone` entities (the Cinemachine confiner rectangles). All three edit visually in the LDtk editor (ldtk.io); a reimport happens automatically on save.
+- **Scene builder** (`Setup/18`, `LDtkWingSceneSetup.cs`) — builds `Assets/Scenes/CastleWingLDtk.unity` from the LDtk file: configures the LDtkToUnity importer (PPU 16, composite colliders, `WallIntGridTile` with Grid collider type, per-layer sorting orders matching Setup/9), instantiates + aligns the prefab, runs the full player pipeline (Setup 4→7), re-applies the hall collider snapshot, builds props/torches via `CastleWingSetup.BuildWingDressing` (shared code), and parses CameraZone entities into the `CameraBounds` composite. "Restyle LDtk Map" re-applies lit materials after reimports.
+- **Hall collider snapshot** (`Setup/17`, `HallColliderGuard.cs`) — `C#/Environment/Configs/HallColliderSnapshot.json` stores the hand-tuned hall boxes; Export reads the scene, Re-apply restores them exactly (also called by Setup/18). This is the durable form of the "never overwrite hall tuning" rule.
+- **Switch status:** SampleScene (script tilemaps) is still the main scene; CastleWingLDtk becomes primary only after team playtest approval. After the switch, map editing = LDtk editor only (Setup/9/14 tile painting retires).
+
 ## Planned
 
 - `Player` — stamina / health / sanity

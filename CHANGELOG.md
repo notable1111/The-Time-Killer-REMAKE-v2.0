@@ -2,6 +2,14 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-22 (later) — LDtk-driven scene (side-by-side): map fully in CastleWing.ldtk
+
+- CastleWing.ldtk is now the single source of truth: tiles + new **Collision IntGrid layer** (286 wall cells, 100% coverage rule — audited 0 gaps / 0 collision-on-floor before import) + **9 CameraZone entities** (the Cinemachine confiner zones, editable visually in the LDtk editor).
+- New scene `Assets/Scenes/CastleWingLDtk.unity` (Setup/18): built entirely from the LDtk file — imported prefab auto-aligned to world coords, IntGrid colliders via WallIntGridTile (Grid type + CompositeCollider2D), full player pipeline (Setup 4→7: New_Leaf animations, footsteps, shadow), lighting, props/torches (shared with Setup/14 — no duplication), camera bounds parsed from the LDtk entities. Companion menu: "Restyle LDtk Map" for after reimports.
+- Hall hand-tuning made durable (Setup/17): `HallColliderSnapshot.json` — export/re-apply the 6 hand-tuned hall collider boxes exactly; the snapshot is committed and re-applied automatically in the LDtk scene.
+- Playtested (Claude, in-editor): full loop Hall→Guardroom→Great Chamber→Chapel→Hall — collision solid, doorways pass, camera confines per room, dark corridors unlit.
+- SampleScene stays the main scene until the team switches; includes the user's manual prop tweaks (pillar collider + prop sorting orders) saved this session.
+
 ## 2026-07-22 (later) — Wing playtest fixes: loop closed, 100% collider coverage
 
 - Loop bug fixed: the C→D corridor was 2 tiles short of the Chapel (dead end) — extended, opening auto-raised; verified by running Chapel→Great Chamber in one pass.

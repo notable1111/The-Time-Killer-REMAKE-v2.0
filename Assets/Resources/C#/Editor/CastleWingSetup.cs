@@ -258,10 +258,6 @@ namespace TimeKiller.EditorTools
 
         static void DressRooms(Transform wing, Tilemap rug, Tilemap wallDecor)
         {
-            var litMat = AssetDatabase.LoadAssetAtPath<Material>(LitMatPath);
-            var unlitMat = AssetDatabase.LoadAssetAtPath<Material>(UnlitMatPath);
-            var blob = AssetDatabase.LoadAssetAtPath<Sprite>(BlobPath);
-
             // Room C: rug center + banners on the north face.
             Region(rug, decoLk, 25, 15, 6, 6, 25, 23);
             Region(wallDecor, decoLk, 0, 0, 3, 4, 23, 31);
@@ -270,6 +266,22 @@ namespace TimeKiller.EditorTools
             Region(wallDecor, mainLk, 25, 6, 6, 6, -8, 31);
             // Room B: banner accent.
             Region(wallDecor, decoLk, 0, 0, 3, 4, 30, 11);
+
+            BuildWingDressing(wing, includeHallDressing: false);
+        }
+
+        // Props + torches only, no tile painting — also used by Setup/18, where
+        // tiles come from CastleWing.ldtk. includeHallDressing adds the hall's
+        // pillars/barrels/pots/torches (in the main scene those exist already
+        // from Setup/9+11; a fresh LDtk scene needs them built here).
+        public static void BuildWingDressing(Transform wing, bool includeHallDressing)
+        {
+            if (mainLk == null) mainLk = Lookup(MainSheet);
+            if (decoLk == null) decoLk = Lookup(DecoSheet);
+            if (mainLk == null || decoLk == null) return;
+            var litMat = AssetDatabase.LoadAssetAtPath<Material>(LitMatPath);
+            var unlitMat = AssetDatabase.LoadAssetAtPath<Material>(UnlitMatPath);
+            var blob = AssetDatabase.LoadAssetAtPath<Sprite>(BlobPath);
 
             var props = new GameObject("WingProps");
             props.transform.SetParent(wing, false);
@@ -291,6 +303,16 @@ namespace TimeKiller.EditorTools
             })
                 Torch(torches.transform, p);
             // The two vertical connector corridors stay UNLIT on purpose — dark passages.
+
+            if (!includeHallDressing) return;
+
+            // Hall dressing, mirroring Setup/11's props and Setup/9's torches.
+            Prop(props.transform, mainLk, litMat, unlitMat, blob, "Pillar", 26, 27, 2, 4, new Vector2(3.5f, 5f), false);
+            Prop(props.transform, mainLk, litMat, unlitMat, blob, "Pillar", 29, 27, 2, 4, new Vector2(12.5f, 5f), false);
+            Prop(props.transform, decoLk, litMat, unlitMat, blob, "Barrels", 5, 8, 3, 3, new Vector2(13.8f, 7.4f), true);
+            Prop(props.transform, decoLk, litMat, unlitMat, blob, "Pots", 1, 8, 3, 3, new Vector2(1.4f, 0.7f), true);
+            Torch(torches.transform, new Vector2(4.5f, 13f));
+            Torch(torches.transform, new Vector2(11.5f, 13f));
         }
 
         static void Torch(Transform parent, Vector2 pos)
