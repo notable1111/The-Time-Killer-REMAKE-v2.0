@@ -45,7 +45,7 @@ namespace TimeKiller.EditorTools
             new RectInt(26, 0, 12, 10),  // Room B — guardroom
             new RectInt(30, 10, 3, 10),  // B -> C corridor (north, unlit)
             new RectInt(20, 20, 16, 10), // Room C — great chamber
-            new RectInt(2, 22, 18, 3),   // C -> D corridor
+            new RectInt(0, 22, 20, 3),   // C -> D corridor (x0..1 included: reaches the chapel!)
             new RectInt(-10, 20, 10, 10),// Room D — chapel
             new RectInt(-7, 6, 3, 14),   // D -> hall corridor (south, unlit)
             new RectInt(-8, 4, 6, 3),    // west corridor
@@ -153,11 +153,18 @@ namespace TimeKiller.EditorTools
             var holder = hallGo.transform.Find("Colliders");
             if (holder == null) { Debug.LogWarning("[TimeKiller Setup] Hall Colliders holder not found — door gaps rely on wing boxes only."); return; }
 
-            foreach (var box in holder.GetComponents<BoxCollider2D>())
+            // Count boxes per side: 2+ on a side means the doorway split already
+            // happened (possibly hand-tuned since) — NEVER split that side again.
+            var all = holder.GetComponents<BoxCollider2D>();
+            int eastCount = all.Count(b => b.offset.x > 10f);
+            int westCount = all.Count(b => b.offset.x < 0f);
+
+            foreach (var box in all)
             {
                 bool east = box.offset.x > 10f, west = box.offset.x < 0f;
                 if (!east && !west) continue;
-                if (box.size.y < 8f) continue; // already split
+                if (east && eastCount >= 2) continue; // already split (protected)
+                if (west && westCount >= 2) continue; // already split (protected)
 
                 float top = box.offset.y + box.size.y / 2f, bottom = box.offset.y - box.size.y / 2f;
                 const float doorBottom = 4f, doorTop = 7f;
@@ -181,16 +188,16 @@ namespace TimeKiller.EditorTools
             var body = go.AddComponent<Rigidbody2D>();
             body.bodyType = RigidbodyType2D.Static;
 
+            // 100% coverage rule: EVERY non-floor cell touching ANY floor gets a
+            // box — no exclusion zones (overlap with the hall's hand-tuned boxes
+            // is harmless; gaps are walk-through-wall bugs).
             var cells = new HashSet<Vector2Int>();
-            foreach (var f in newFloor)
+            foreach (var f in allFloor)
                 for (int dx = -1; dx <= 1; dx++)
                     for (int dy = -1; dy <= 1; dy++)
                     {
                         var n = new Vector2Int(f.x + dx, f.y + dy);
-                        if (allFloor.Contains(n)) continue;
-                        if (n.x >= 16 && n.x <= 17) continue;  // hall east wall column (user boxes)
-                        if (n.x >= -2 && n.x <= -1 && n.y <= 17) continue; // hall west wall column
-                        cells.Add(n);
+                        if (!allFloor.Contains(n)) cells.Add(n);
                     }
             foreach (var c in cells)
             {
@@ -277,7 +284,7 @@ namespace TimeKiller.EditorTools
             torches.transform.SetParent(wing, false);
             foreach (var p in new[]
             {
-                new Vector2(21f, 9.5f), new Vector2(-5f, 9.5f),          // east + west corridors
+                new Vector2(21f, 9.5f), new Vector2(-4f, 9.5f),          // east + west corridors (west torch ON the wall, not in the dark connector)
                 new Vector2(28.5f, 12.5f), new Vector2(35.5f, 12.5f),    // room B
                 new Vector2(24f, 32.5f), new Vector2(31f, 32.5f),        // room C
                 new Vector2(-7.5f, 32.5f), new Vector2(-3.5f, 32.5f),    // room D

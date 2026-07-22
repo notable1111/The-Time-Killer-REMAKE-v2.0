@@ -2,6 +2,14 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-22 (later) — Wing playtest fixes: loop closed, 100% collider coverage
+
+- Loop bug fixed: the C→D corridor was 2 tiles short of the Chapel (dead end) — extended, opening auto-raised; verified by running Chapel→Great Chamber in one pass.
+- Walk-through-wall bug fixed: collider exclusion zones removed — EVERY wall cell adjacent to floor now gets a merged collider box (verified: capsule blocks flush at wall boundaries).
+- Door-split guard hardened: a hall wall side with 2+ collider boxes is never re-split (protects hand-tuned values on rebuilds).
+- New tool: Python collider-audit renderer (green/red coverage overlay on the map preview) — coverage is now proven visually before Unity runs.
+- West-corridor torch moved onto the wall (dark connectors stay unlit by design). LDtk twin regenerated in sync.
+
 ## 2026-07-22 (later) — Map v1: castle wing loop + LDtk pipeline
 
 - Castle wing (Setup/14): LOOP Hall -> east corridor -> Guardroom -> dark corridor -> Great Chamber -> corridor -> Chapel -> dark corridor -> Hall west door. Generic wall-raising from the floor plan, per-cell merged collision, per-zone camera bounds, room dressing + torches. Hall's protected side colliders split around the two new doorways (approved; tuned values preserved).
