@@ -43,7 +43,9 @@ Flow: `IInputSource` → states → `PlayerMotor` → `Rigidbody2D`.
 - Setup: menu `TimeKiller/Setup/6 - Setup Footsteps + Tight Camera` (after 4 and 5).
 
 ### Camera (`C#/Camera/`, namespace `TimeKiller.CameraSystem`)
-- **CameraFollow** — smooth-follow v1 (SmoothDamp in LateUpdate). Look-ahead/room-lock/shake planned. Tuning: `CameraConfig.asset`. Setup: menu `TimeKiller/Setup/10`.
+- **v2 = Cinemachine rig** (menu `TimeKiller/Setup/12`): `CM_PlayerCamera` (CinemachineCamera + PositionComposer + Confiner2D) follows the **CameraTarget** child of the Player. `CameraTargetDriver` drifts that child toward the direction the character faces (look-ahead). `CameraBounds` polygon hard-confines the view to the hall — extend its path (or add per-room bounds) when the map grows. `CinemachineConfigSync` pushes `CameraConfig.asset` values (view size, damping) into Cinemachine every frame — tune the ONE asset, in edit or play mode.
+- **CameraFollow** — legacy v1, kept on the Main Camera but disabled (fallback: disable CM objects, re-enable it). Setup: menu `TimeKiller/Setup/10`.
+- All knobs in `CameraConfig.asset`: viewSize (zoom 1.5–8), smoothTime, lookAheadDistance/Speed.
 
 ### Lighting & depth (`C#/Lighting/`, namespace `TimeKiller.Lighting`)
 - URP runs the **2D Renderer** (`URP_2DRenderer.asset`) with Y-axis transparency sorting: same-order sprites sort by world Y — lower on screen renders in front. Player and props share order 0 under SortingGroups, so walking behind/in front of objects just works.
