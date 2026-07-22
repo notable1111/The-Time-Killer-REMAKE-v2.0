@@ -102,6 +102,17 @@ The music IS the threat detector (interview 2026-07-23). One layer at a time, cr
 - **AudioConfig** (SO) — all track arrays, per-layer volumes, sting cooldowns, crossfade time, safe-zone rects. Asset: `C#/Audio/Configs/`.
 - Tracks: PSX Horror Music pack (royalty-free, credited). Setup: menu `TimeKiller/Setup/24` (also run by Setup/18).
 
+### Hiding (`C#/Hiding/`, namespace `TimeKiller.Hiding`) — the last verb of hide & run
+Design (interview 2026-07-23): **E** to enter/exit a wardrobe; **the Outlast rule** — hiding only works if he didn't see you enter; darkened slat view + proximity heartbeat while hidden.
+- **HidingSpot** — one wardrobe: occupied flag + closed/ajar sprite swap (ajar while empty — an invitation; shut while you're inside).
+- **PlayerHiding** (+ its `HidingState` for the player state machine) — E near a free spot parks the player at it: invisible, intangible, motionless; E again (or a landed hit — the drag-out) exits at the entry position. Publishes `PlayerHidEvent` / `PlayerUnhidEvent`.
+- **Maniac side:** `ManiacPerception.PlayerHidden` blinds sight while hidden; `ManiacController.CompromisedSpot` — if he had eyes on the player within `seenEnterWindow` (ManiacConfig, 1.25s) before they hid, he marches to the spot and drags a hit out (ChaseState/AttackState ignore sight rules for a compromised spot).
+- **HidingVfx** — screen-space slat overlay (self-made texture, door-crack slit in the middle) + proximity heartbeat: BPM 60→140 and volume scale with the maniac's distance to the wardrobe. Presentation only.
+- **HidingConfig** (SO) — interact range, overlay alpha/fade, heartbeat range/BPM/volume.
+- Art: AI-generated wardrobes (approved 2026-07-23) — style A flat-top (hall/guardroom/kitchen), style B gothic crown (chapel/great chamber/library), closed+ajar states each, in `Assets/Resources/Assets/Hiding/`. Six spots placed along north walls.
+- Fix that rode along: `PlayerAnimationDriver.IsMovingState` is now an explicit Walk/Run list — unknown states (Hiding) no longer play run-clip frame events that would publish phantom footstep noise.
+- Setup: menu `TimeKiller/Setup/25` (also run by Setup/18).
+
 ## Planned
 
 - `Player` — sanity

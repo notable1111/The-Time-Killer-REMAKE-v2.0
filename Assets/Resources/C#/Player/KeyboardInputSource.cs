@@ -10,11 +10,13 @@ namespace TimeKiller.Player
     {
         public Vector2 MoveInput { get; private set; }
         public bool RunHeld { get; private set; }
+        public bool InteractPressed { get; private set; }
 
         void Update()
         {
             var kb = Keyboard.current;
-            if (kb == null) { MoveInput = Vector2.zero; RunHeld = false; return; }
+            if (kb == null) { MoveInput = Vector2.zero; RunHeld = false; InteractPressed = false; return; }
+            InteractPressed = kb.eKey.wasPressedThisFrame;
 
             var move = new Vector2(
                 (kb.dKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed ? 1f : 0f),

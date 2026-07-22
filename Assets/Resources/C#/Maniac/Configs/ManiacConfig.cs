@@ -44,6 +44,10 @@ namespace TimeKiller.Maniac
         [Tooltip("Brief swing recovery before he resumes the chase — just enough to read the attack.")]
         public float attackRecoverySeconds = 0.35f;
 
+        [Header("Hiding (the Outlast rule)")]
+        [Tooltip("If he had eyes on the player within this many seconds before they hid, the spot is compromised — he walks up and drags a hit out of it.")]
+        public float seenEnterWindow = 1.25f;
+
         [Header("Body")]
         [Tooltip("Rigidbody mass. Heavy on purpose: the player must NOT be able to push him around.")]
         public float bodyMass = 400f;

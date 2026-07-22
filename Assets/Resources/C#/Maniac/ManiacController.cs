@@ -32,6 +32,10 @@ namespace TimeKiller.Maniac
         /// Next Time.time a swing is allowed — chase keeps running in between.
         public float NextAttackAllowed { get; set; }
 
+        /// The Outlast rule: set when the player hides while he had recent eyes
+        /// on them — he marches to this spot and drags a hit out of it.
+        public Vector2? CompromisedSpot { get; private set; }
+
         readonly StateMachine stateMachine = new StateMachine();
         Transform player;
         Collider2D ownCollider;
@@ -85,6 +89,9 @@ namespace TimeKiller.Maniac
             var controller = Object.FindAnyObjectByType<PlayerController>();
             if (controller != null) player = controller.transform;
 
+            EventBus.Subscribe<TimeKiller.Hiding.PlayerHidEvent>(OnPlayerHid);
+            EventBus.Subscribe<TimeKiller.Hiding.PlayerUnhidEvent>(OnPlayerUnhid);
+
             stateMachine.ChangeState(Patrol);
             DebugOverlay.Watch("Maniac", () => stateMachine.Current?.GetType().Name ?? "none");
             DebugOverlay.Watch("Maniac Sees", () => Perception.CanSeePlayer ? "PLAYER!" : "-");
@@ -118,8 +125,22 @@ namespace TimeKiller.Maniac
         void OnDestroy()
         {
             stateMachine.StateChanged -= OnStateChanged;
+            EventBus.Unsubscribe<TimeKiller.Hiding.PlayerHidEvent>(OnPlayerHid);
+            EventBus.Unsubscribe<TimeKiller.Hiding.PlayerUnhidEvent>(OnPlayerUnhid);
             DebugOverlay.Unwatch("Maniac");
             DebugOverlay.Unwatch("Maniac Sees");
         }
+
+        void OnPlayerHid(TimeKiller.Hiding.PlayerHidEvent evt)
+        {
+            // Saw them within the window? Then hiding fools nobody.
+            if (Perception.TimeSinceSeen <= config.seenEnterWindow)
+            {
+                CompromisedSpot = evt.SpotPosition;
+                ChangeState(Chase);
+            }
+        }
+
+        void OnPlayerUnhid(TimeKiller.Hiding.PlayerUnhidEvent evt) => CompromisedSpot = null;
     }
 }

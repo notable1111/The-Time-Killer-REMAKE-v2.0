@@ -9,5 +9,6 @@ namespace TimeKiller.Player
     {
         Vector2 MoveInput { get; } // normalized direction, zero when no input
         bool RunHeld { get; }
+        bool InteractPressed { get; } // true on the frame the interact key goes down (E)
     }
 }

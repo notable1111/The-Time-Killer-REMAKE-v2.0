@@ -2,6 +2,16 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-23 — HIDING: wardrobes complete the hide & run loop
+
+- **Hiding** (`C#/Hiding`, Setup/25): press **E** near a wardrobe to slip in (invisible, intangible, doors shut behind you), E to step out. While hidden: dark slat overlay with a door-crack view + your heartbeat scales with his distance (60→140 BPM as he approaches — you HEAR how close he is).
+- **The Outlast rule:** while hidden his sight can't find you — but if he had eyes on you within 1.25s of entering (`ManiacConfig.seenEnterWindow`), the spot is compromised: he marches to the wardrobe and drags a hit out of it (auto-eject into your shove/adrenaline/ghost-through escape kit).
+- **Hidden camera:** the room confiner releases while hidden so the wardrobe is ALWAYS dead-center (fixes the off-center view the user caught); restores seamlessly on exit.
+- Art: AI-generated wardrobes per the approved pipeline — style A flat-top + style B gothic crown, closed/ajar states, processed to 32×48 px in the RF Castle palette. Six spots seeded across the wing.
+- **⚠️ Placement is HAND-TUNED territory:** the user drags wardrobes where he wants them — Setup/25 PRESERVES an existing HidingSpots object (rewires player/VFX only). Same protection class as the hall colliders. (One user position restored at 1.67/9.6; the rest re-placed by hand after an overwrite mistake — rule now enforced in code.)
+- Interact input added to IInputSource (E) — the seed of the future doors/items interaction system. Fix: unknown player states no longer emit phantom footstep noise (explicit Walk/Run animation gate).
+- New F1 overlay line: "Hide" (state + nearest wardrobe distance). Playtested: hide/exit, centered view, spot occupancy, maniac blindness while hidden.
+
 ## 2026-07-23 — Audio tension radar: the music is the threat detector
 
 - **AudioDirector** (`C#/Audio`, Setup/24): one crossfading music layer at a time, priority Safe > Chase > Tense > Calm, driven purely by bus events. Patrol→Calm (5 creepy ambiences), Investigate→Tense (4 tracks), Chase/Attack→Chase (3 tracks, random per chase). The servant passage plays the safe-room theme when not actively chased (safe zones = config rects).

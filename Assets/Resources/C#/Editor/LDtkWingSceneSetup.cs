@@ -76,6 +76,7 @@ namespace TimeKiller.EditorTools
             TimeKiller.HealthVfx.EditorTools.HealthVfxSetup.Build();  // screen-blood health presentation
             TimeKiller.Effects.EditorTools.EffectsSetup.Build();      // effect recipes (hit/death juice)
             TimeKiller.Audio.EditorTools.AudioSetup.Build();          // tension-radar music + stings
+            TimeKiller.Hiding.EditorTools.HidingSetup.Build();        // wardrobes + hidden view
             var player = Object.FindAnyObjectByType<PlayerController>();
             if (player != null)
             {

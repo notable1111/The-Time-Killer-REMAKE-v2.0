@@ -19,7 +19,10 @@ namespace TimeKiller.Player
         string currentState = nameof(IdleState);
         FacingDirection facing = FacingDirection.Down;
 
-        public bool IsMovingState => currentState != nameof(IdleState);
+        // Explicit list — unknown states (Hiding, future Stunned…) must count as
+        // NOT moving, or their run-clip frame events would publish phantom
+        // footstep noise for the maniac to hear.
+        public bool IsMovingState => currentState == nameof(WalkState) || currentState == nameof(RunState);
         public bool IsRunningState => currentState == nameof(RunState);
 
         void Awake()

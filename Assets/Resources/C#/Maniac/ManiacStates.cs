@@ -111,6 +111,21 @@ namespace TimeKiller.Maniac
             var config = maniac.Config;
             var perception = maniac.Perception;
 
+            // Compromised wardrobe: he watched them hide — march to the spot
+            // and drag the hit out. Sight rules don't apply to a known spot.
+            if (maniac.CompromisedSpot.HasValue)
+            {
+                var spot = maniac.CompromisedSpot.Value;
+                if (Time.time >= maniac.NextAttackAllowed &&
+                    Vector2.Distance(maniac.Motor.Position, spot) <= config.attackRange)
+                {
+                    maniac.ChangeState(maniac.Attack);
+                    return;
+                }
+                maniac.Motor.MoveTo(spot, config.chaseSpeed);
+                return;
+            }
+
             if (perception.CanSeePlayer)
                 maniac.Breadcrumbs.Record(perception.LastSeenPosition);
 

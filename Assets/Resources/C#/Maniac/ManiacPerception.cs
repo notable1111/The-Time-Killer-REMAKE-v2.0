@@ -4,6 +4,7 @@
 // linecast that walls block. States read the flags; this component never
 // drives movement itself.
 using TimeKiller.Core;
+using TimeKiller.Hiding;
 using TimeKiller.Player;
 using UnityEngine;
 
@@ -13,6 +14,9 @@ namespace TimeKiller.Maniac
     {
         ManiacConfig config;
         Transform player;
+
+        /// True while the player is inside a hiding spot — sight can't find them.
+        public bool PlayerHidden { get; private set; }
 
         public bool CanSeePlayer { get; private set; }
         public Vector2 LastSeenPosition { get; private set; }
@@ -25,9 +29,19 @@ namespace TimeKiller.Maniac
         {
             config = maniacConfig;
             EventBus.Subscribe<PlayerFootstepEvent>(OnFootstep);
+            EventBus.Subscribe<PlayerHidEvent>(OnPlayerHid);
+            EventBus.Subscribe<PlayerUnhidEvent>(OnPlayerUnhid);
         }
 
-        void OnDestroy() => EventBus.Unsubscribe<PlayerFootstepEvent>(OnFootstep);
+        void OnDestroy()
+        {
+            EventBus.Unsubscribe<PlayerFootstepEvent>(OnFootstep);
+            EventBus.Unsubscribe<PlayerHidEvent>(OnPlayerHid);
+            EventBus.Unsubscribe<PlayerUnhidEvent>(OnPlayerUnhid);
+        }
+
+        void OnPlayerHid(PlayerHidEvent evt) => PlayerHidden = true;
+        void OnPlayerUnhid(PlayerUnhidEvent evt) => PlayerHidden = false;
 
         /// Called by states when they start responding to the current noise.
         public void ConsumeNoise() => HasUnhandledNoise = false;
@@ -66,6 +80,7 @@ namespace TimeKiller.Maniac
 
         bool CheckSight()
         {
+            if (PlayerHidden) return false; // inside a wardrobe — eyes can't find you
             Vector2 toPlayer = player.position - transform.position;
             if (toPlayer.magnitude > config.sightRange) return false;
             if (Vector2.Angle(FacingDirection, toPlayer) > config.sightConeAngle * 0.5f) return false;
