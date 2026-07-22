@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 366b4d6931264ba41b7830e0f91c7c01, type: 3}
+  m_Name: HealthVfxConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.HealthVfx.HealthVfxConfig
+  subtleAtHp: 2
+  criticalAtHp: 1
+  vignetteColor: {r: 0.45, g: 0, b: 0, a: 1}
+  subtleVignette: 0.28
+  criticalVignette: 0.47
+  subtleOverlayAlpha: 0.35
+  criticalOverlayAlpha: 0.85
+  subtlePulseRate: 1.1
+  criticalPulseRate: 1.9
+  subtlePulseDepth: 0.18
+  criticalPulseDepth: 0.35
+  hitFlashAlpha: 0.9
+  hitFlashFade: 0.6
+  breathingVolume: 0.75
+  breathingFade: 1.2
+  transitionSharpness: 5

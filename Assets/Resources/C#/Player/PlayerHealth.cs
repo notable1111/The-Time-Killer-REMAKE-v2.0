@@ -42,6 +42,8 @@ namespace TimeKiller.Player
             DebugOverlay.Watch("Health", () => $"{Current}/{config?.maxHealth ?? 3}{(GodMode ? " (GOD)" : "")}");
             CheatHotkeys.RegisterCheat(UnityEngine.InputSystem.Key.F5, "God mode", () => GodMode = !GodMode);
             CheatHotkeys.RegisterCheat(UnityEngine.InputSystem.Key.F6, "Refill health", RefillFull);
+            CheatHotkeys.RegisterCheat(UnityEngine.InputSystem.Key.F7, "Take 1 hit", () =>
+                EventBus.Publish(new PlayerHitEvent { Damage = 1, SourcePosition = (Vector2)transform.position + Vector2.down }));
             PublishChanged();
         }
 

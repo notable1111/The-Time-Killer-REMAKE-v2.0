@@ -1,0 +1,3094 @@
+fileFormatVersion: 2
+guid: 103a563c5b5d0bb4b967e56d8ca40500
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8727816746817745307
+    second: band_critical_0
+  - first:
+      213: -9028787545975362932
+    second: band_critical_1
+  - first:
+      213: 3511003711468040801
+    second: band_critical_2
+  - first:
+      213: -6287336127847962075
+    second: band_critical_3
+  - first:
+      213: -3084021242664921873
+    second: band_critical_4
+  - first:
+      213: -4593269598931963653
+    second: band_critical_5
+  - first:
+      213: 8849817797432039220
+    second: band_critical_6
+  - first:
+      213: 8554434556448251097
+    second: band_critical_7
+  - first:
+      213: -7541337249053130539
+    second: band_critical_8
+  - first:
+      213: -7045992304616092356
+    second: band_critical_9
+  - first:
+      213: -9212270901513034739
+    second: band_critical_10
+  - first:
+      213: -9207525400408997728
+    second: band_critical_11
+  - first:
+      213: -7066454917668788984
+    second: band_critical_12
+  - first:
+      213: 7189247947363554229
+    second: band_critical_13
+  - first:
+      213: -2787387841090658957
+    second: band_critical_14
+  - first:
+      213: -4903870792782230490
+    second: band_critical_15
+  - first:
+      213: 3745745545054399606
+    second: band_critical_16
+  - first:
+      213: -2579592874544054966
+    second: band_critical_17
+  - first:
+      213: -1442842951314642436
+    second: band_critical_18
+  - first:
+      213: 3584785918911420408
+    second: band_critical_19
+  - first:
+      213: 9012264894078017730
+    second: band_critical_20
+  - first:
+      213: -8135381978168411048
+    second: band_critical_21
+  - first:
+      213: 7526612952513488686
+    second: band_critical_22
+  - first:
+      213: 5240295189615476001
+    second: band_critical_23
+  - first:
+      213: -9052218990196001799
+    second: band_critical_24
+  - first:
+      213: 5865825652003469983
+    second: band_critical_25
+  - first:
+      213: -1710720041843478632
+    second: band_critical_26
+  - first:
+      213: 3139074186067212939
+    second: band_critical_27
+  - first:
+      213: -4713025132263010515
+    second: band_critical_28
+  - first:
+      213: 6971445570859266191
+    second: band_critical_29
+  - first:
+      213: 3444869990447972261
+    second: band_critical_30
+  - first:
+      213: 7499775282979820924
+    second: band_critical_31
+  - first:
+      213: 8199978338254746577
+    second: band_critical_32
+  - first:
+      213: -4281338023455704195
+    second: band_critical_33
+  - first:
+      213: 702607618906094368
+    second: band_critical_34
+  - first:
+      213: -179673400681226602
+    second: band_critical_35
+  - first:
+      213: 1305385204371648694
+    second: band_critical_36
+  - first:
+      213: 6215928352343569057
+    second: band_critical_37
+  - first:
+      213: 154294095626793770
+    second: band_critical_38
+  - first:
+      213: -4270140388387857281
+    second: band_critical_39
+  - first:
+      213: 2415918455302728205
+    second: band_critical_40
+  - first:
+      213: 3886825673546220101
+    second: band_critical_41
+  - first:
+      213: 1222028781588390669
+    second: band_critical_42
+  - first:
+      213: 2710398950114854866
+    second: band_critical_43
+  - first:
+      213: 6148156302701102690
+    second: band_critical_44
+  - first:
+      213: -4407355475708701893
+    second: band_critical_45
+  - first:
+      213: 5925158087549744666
+    second: band_critical_46
+  - first:
+      213: -2383737427045795837
+    second: band_critical_47
+  - first:
+      213: -383731192112544961
+    second: band_critical_48
+  - first:
+      213: -7941269609301845184
+    second: band_critical_49
+  - first:
+      213: 8559001835325378205
+    second: band_critical_50
+  - first:
+      213: -7072854056347028436
+    second: band_critical_51
+  - first:
+      213: -878587949154451407
+    second: band_critical_52
+  - first:
+      213: -265312581424245222
+    second: band_critical_53
+  - first:
+      213: 5721524204434161680
+    second: band_critical_54
+  - first:
+      213: -247352235630175385
+    second: band_critical_55
+  - first:
+      213: 6212224633228033583
+    second: band_critical_56
+  - first:
+      213: 8471047317325573876
+    second: band_critical_57
+  - first:
+      213: -6921007012806173872
+    second: band_critical_58
+  - first:
+      213: 2234866649658498155
+    second: band_critical_59
+  - first:
+      213: 1653822083379151934
+    second: band_critical_60
+  - first:
+      213: 7792823329361898130
+    second: band_critical_61
+  - first:
+      213: -2732605272273097600
+    second: band_critical_62
+  - first:
+      213: -6853544068497592281
+    second: band_critical_63
+  - first:
+      213: -3757765761364986262
+    second: band_critical_64
+  - first:
+      213: 4237601220311014549
+    second: band_critical_65
+  - first:
+      213: -8601266539070442070
+    second: band_critical_66
+  - first:
+      213: 1861109538972480300
+    second: band_critical_67
+  - first:
+      213: -1265069279615053984
+    second: band_critical_68
+  - first:
+      213: 8249534580630222695
+    second: band_critical_69
+  - first:
+      213: -4843018680195721640
+    second: band_critical_70
+  - first:
+      213: -6328137203046676294
+    second: band_critical_71
+  - first:
+      213: 1721491297519129888
+    second: band_critical_72
+  - first:
+      213: 5892305158297804606
+    second: band_critical_73
+  - first:
+      213: 855590646441903424
+    second: band_critical_74
+  - first:
+      213: 4135188131909956810
+    second: band_critical_75
+  - first:
+      213: 3830425098612716911
+    second: band_critical_76
+  - first:
+      213: -2848328238317613568
+    second: band_critical_77
+  - first:
+      213: -7627522661850962200
+    second: band_critical_78
+  - first:
+      213: 2136348507395975245
+    second: band_critical_79
+  - first:
+      213: -7782983463347675902
+    second: band_critical_80
+  - first:
+      213: 8551762664640739257
+    second: band_critical_81
+  - first:
+      213: -8673985430853823205
+    second: band_critical_82
+  - first:
+      213: 8399996373338256336
+    second: band_critical_83
+  - first:
+      213: -6306791257574726725
+    second: band_critical_84
+  - first:
+      213: -1648497950658756857
+    second: band_critical_85
+  - first:
+      213: 398834068641974361
+    second: band_critical_86
+  - first:
+      213: 4588347527047997968
+    second: band_critical_87
+  - first:
+      213: -2912658464269458250
+    second: band_critical_88
+  - first:
+      213: -7109826211155408367
+    second: band_critical_89
+  - first:
+      213: 1584517583312338908
+    second: band_critical_90
+  - first:
+      213: -8089976527947447601
+    second: band_critical_91
+  - first:
+      213: -4705102019407145520
+    second: band_critical_92
+  - first:
+      213: -1323863566407270467
+    second: band_critical_93
+  - first:
+      213: 7066545145165825657
+    second: band_critical_94
+  - first:
+      213: 298025423905140823
+    second: band_critical_95
+  - first:
+      213: 6289130703653103677
+    second: band_critical_96
+  - first:
+      213: -5256970871199964329
+    second: band_critical_97
+  - first:
+      213: 5185922997131579859
+    second: band_critical_98
+  - first:
+      213: -1188156221018896606
+    second: band_critical_99
+  - first:
+      213: 45203491902092318
+    second: band_critical_100
+  - first:
+      213: -795075127283410436
+    second: band_critical_101
+  - first:
+      213: 3103825061260199394
+    second: band_critical_102
+  - first:
+      213: 4264927049811077656
+    second: band_critical_103
+  - first:
+      213: 4532983269180619950
+    second: band_critical_104
+  - first:
+      213: 5231469110563198879
+    second: band_critical_105
+  - first:
+      213: -8225194752858735657
+    second: band_critical_106
+  - first:
+      213: 9207916759767648238
+    second: band_critical_107
+  - first:
+      213: 9130646726811619020
+    second: band_critical_108
+  - first:
+      213: 1776837553604216614
+    second: band_critical_109
+  - first:
+      213: 8566983830907002487
+    second: band_critical_110
+  - first:
+      213: -684400772932963755
+    second: band_critical_111
+  - first:
+      213: -4126801889167997231
+    second: band_critical_112
+  - first:
+      213: 8346356207046958719
+    second: band_critical_113
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: band_critical_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 742
+        width: 594
+        height: 338
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b91f6cad61f6f1970800000000000000
+      internalID: 8727816746817745307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_1
+      rect:
+        serializedVersion: 2
+        x: 538
+        y: 1048
+        width: 71
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8aeaa1409d43b280800000000000000
+      internalID: -9028787545975362932
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_2
+      rect:
+        serializedVersion: 2
+        x: 577
+        y: 756
+        width: 451
+        height: 324
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1627123064799b030800000000000000
+      internalID: 3511003711468040801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_3
+      rect:
+        serializedVersion: 2
+        x: 994
+        y: 1035
+        width: 59
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52a642c7a15eeb8a0800000000000000
+      internalID: -6287336127847962075
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_4
+      rect:
+        serializedVersion: 2
+        x: 1032
+        y: 769
+        width: 441
+        height: 311
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe4d237050b5335d0800000000000000
+      internalID: -3084021242664921873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_5
+      rect:
+        serializedVersion: 2
+        x: 1040
+        y: 1063
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf03f0ec2ad6140c0800000000000000
+      internalID: -4593269598931963653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_6
+      rect:
+        serializedVersion: 2
+        x: 1046
+        y: 1056
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 437dddef56ed0da70800000000000000
+      internalID: 8849817797432039220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_7
+      rect:
+        serializedVersion: 2
+        x: 1423
+        y: 1048
+        width: 38
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9dc9c6fd7e477b670800000000000000
+      internalID: 8554434556448251097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_8
+      rect:
+        serializedVersion: 2
+        x: 1445
+        y: 881
+        width: 101
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d044ca4ab9c75790800000000000000
+      internalID: -7541337249053130539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_9
+      rect:
+        serializedVersion: 2
+        x: 1445
+        y: 1033
+        width: 44
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3dc839845b973e90800000000000000
+      internalID: -7045992304616092356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_10
+      rect:
+        serializedVersion: 2
+        x: 1467
+        y: 1060
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d04e5ac7c60772080800000000000000
+      internalID: -9212270901513034739
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_11
+      rect:
+        serializedVersion: 2
+        x: 1512
+        y: 651
+        width: 408
+        height: 429
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a04c309e6c483080800000000000000
+      internalID: -9207525400408997728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_12
+      rect:
+        serializedVersion: 2
+        x: 1046
+        y: 1055
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8052a0b21b8eeed90800000000000000
+      internalID: -7066454917668788984
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_13
+      rect:
+        serializedVersion: 2
+        x: 568
+        y: 1025
+        width: 14
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b39fc8fae655c360800000000000000
+      internalID: 7189247947363554229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_14
+      rect:
+        serializedVersion: 2
+        x: 579
+        y: 1040
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37d5c88d6853159d0800000000000000
+      internalID: -2787387841090658957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_15
+      rect:
+        serializedVersion: 2
+        x: 1014
+        y: 1030
+        width: 10
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62c4dcbee73f1fbb0800000000000000
+      internalID: -4903870792782230490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_16
+      rect:
+        serializedVersion: 2
+        x: 1015
+        y: 974
+        width: 54
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67c28f73abf8bf330800000000000000
+      internalID: 3745745545054399606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_17
+      rect:
+        serializedVersion: 2
+        x: 1414
+        y: 1029
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4d3ca7a2f1733cd0800000000000000
+      internalID: -2579592874544054966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_18
+      rect:
+        serializedVersion: 2
+        x: 1441
+        y: 1018
+        width: 15
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf9e634fafdf9fbe0800000000000000
+      internalID: -1442842951314642436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_19
+      rect:
+        serializedVersion: 2
+        x: 1504
+        y: 998
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f7998cdcc7bfb130800000000000000
+      internalID: 3584785918911420408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_20
+      rect:
+        serializedVersion: 2
+        x: 1521
+        y: 1005
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c06e311c2ff11d70800000000000000
+      internalID: 9012264894078017730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_21
+      rect:
+        serializedVersion: 2
+        x: 1007
+        y: 992
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85c3827a131591f80800000000000000
+      internalID: -8135381978168411048
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_22
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 937
+        width: 32
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e27ab644a96e37860800000000000000
+      internalID: 7526612952513488686
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_23
+      rect:
+        serializedVersion: 2
+        x: 1427
+        y: 979
+        width: 25
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12df73fe5b449b840800000000000000
+      internalID: 5240295189615476001
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_24
+      rect:
+        serializedVersion: 2
+        x: 559
+        y: 965
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f372540ace006280800000000000000
+      internalID: -9052218990196001799
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_25
+      rect:
+        serializedVersion: 2
+        x: 569
+        y: 965
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9a7a0e1a59976150800000000000000
+      internalID: 5865825652003469983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_26
+      rect:
+        serializedVersion: 2
+        x: 582
+        y: 967
+        width: 17
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89f27cb8f2d4248e0800000000000000
+      internalID: -1710720041843478632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_27
+      rect:
+        serializedVersion: 2
+        x: 1452
+        y: 952
+        width: 22
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8a7228375b309b20800000000000000
+      internalID: 3139074186067212939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_28
+      rect:
+        serializedVersion: 2
+        x: 1502
+        y: 960
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2f89f5ec98f79eb0800000000000000
+      internalID: -4713025132263010515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_29
+      rect:
+        serializedVersion: 2
+        x: 1519
+        y: 970
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8079067fcc8fb060800000000000000
+      internalID: 6971445570859266191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_30
+      rect:
+        serializedVersion: 2
+        x: 1524
+        y: 967
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5affd0e2103aecf20800000000000000
+      internalID: 3444869990447972261
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_31
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 951
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c75544562ed841860800000000000000
+      internalID: 7499775282979820924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_32
+      rect:
+        serializedVersion: 2
+        x: 1440
+        y: 957
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d372917adc2cc170800000000000000
+      internalID: 8199978338254746577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_33
+      rect:
+        serializedVersion: 2
+        x: 1517
+        y: 952
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7bbc8c40c1a594c0800000000000000
+      internalID: -4281338023455704195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_34
+      rect:
+        serializedVersion: 2
+        x: 1525
+        y: 962
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02b716528e920c900800000000000000
+      internalID: 702607618906094368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_35
+      rect:
+        serializedVersion: 2
+        x: 575
+        y: 942
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69e1fc87efba18df0800000000000000
+      internalID: -179673400681226602
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_36
+      rect:
+        serializedVersion: 2
+        x: 1453
+        y: 942
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b07f995de8ad1210800000000000000
+      internalID: 1305385204371648694
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_37
+      rect:
+        serializedVersion: 2
+        x: 1493
+        y: 946
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a2b7be27e9634650800000000000000
+      internalID: 6215928352343569057
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_38
+      rect:
+        serializedVersion: 2
+        x: 1512
+        y: 942
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2376c899a9242200800000000000000
+      internalID: 154294095626793770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_39
+      rect:
+        serializedVersion: 2
+        x: 1419
+        y: 926
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7cd711e0f96db4c0800000000000000
+      internalID: -4270140388387857281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_40
+      rect:
+        serializedVersion: 2
+        x: 1442
+        y: 931
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0a21a6f801178120800000000000000
+      internalID: 2415918455302728205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_41
+      rect:
+        serializedVersion: 2
+        x: 1445
+        y: 919
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54247975b57c0f530800000000000000
+      internalID: 3886825673546220101
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_42
+      rect:
+        serializedVersion: 2
+        x: 1516
+        y: 937
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0321e7c3b485f010800000000000000
+      internalID: 1222028781588390669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_43
+      rect:
+        serializedVersion: 2
+        x: 1452
+        y: 917
+        width: 12
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d7003d1c754d9520800000000000000
+      internalID: 2710398950114854866
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_44
+      rect:
+        serializedVersion: 2
+        x: 1457
+        y: 917
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 266041e3593a25550800000000000000
+      internalID: 6148156302701102690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_45
+      rect:
+        serializedVersion: 2
+        x: 1422
+        y: 894
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b339287cb8de5d2c0800000000000000
+      internalID: -4407355475708701893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_46
+      rect:
+        serializedVersion: 2
+        x: 1424
+        y: 900
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a167f6643e36a3250800000000000000
+      internalID: 5925158087549744666
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_47
+      rect:
+        serializedVersion: 2
+        x: 1437
+        y: 893
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 308b12f80734beed0800000000000000
+      internalID: -2383737427045795837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_48
+      rect:
+        serializedVersion: 2
+        x: 1428
+        y: 891
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3305ec8386bcaaf0800000000000000
+      internalID: -383731192112544961
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_49
+      rect:
+        serializedVersion: 2
+        x: 1434
+        y: 891
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04b55ff6d51fac190800000000000000
+      internalID: -7941269609301845184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_50
+      rect:
+        serializedVersion: 2
+        x: 639
+        y: 793
+        width: 40
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d9e4c7a52dea7c670800000000000000
+      internalID: 8559001835325378205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_51
+      rect:
+        serializedVersion: 2
+        x: 802
+        y: 796
+        width: 34
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c24314795bc28dd90800000000000000
+      internalID: -7072854056347028436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_52
+      rect:
+        serializedVersion: 2
+        x: 1099
+        y: 789
+        width: 70
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 130c5ba4ae0aec3f0800000000000000
+      internalID: -878587949154451407
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_53
+      rect:
+        serializedVersion: 2
+        x: 1386
+        y: 817
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1614c5ec9b615cf0800000000000000
+      internalID: -265312581424245222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_54
+      rect:
+        serializedVersion: 2
+        x: 798
+        y: 802
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 010091333ffe66f40800000000000000
+      internalID: 5721524204434161680
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_55
+      rect:
+        serializedVersion: 2
+        x: 1163
+        y: 809
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76b5dd4c37a319cf0800000000000000
+      internalID: -247352235630175385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_56
+      rect:
+        serializedVersion: 2
+        x: 1171
+        y: 801
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2efc70e361463650800000000000000
+      internalID: 6212224633228033583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_57
+      rect:
+        serializedVersion: 2
+        x: 1184
+        y: 805
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4fe67b057a43f8570800000000000000
+      internalID: 8471047317325573876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_58
+      rect:
+        serializedVersion: 2
+        x: 1239
+        y: 801
+        width: 13
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05b53b97ac4a3ff90800000000000000
+      internalID: -6921007012806173872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_59
+      rect:
+        serializedVersion: 2
+        x: 692
+        y: 799
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6c13458067d30f10800000000000000
+      internalID: 2234866649658498155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_60
+      rect:
+        serializedVersion: 2
+        x: 695
+        y: 797
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e34c2892c6e83f610800000000000000
+      internalID: 1653822083379151934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_61
+      rect:
+        serializedVersion: 2
+        x: 704
+        y: 794
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29a2ef7a78ba52c60800000000000000
+      internalID: 7792823329361898130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_62
+      rect:
+        serializedVersion: 2
+        x: 725
+        y: 799
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08c6dca9bf5d31ad0800000000000000
+      internalID: -2732605272273097600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_63
+      rect:
+        serializedVersion: 2
+        x: 1085
+        y: 788
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72037b83bf153e0a0800000000000000
+      internalID: -6853544068497592281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_64
+      rect:
+        serializedVersion: 2
+        x: 730
+        y: 780
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a66f6b413fbb9dbc0800000000000000
+      internalID: -3757765761364986262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_65
+      rect:
+        serializedVersion: 2
+        x: 754
+        y: 781
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59c566cabdbfeca30800000000000000
+      internalID: 4237601220311014549
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_66
+      rect:
+        serializedVersion: 2
+        x: 777
+        y: 786
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa5b04877a922a880800000000000000
+      internalID: -8601266539070442070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_67
+      rect:
+        serializedVersion: 2
+        x: 796
+        y: 780
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c23bb8ed34df3d910800000000000000
+      internalID: 1861109538972480300
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_68
+      rect:
+        serializedVersion: 2
+        x: 797
+        y: 787
+        width: 13
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06f094c5132917ee0800000000000000
+      internalID: -1265069279615053984
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_69
+      rect:
+        serializedVersion: 2
+        x: 1208
+        y: 784
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 767f3c04efb3c7270800000000000000
+      internalID: 8249534580630222695
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_70
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 764
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8565a567b242accb0800000000000000
+      internalID: -4843018680195721640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_71
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 752
+        width: 21
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab80872edb0fd28a0800000000000000
+      internalID: -6328137203046676294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_72
+      rect:
+        serializedVersion: 2
+        x: 61
+        y: 764
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 025dd88d637f3e710800000000000000
+      internalID: 1721491297519129888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_73
+      rect:
+        serializedVersion: 2
+        x: 730
+        y: 761
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3fda8c925ca5c150800000000000000
+      internalID: 5892305158297804606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_74
+      rect:
+        serializedVersion: 2
+        x: 791
+        y: 770
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 045015ae82bafdb00800000000000000
+      internalID: 855590646441903424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_75
+      rect:
+        serializedVersion: 2
+        x: 818
+        y: 773
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac477e162b3236930800000000000000
+      internalID: 4135188131909956810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_76
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 743
+        width: 24
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f653d8d2557682530800000000000000
+      internalID: 3830425098612716911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_77
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 748
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00e4d5fee84b878d0800000000000000
+      internalID: -2848328238317613568
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_78
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 752
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e6a1282d88952690800000000000000
+      internalID: -7627522661850962200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_79
+      rect:
+        serializedVersion: 2
+        x: 182
+        y: 738
+        width: 21
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d48e5cb06a5d5ad10800000000000000
+      internalID: 2136348507395975245
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_80
+      rect:
+        serializedVersion: 2
+        x: 786
+        y: 753
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20d1c6ea6c94df390800000000000000
+      internalID: -7782983463347675902
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_81
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 374
+        width: 209
+        height: 372
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b7fb5595d6fda670800000000000000
+      internalID: 8551762664640739257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_82
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 738
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b155b071530df9780800000000000000
+      internalID: -8673985430853823205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_83
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 741
+        width: 13
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d3756b4238c29470800000000000000
+      internalID: 8399996373338256336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_84
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 732
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb328bb14c6c978a0800000000000000
+      internalID: -6306791257574726725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_85
+      rect:
+        serializedVersion: 2
+        x: 60
+        y: 741
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70f760619db5f19e0800000000000000
+      internalID: -1648497950658756857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_86
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 735
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9588ab9e871f88500800000000000000
+      internalID: 398834068641974361
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_87
+      rect:
+        serializedVersion: 2
+        x: 1742
+        y: 650
+        width: 100
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01aecb704c51daf30800000000000000
+      internalID: 4588347527047997968
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_88
+      rect:
+        serializedVersion: 2
+        x: 1621
+        y: 617
+        width: 92
+        height: 69
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b42f250f882497d0800000000000000
+      internalID: -2912658464269458250
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_89
+      rect:
+        serializedVersion: 2
+        x: 1742
+        y: 679
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11a025dfab2d45d90800000000000000
+      internalID: -7109826211155408367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_90
+      rect:
+        serializedVersion: 2
+        x: 1828
+        y: 657
+        width: 56
+        height: 73
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cdf31bdc8565df510800000000000000
+      internalID: 1584517583312338908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_91
+      rect:
+        serializedVersion: 2
+        x: 1879
+        y: 669
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc2c17ad531aabf80800000000000000
+      internalID: -8089976527947447601
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_92
+      rect:
+        serializedVersion: 2
+        x: 1810
+        y: 648
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d5934d54ae14beb0800000000000000
+      internalID: -4705102019407145520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_93
+      rect:
+        serializedVersion: 2
+        x: 1882
+        y: 640
+        width: 27
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbf7639b911b0ade0800000000000000
+      internalID: -1323863566407270467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_94
+      rect:
+        serializedVersion: 2
+        x: 1902
+        y: 655
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 976cede8e59611260800000000000000
+      internalID: 7066545145165825657
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_95
+      rect:
+        serializedVersion: 2
+        x: 1908
+        y: 654
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 750b6e54b8cc22400800000000000000
+      internalID: 298025423905140823
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_96
+      rect:
+        serializedVersion: 2
+        x: 1911
+        y: 660
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d38ee31cd0b774750800000000000000
+      internalID: 6289130703653103677
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_97
+      rect:
+        serializedVersion: 2
+        x: 1651
+        y: 350
+        width: 269
+        height: 304
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 753ec8368dc7b07b0800000000000000
+      internalID: -5256970871199964329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_98
+      rect:
+        serializedVersion: 2
+        x: 1830
+        y: 649
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d19e8c5d7918f740800000000000000
+      internalID: 5185922997131579859
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_99
+      rect:
+        serializedVersion: 2
+        x: 1598
+        y: 578
+        width: 39
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2278f7c4632d28fe0800000000000000
+      internalID: -1188156221018896606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_100
+      rect:
+        serializedVersion: 2
+        x: 1631
+        y: 608
+        width: 44
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e147e6d165890a000800000000000000
+      internalID: 45203491902092318
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_101
+      rect:
+        serializedVersion: 2
+        x: 1657
+        y: 568
+        width: 28
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf9168c526357f4f0800000000000000
+      internalID: -795075127283410436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_102
+      rect:
+        serializedVersion: 2
+        x: 1638
+        y: 545
+        width: 18
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e58e5dc270031b20800000000000000
+      internalID: 3103825061260199394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_103
+      rect:
+        serializedVersion: 2
+        x: 1666
+        y: 549
+        width: 33
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81aa1f42e80103b30800000000000000
+      internalID: 4264927049811077656
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_104
+      rect:
+        serializedVersion: 2
+        x: 1656
+        y: 507
+        width: 42
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eacbc4c344468ee30800000000000000
+      internalID: 4532983269180619950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_105
+      rect:
+        serializedVersion: 2
+        x: 1687
+        y: 538
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f975c844079e99840800000000000000
+      internalID: 5231469110563198879
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_106
+      rect:
+        serializedVersion: 2
+        x: 1595
+        y: 471
+        width: 62
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7dbb27383fc3add80800000000000000
+      internalID: -8225194752858735657
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_107
+      rect:
+        serializedVersion: 2
+        x: 1659
+        y: 518
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee70153e18719cf70800000000000000
+      internalID: 9207916759767648238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_108
+      rect:
+        serializedVersion: 2
+        x: 1661
+        y: 520
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cce803162d296be70800000000000000
+      internalID: 9130646726811619020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_109
+      rect:
+        serializedVersion: 2
+        x: 1669
+        y: 513
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6274726475898a810800000000000000
+      internalID: 1776837553604216614
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_110
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 425
+        width: 15
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77e1ab5876a04e670800000000000000
+      internalID: 8566983830907002487
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_111
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 411
+        width: 19
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 552f3558f158086f0800000000000000
+      internalID: -684400772932963755
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_112
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 403
+        width: 23
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d60bb9eb87aab6c0800000000000000
+      internalID: -4126801889167997231
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: band_critical_113
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1920
+        height: 421
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7e19e9dfb634d370800000000000000
+      internalID: 8346356207046958719
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      band_critical_0: 8727816746817745307
+      band_critical_1: -9028787545975362932
+      band_critical_10: -9212270901513034739
+      band_critical_100: 45203491902092318
+      band_critical_101: -795075127283410436
+      band_critical_102: 3103825061260199394
+      band_critical_103: 4264927049811077656
+      band_critical_104: 4532983269180619950
+      band_critical_105: 5231469110563198879
+      band_critical_106: -8225194752858735657
+      band_critical_107: 9207916759767648238
+      band_critical_108: 9130646726811619020
+      band_critical_109: 1776837553604216614
+      band_critical_11: -9207525400408997728
+      band_critical_110: 8566983830907002487
+      band_critical_111: -684400772932963755
+      band_critical_112: -4126801889167997231
+      band_critical_113: 8346356207046958719
+      band_critical_12: -7066454917668788984
+      band_critical_13: 7189247947363554229
+      band_critical_14: -2787387841090658957
+      band_critical_15: -4903870792782230490
+      band_critical_16: 3745745545054399606
+      band_critical_17: -2579592874544054966
+      band_critical_18: -1442842951314642436
+      band_critical_19: 3584785918911420408
+      band_critical_2: 3511003711468040801
+      band_critical_20: 9012264894078017730
+      band_critical_21: -8135381978168411048
+      band_critical_22: 7526612952513488686
+      band_critical_23: 5240295189615476001
+      band_critical_24: -9052218990196001799
+      band_critical_25: 5865825652003469983
+      band_critical_26: -1710720041843478632
+      band_critical_27: 3139074186067212939
+      band_critical_28: -4713025132263010515
+      band_critical_29: 6971445570859266191
+      band_critical_3: -6287336127847962075
+      band_critical_30: 3444869990447972261
+      band_critical_31: 7499775282979820924
+      band_critical_32: 8199978338254746577
+      band_critical_33: -4281338023455704195
+      band_critical_34: 702607618906094368
+      band_critical_35: -179673400681226602
+      band_critical_36: 1305385204371648694
+      band_critical_37: 6215928352343569057
+      band_critical_38: 154294095626793770
+      band_critical_39: -4270140388387857281
+      band_critical_4: -3084021242664921873
+      band_critical_40: 2415918455302728205
+      band_critical_41: 3886825673546220101
+      band_critical_42: 1222028781588390669
+      band_critical_43: 2710398950114854866
+      band_critical_44: 6148156302701102690
+      band_critical_45: -4407355475708701893
+      band_critical_46: 5925158087549744666
+      band_critical_47: -2383737427045795837
+      band_critical_48: -383731192112544961
+      band_critical_49: -7941269609301845184
+      band_critical_5: -4593269598931963653
+      band_critical_50: 8559001835325378205
+      band_critical_51: -7072854056347028436
+      band_critical_52: -878587949154451407
+      band_critical_53: -265312581424245222
+      band_critical_54: 5721524204434161680
+      band_critical_55: -247352235630175385
+      band_critical_56: 6212224633228033583
+      band_critical_57: 8471047317325573876
+      band_critical_58: -6921007012806173872
+      band_critical_59: 2234866649658498155
+      band_critical_6: 8849817797432039220
+      band_critical_60: 1653822083379151934
+      band_critical_61: 7792823329361898130
+      band_critical_62: -2732605272273097600
+      band_critical_63: -6853544068497592281
+      band_critical_64: -3757765761364986262
+      band_critical_65: 4237601220311014549
+      band_critical_66: -8601266539070442070
+      band_critical_67: 1861109538972480300
+      band_critical_68: -1265069279615053984
+      band_critical_69: 8249534580630222695
+      band_critical_7: 8554434556448251097
+      band_critical_70: -4843018680195721640
+      band_critical_71: -6328137203046676294
+      band_critical_72: 1721491297519129888
+      band_critical_73: 5892305158297804606
+      band_critical_74: 855590646441903424
+      band_critical_75: 4135188131909956810
+      band_critical_76: 3830425098612716911
+      band_critical_77: -2848328238317613568
+      band_critical_78: -7627522661850962200
+      band_critical_79: 2136348507395975245
+      band_critical_8: -7541337249053130539
+      band_critical_80: -7782983463347675902
+      band_critical_81: 8551762664640739257
+      band_critical_82: -8673985430853823205
+      band_critical_83: 8399996373338256336
+      band_critical_84: -6306791257574726725
+      band_critical_85: -1648497950658756857
+      band_critical_86: 398834068641974361
+      band_critical_87: 4588347527047997968
+      band_critical_88: -2912658464269458250
+      band_critical_89: -7109826211155408367
+      band_critical_9: -7045992304616092356
+      band_critical_90: 1584517583312338908
+      band_critical_91: -8089976527947447601
+      band_critical_92: -4705102019407145520
+      band_critical_93: -1323863566407270467
+      band_critical_94: 7066545145165825657
+      band_critical_95: 298025423905140823
+      band_critical_96: 6289130703653103677
+      band_critical_97: -5256970871199964329
+      band_critical_98: 5185922997131579859
+      band_critical_99: -1188156221018896606
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

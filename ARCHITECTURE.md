@@ -80,6 +80,14 @@ The killer. Design (interview 2026-07-22): hearing+sight hybrid, patrols the win
 - **ManiacConfig** (SO) — every tunable: speeds, hearing radius, sight range/cone, lose-sight seconds (the balancing valve), attack damage/range/cooldown, patrol pacing. Asset: `C#/Maniac/Configs/ManiacConfig.asset`.
 - Scene setup: menu `TimeKiller/Setup/20 - Create Maniac In Scene` — REFUSES to run without the Nightmare Slashers pack under `Outsource/NightmareSlashers` (no invisible enemies / no placeholder art). Animation slicing pass comes once the killer look is picked from the pack.
 
+### Health VFX (`C#/HealthVfx/`, namespace `TimeKiller.HealthVfx`)
+Diegetic health — no HP bar, the screen is the health bar (design 2026-07-22). Bands on 3 HP: **3 = clean · 2 = subtle red heartbeat vignette · 1 = heavy blood + panicked breathing = "next hit kills"**, plus a splatter flash on every hit.
+- **HealthVfxDirector** — subscribes `PlayerHealthChangedEvent`/`PlayerHitEvent`/`PlayerDiedEvent` only (knows nothing about player/maniac; delete the object and the game runs unchanged). One BPM phase clock (74 at 2 HP, 118 at 1 HP) drives EVERYTHING in sync: URP Vignette + Chromatic Aberration (|sin|³ systole modulation), dual counter-pulsing blood layers with scale-breath, film grain + desaturation ramps, and the lub-dub SFX fired on the exact visual systole frame. Hits: splatter flash (scale punch) + Cinemachine impulse shake + pitch-jittered blood-splash SFX; death: impact sting; critical: breathing loop fade.
+- **HealthVfxConfig** (SO) — band thresholds, per-band vignette/overlay/chromatic/grain/desat, BPM + pulse depths + heart volumes, hit/death SFX levels, shake/punch, fades. Asset: `C#/HealthVfx/Configs/`.
+- Assets: OpenGameArt CC0 blood overlays reprocessed by `Tools/VfxPipeline/process_blood.py` (radial edge mask, two-tone crimson); heartbeat synthesized by `Tools/VfxPipeline/gen_heartbeat.py` (S1/S2 physiological model, license-free); breathing/splash/impact from the PSX SFX pack.
+- Setup: menu `TimeKiller/Setup/22` (also run by Setup/18). Dev cheat: **F7 = take 1 hit** (respects i-frames).
+- Camera note: `CameraConfig.lookAheadDistance` set to **0** (user decision 2026-07-22) — player stays dead-center; the look-ahead system remains available via the slider.
+
 ## Planned
 
 - `Player` — sanity

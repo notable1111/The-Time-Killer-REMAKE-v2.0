@@ -73,6 +73,7 @@ namespace TimeKiller.EditorTools
             PlayerFootstepSetup.Setup();
             BlobShadowSetup.AddShadow();
             TimeKiller.Player.EditorTools.PlayerHealthSetup.Setup();  // 3 HP + cheat hotkeys
+            TimeKiller.HealthVfx.EditorTools.HealthVfxSetup.Build();  // screen-blood health presentation
             var player = Object.FindAnyObjectByType<PlayerController>();
             if (player != null)
             {

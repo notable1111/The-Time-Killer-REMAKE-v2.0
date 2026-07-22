@@ -27,3 +27,6 @@ A 2.5D survival-horror game built in **Unity 6000.4.10f1**.
 - Maniac (killer enemy): [Maranza — TopDown Horror Pixel Art Characters Sprites](https://maranza.itch.io/assets) (free, credit required — commercial use author-approved)
 - Previous dev character: [xzany — Adventurer 2D Top-Down](https://xzany.itch.io/top-down-adventurer-character) (kept in Outsource as fallback)
 - Footstep sounds: [Kenney — RPG Audio](https://kenney.nl/assets/rpg-audio) (CC0)
+- Horror SFX: [pabloalegria9 — Horror PSX Music & FX](https://pabloalegria9.itch.io/psxhorrorpack) (royalty-free)
+- Horror music (chase/ambience/safe-room): [pabloalegria9 — PSX Horror Music Pack](https://pabloalegria9.itch.io/30freemusicpack) (royalty-free)
+- Ambience (EVALUATION ONLY — license unverified, see LICENSE-UNVERIFIED.txt): [Echo Chambers — Free Horror Ambience & SFX](https://echochamberworks.itch.io/free-horror-ambience-sfx-sample-pack-echo-chambers)

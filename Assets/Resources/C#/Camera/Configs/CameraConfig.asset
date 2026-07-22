@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.CameraSystem.CameraConfig
   viewSize: 3.37
   smoothTime: 0.18
+  lookAheadDistance: 0
+  lookAheadSpeed: 2.5

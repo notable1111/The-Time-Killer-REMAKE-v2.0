@@ -1,0 +1,2 @@
+﻿blood_overlay_light.png: 'Blood overlay' via OpenGameArt (CC0, public domain)
+health overlay set: 'Health Overlay Images' by GreyFrogGames via OpenGameArt (CC0)

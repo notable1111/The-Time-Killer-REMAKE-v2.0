@@ -2,6 +2,16 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-22 (later) — Health VFX: the screen IS the health bar + audio stash + centered camera
+
+- **HealthVfx** (`C#/HealthVfx`, Setup/22): diegetic health, no UI. Bands: 3 HP clean · 2 HP subtle edge blood + red vignette · 1 HP heavy blood + desaturation + breathing = "next hit kills". Every hit: blood splatter flash (slams in at 118% scale) + Cinemachine camera shake + blood-splash SFX (pitch-jittered); death: impact sting.
+- **Audio-visual heartbeat, one clock:** synthesized lub-dub (S1/S2 physiological model, `Tools/VfxPipeline/gen_heartbeat.py` — license-free) fires on the exact frame the visual systole peaks. Real BPM: 74 at 2 HP, 118 (tachycardia) at 1 HP. Dual blood layers counter-pulse with a 3% scale-breath; chromatic aberration + film grain ramp with the bands.
+- Blood textures: OpenGameArt CC0, reprocessed via `Tools/VfxPipeline/process_blood.py` — radial edge mask (center stays playable), two-tone wet crimson.
+- **Audio packs stashed** (`Outsource/Audio`): PSX Horror SFX + PSX Horror Music (both royalty-free, credited) and Echo Chambers ambience (**evaluation only** — license unverified, warning file inside; do not ship its sounds).
+- **Camera centered:** CameraConfig lookAheadDistance 1.1 → 0 per user decision — the player now sits dead-center; look-ahead can return via the slider anytime.
+- Cheat: F7 = take 1 hit (respects i-frames) for stepping through bands.
+- Playtested (Claude, in-editor): band escalation, hit flash + shake, death cleanup, centered framing in all directions.
+
 ## 2026-07-22 (later) — THE MANIAC v1 + 3-point player health (first gameplay systems!)
 
 - **Maniac** (`C#/Maniac`, Setup/20+21): the killer is in the game — patrol/investigate/chase/attack state machine, hearing (footstep loudness × 9-unit radius — walk quiet, run loud), sight (7 units, 140° cone aimed by movement, walls block via filtered linecast), breadcrumb-trail chase (follows the player's path through doorways, zero pathfinding), chase 5.2 vs player run 4.5 (design choice: faster than run; balanced by the generous 2.5s lose-sight valve). Patrols the whole wing loop — the servant passage is deliberately his blind spot. All tunables in `ManiacConfig.asset`.
