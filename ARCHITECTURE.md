@@ -107,14 +107,21 @@ Design (interview 2026-07-23): **E** to enter/exit a wardrobe; **the Outlast rul
 - **HidingSpot** — one wardrobe: occupied flag + closed/ajar sprite swap (ajar while empty — an invitation; shut while you're inside).
 - **PlayerHiding** (+ its `HidingState` for the player state machine) — E near a free spot parks the player at it: invisible, intangible, motionless; E again (or a landed hit — the drag-out) exits at the entry position. Publishes `PlayerHidEvent` / `PlayerUnhidEvent`.
 - **Maniac side:** `ManiacPerception.PlayerHidden` blinds sight while hidden; `ManiacController.CompromisedSpot` — if he had eyes on the player within `seenEnterWindow` (ManiacConfig, 1.25s) before they hid, he marches to the spot and drags a hit out (ChaseState/AttackState ignore sight rules for a compromised spot).
-- **HidingVfx** — screen-space slat overlay (self-made texture, door-crack slit in the middle) + proximity heartbeat: BPM 60→140 and volume scale with the maniac's distance to the wardrobe. Presentation only.
-- **HidingConfig** (SO) — interact range, overlay alpha/fade, heartbeat range/BPM/volume.
-- Art: AI-generated wardrobes (approved 2026-07-23) — style A flat-top (hall/guardroom/kitchen), style B gothic crown (chapel/great chamber/library), closed+ajar states each, in `Assets/Resources/Assets/Hiding/`. Six spots placed along north walls.
+- **HidingVfx** — screen-space slat overlay (self-made texture, door-crack slit in the middle) + proximity heartbeat: BPM 60→140 and volume scale with the maniac's distance to the wardrobe. Presentation only. F1 overlay line `HideVfx` shows live dist/BPM/volume/slat for tuning.
+- **HidingConfig** (SO) — interact range, overlay alpha/fade, heartbeat range/BPM/volume. All fields are `[Range]` sliders read live every frame — tune in Play Mode (SO edits persist). interactRange raised to 2.2 (2026-07-23): it measures to the sprite CENTER, and 1.8 was borderline at the wardrobe's foot.
+- Art: AI-generated wardrobes (approved 2026-07-23) — style A flat-top (hall/guardroom/kitchen), style B gothic crown (chapel/great chamber/library), closed+ajar states each, in `Assets/Resources/Assets/Hiding/`. Seven spots: six original + armory (Setup/27, additive — refuses to run if the armory already has one).
 - Fix that rode along: `PlayerAnimationDriver.IsMovingState` is now an explicit Walk/Run list — unknown states (Hiding) no longer play run-clip frame events that would publish phantom footstep noise.
 - Setup: menu `TimeKiller/Setup/25` (also run by Setup/18).
+
+### Furniture (map v2 props, `FurnitureSetup.cs` in `C#/Editor/`)
+Lived-in dressing for the map-v2 rooms (interview 2026-07-23): kitchen 10 props, armory 9, library 10 (bookcase reused), 28 unique sprites in `Assets/Resources/Assets/Furniture/`.
+- **Mixed colliders (team decision):** big furniture gets a base-only BoxCollider2D (you collide with its feet, not its painted height); small dressing (stool, sacks, firewood, shield, globe...) is walk-through. Every prop: bottom-center pivot → Y-sorts with the player under a SortingGroup, unlit blob shadow child, Sprite-Lit material. The library candelabra carries a `FlickerLight2D` candle light.
+- **PROTECTED PLACEMENT** — same class as HidingSpots and the hall colliders: if a `Furniture` object exists, Setup/26 refuses to rebuild. The user drags props freely; full re-place = delete the object manually first.
+- **Art pipeline** (`Tools/ArtPipeline/process_props.py`): AI prop sheets (Recraft V4.1, RF-Castle palette hint, flat magenta key background) → magenta key-out → connected-component slicing → per-prop downscale to 16 PPU targets → quantize to the full 57-color RF Castle tileset palette → labeled contact sheet for approval. Per-room shadow-lift (`BRIGHTEN` gamma/gain) — kitchen ships lifted (0.78/1.18) after the first pass came out too murky.
+- Setup: menu `TimeKiller/Setup/26` (furniture) + `27` (armory wardrobe).
 
 ## Planned
 
 - `Player` — sanity
 - `Maniac` — animation set from Nightmare Slashers pack (slicing setup), hiding-spot interaction, de-aggro polish
-- Environment — darkness + player light (deferred by choice), AI furniture props for map v2 rooms
+- Environment — darkness + player light (deferred by choice)

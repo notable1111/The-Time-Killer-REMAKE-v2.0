@@ -21,6 +21,7 @@ namespace TimeKiller.Hiding
         float pulsePhase;
         int lastBeatIndex = -1;
         ManiacController maniac;
+        float liveBpm, liveVolume, liveDistance; // F1 readout for live tuning
 
         public void Init(HidingConfig hidingConfig) => config = hidingConfig;
 
@@ -29,6 +30,9 @@ namespace TimeKiller.Hiding
             overlay.alpha = 0f;
             EventBus.Subscribe<PlayerHidEvent>(OnHid);
             EventBus.Subscribe<PlayerUnhidEvent>(OnUnhid);
+            DebugOverlay.Watch("HideVfx", () => hidden
+                ? $"dist {liveDistance:0.0}/{(config != null ? config.heartbeatRange : 0f):0.0} bpm {liveBpm:0} vol {liveVolume:0.00} slat {overlay.alpha:0.00}"
+                : "not hidden");
         }
 
         void OnDestroy()
@@ -60,6 +64,7 @@ namespace TimeKiller.Hiding
             float closeness = 1f - Mathf.Clamp01(distance / Mathf.Max(0.1f, config.heartbeatRange));
             float bpm = Mathf.Lerp(config.farBpm, config.nearBpm, closeness);
             float volume = config.heartbeatMaxVolume * Mathf.Max(0.15f, closeness);
+            liveBpm = bpm; liveVolume = volume; liveDistance = distance;
 
             pulsePhase += (bpm / 60f) * Time.deltaTime;
             int beatIndex = Mathf.FloorToInt(pulsePhase + 0.5f);

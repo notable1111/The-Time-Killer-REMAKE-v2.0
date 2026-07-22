@@ -2,6 +2,15 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-23 — Map v2 furnished (100%) + hiding feel pass
+
+- **Furniture** (Setup/26): 28 AI-generated props dress the map-v2 rooms — kitchen (table, hearth w/ cauldron, shelf, chopping block, bench, barrel, firewood, sacks, crates, stool), armory (sword/spear racks, armor stand, shield, chest, anvil, training dummy, arrow barrel, grindstone), library (2 bookcase styles ×3, candle-lit desk, lectern, globe, tattered armchair, book stack, flickering candelabra, scroll table). Mixed colliders per team decision: big furniture blocks at its feet, small dressing is walk-through; all props Y-sort with the player + blob shadows.
+- **⚠️ Furniture placement is HAND-TUNED territory** (same rule as HidingSpots): Setup/26 refuses to rebuild an existing `Furniture` object — drag props freely.
+- **New art pipeline** `Tools/ArtPipeline/process_props.py`: room prop sheets (Recraft V4.1, magenta key bg, RF-palette hint) → key-out → component slicing → 16 PPU downscale → quantize to the RF Castle 57-color palette → approval contact sheet. Kitchen ships with a shadow-lift (gamma 0.78 / gain 1.18) after the first pass proved too murky. All 28 props user-approved before integration.
+- **Armory wardrobe** (Setup/27): the one room without a hiding spot got a WardrobeA, added WITHOUT touching the six hand-placed spots (menu is additive + idempotent). Hide & run now works across the whole map.
+- **Hiding feel pass:** every HidingConfig value is a real `[Range]` slider, read live each frame (tune in Play Mode, values persist); new F1 line `HideVfx: dist/bpm/vol/slat` for tuning sessions; interactRange 1.8 → 2.2 (measured to sprite center — 1.8 was borderline standing at the wardrobe's foot). Heartbeat/slat values await the user's ear-tuning session.
+- Playtested (Claude, in-editor): kitchen table blocks movement, armory wardrobe hide w/ live readout, library candelabra flickers, spawn restored, console clean. Known nit: kitchen crates/sacks lean reddish after palette quantize; kitchen wardrobe (hand-placed) is reachable only from the corridor side.
+
 ## 2026-07-23 — HIDING: wardrobes complete the hide & run loop
 
 - **Hiding** (`C#/Hiding`, Setup/25): press **E** near a wardrobe to slip in (invisible, intangible, doors shut behind you), E to step out. While hidden: dark slat overlay with a door-crack view + your heartbeat scales with his distance (60→140 BPM as he approaches — you HEAR how close he is).
