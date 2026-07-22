@@ -39,8 +39,16 @@ namespace TimeKiller.Maniac
         [Header("Attack")]
         public int damage = 1;
         public float attackRange = 0.9f;
-        [Tooltip("Seconds between swings — also the player's escape window after the shove.")]
+        [Tooltip("Minimum seconds between swings. He KEEPS CHASING during this — the player's escape comes from the post-hit adrenaline burst, not from him stopping (design 2026-07-23).")]
         public float attackCooldown = 1.6f;
+        [Tooltip("Brief swing recovery before he resumes the chase — just enough to read the attack.")]
+        public float attackRecoverySeconds = 0.35f;
+
+        [Header("Body")]
+        [Tooltip("Rigidbody mass. Heavy on purpose: the player must NOT be able to push him around.")]
+        public float bodyMass = 400f;
+        [Tooltip("After his hit lands the player can slip THROUGH him for this long — otherwise his unpushable body can pin a cornered player (design 2026-07-23). Collision restores once they separate.")]
+        public float phaseThroughSeconds = 2.5f;
 
         [Header("Patrol")]
         [Tooltip("How close to a waypoint counts as reached.")]

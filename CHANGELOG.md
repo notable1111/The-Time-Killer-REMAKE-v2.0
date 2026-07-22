@@ -2,6 +2,15 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-23 — Maniac v1.1: relentless chase + fair escape (playtest-driven)
+
+Three fixes from the user's playtest, one design: he never stops — but every hit hands you a real escape window.
+- **Unpushable:** body mass 1 → 400 (`ManiacConfig.bodyMass`) — the player can't shove him around; his own movement is unaffected (motor drives velocity directly).
+- **No more post-hit nap:** the old stand-still-through-cooldown is gone. Swing → 0.35s recovery (`attackRecoverySeconds`) → straight back to full-speed chase; the 1.6s swing cooldown now runs DURING the chase (gated in ChaseState).
+- **Adrenaline escape:** on being hit the player gets a 1.3× speed burst for 2.5s (`PlayerHealthConfig.adrenaline*`) — run 5.85 vs his 5.2: you outrun him briefly, he never stops coming.
+- **Ghost-through:** after his hit lands, player↔maniac collision is off for 2.5s (`phaseThroughSeconds`) — an unpushable body must never pin a cornered player; collision restores only once separated (no depenetration pop).
+- Playtested in-editor: chased through a death+respawn without pausing, speed readout 8.11 post-hit (shove+adrenaline), walked clean through his body from a corner.
+
 ## 2026-07-23 — CFXR effects integrated + teammate-checkout fix (Windows path limit)
 
 - **Cartoon FX Remaster Free integrated** (`Outsource/JMO Assets`, 66 prefabs, free): PlayerHit recipe now fires CFXR2 Blood (Directional), PlayerDeath uses CFXR2 Blood Shape Splash, and a NEW layered PlayerDeathSoul recipe releases a soul (CFXR2 Souls Escape) on death. Our hand-made BloodBurst remains the automatic fallback when CFXR is absent (Setup/23 logs a warning instead of breaking).

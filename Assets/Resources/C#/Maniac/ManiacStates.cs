@@ -114,8 +114,10 @@ namespace TimeKiller.Maniac
             if (perception.CanSeePlayer)
                 maniac.Breadcrumbs.Record(perception.LastSeenPosition);
 
-            // In range and visible -> swing.
+            // In range, visible, and off cooldown -> swing. During cooldown he
+            // KEEPS CHASING at full speed — no free pause for the player.
             if (perception.CanSeePlayer &&
+                Time.time >= maniac.NextAttackAllowed &&
                 Vector2.Distance(maniac.Motor.Position, perception.LastSeenPosition) <= config.attackRange)
             {
                 maniac.ChangeState(maniac.Attack);
@@ -138,10 +140,12 @@ namespace TimeKiller.Maniac
         public override void Exit() => maniac.Breadcrumbs.Clear();
     }
 
-    /// One swing: publish the hit, wait out the cooldown, then reassess.
+    /// One swing + a BRIEF recovery, then straight back to the chase. The
+    /// swing cooldown runs while chasing (gated in ChaseState) — he never
+    /// stands around; the player's escape is the post-hit adrenaline burst.
     public class AttackState : ManiacStateBase
     {
-        float cooldownUntil;
+        float recoverUntil;
         bool swung;
 
         public AttackState(ManiacController maniac) : base(maniac) { }
@@ -150,7 +154,8 @@ namespace TimeKiller.Maniac
         {
             maniac.Motor.Stop();
             swung = false;
-            cooldownUntil = Time.time + maniac.Config.attackCooldown;
+            recoverUntil = Time.time + maniac.Config.attackRecoverySeconds;
+            maniac.NextAttackAllowed = Time.time + maniac.Config.attackCooldown;
         }
 
         public override void Tick(float deltaTime)
@@ -160,14 +165,17 @@ namespace TimeKiller.Maniac
                 swung = true;
                 EventBus.Publish(new ManiacAttackEvent { Position = maniac.Motor.Position });
                 if (Vector2.Distance(maniac.Motor.Position, maniac.PlayerPosition) <= maniac.Config.attackRange * 1.25f)
+                {
                     EventBus.Publish(new TimeKiller.Player.PlayerHitEvent
                     {
                         Damage = maniac.Config.damage,
                         SourcePosition = maniac.Motor.Position,
                     });
+                    maniac.BeginPhaseThrough(); // shove + adrenaline + slip-through = the escape
+                }
             }
-            if (Time.time >= cooldownUntil)
-                maniac.ChangeState(maniac.Chase); // reassess: chase re-evaluates sight/give-up
+            if (Time.time >= recoverUntil)
+                maniac.ChangeState(maniac.Chase); // right back on the hunt
         }
     }
 }

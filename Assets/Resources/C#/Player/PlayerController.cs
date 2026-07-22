@@ -21,7 +21,19 @@ namespace TimeKiller.Player
         public WalkState Walk { get; private set; }
         public RunState Run { get; private set; }
 
+        /// Temporary speed factor (adrenaline after a hit). 1 = normal.
+        public float SpeedMultiplier => Time.time < boostUntil ? boostFactor : 1f;
+
         readonly StateMachine stateMachine = new StateMachine();
+        float boostFactor = 1f;
+        float boostUntil;
+
+        /// Called by PlayerHealth on hit: outrun-the-killer escape window.
+        public void SetSpeedBoost(float multiplier, float seconds)
+        {
+            boostFactor = multiplier;
+            boostUntil = Time.time + seconds;
+        }
 
         void Awake()
         {

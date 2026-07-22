@@ -38,7 +38,7 @@ namespace TimeKiller.Player
             var move = player.Input.MoveInput;
             if (move.sqrMagnitude < 0.01f) { player.ChangeState(player.Idle); return; }
             if (player.Input.RunHeld) { player.ChangeState(player.Run); return; }
-            player.Motor.SetTargetVelocity(move * player.Config.walkSpeed);
+            player.Motor.SetTargetVelocity(move * player.Config.walkSpeed * player.SpeedMultiplier);
         }
     }
 
@@ -51,7 +51,9 @@ namespace TimeKiller.Player
             var move = player.Input.MoveInput;
             if (move.sqrMagnitude < 0.01f) { player.ChangeState(player.Idle); return; }
             if (!player.Input.RunHeld) { player.ChangeState(player.Walk); return; }
-            player.Motor.SetTargetVelocity(move * player.Config.runSpeed);
+            // Adrenaline (post-hit) can push this past the maniac's chase speed —
+            // the escape window is outrunning him, not him stopping.
+            player.Motor.SetTargetVelocity(move * player.Config.runSpeed * player.SpeedMultiplier);
             // Future: stamina drain hooks in here (see time-killer design: stamina system).
         }
     }

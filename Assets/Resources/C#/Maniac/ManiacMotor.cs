@@ -21,6 +21,9 @@ namespace TimeKiller.Maniac
         {
             config = maniacConfig;
             body = GetComponent<Rigidbody2D>();
+            // Heavy so the player can't shove him (motor drives velocity directly,
+            // so mass doesn't slow HIM down — it only deadens incoming pushes).
+            body.mass = config.bodyMass;
         }
 
         public void MoveTo(Vector2 target, float moveSpeed)

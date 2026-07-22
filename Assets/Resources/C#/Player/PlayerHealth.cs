@@ -20,6 +20,7 @@ namespace TimeKiller.Player
 
         Rigidbody2D body;
         SpriteRenderer sprite;
+        PlayerController controller;
         Vector3 spawnPosition;
         float invulnerableUntil;
         float flashUntil;
@@ -30,6 +31,7 @@ namespace TimeKiller.Player
         {
             body = GetComponent<Rigidbody2D>();
             sprite = GetComponent<SpriteRenderer>();
+            controller = GetComponent<PlayerController>();
             if (config == null)
                 Debug.LogError("[PlayerHealth] PlayerHealthConfig not assigned.");
         }
@@ -72,10 +74,13 @@ namespace TimeKiller.Player
             Current -= Mathf.Max(1, hit.Damage);
             invulnerableUntil = Time.time + config.invulnerabilitySeconds;
 
-            // Shove away from the attacker — the escape window.
+            // Shove away from the attacker + adrenaline: for a few seconds the
+            // player outruns the chase (he never stops chasing — design 2026-07-23).
             var away = ((Vector2)transform.position - hit.SourcePosition).normalized;
             if (away.sqrMagnitude < 0.01f) away = Vector2.down;
             body.AddForce(away * config.shoveImpulse, ForceMode2D.Impulse);
+            if (controller != null)
+                controller.SetSpeedBoost(config.adrenalineMultiplier, config.adrenalineSeconds);
 
             if (sprite != null)
             {

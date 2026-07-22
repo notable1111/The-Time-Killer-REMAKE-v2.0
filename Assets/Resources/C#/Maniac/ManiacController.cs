@@ -29,8 +29,30 @@ namespace TimeKiller.Maniac
 
         public Vector2 PlayerPosition => player != null ? (Vector2)player.position : Motor.Position;
 
+        /// Next Time.time a swing is allowed — chase keeps running in between.
+        public float NextAttackAllowed { get; set; }
+
         readonly StateMachine stateMachine = new StateMachine();
         Transform player;
+        Collider2D ownCollider;
+        Collider2D playerCollider;
+        float phaseUntil;
+        bool phasing;
+
+        /// Called by AttackState when a hit lands: the player can slip through
+        /// his body during the escape window — an unpushable maniac must never
+        /// pin a cornered player. Collision restores once they separate.
+        public void BeginPhaseThrough()
+        {
+            if (ownCollider == null) ownCollider = GetComponent<Collider2D>();
+            if (playerCollider == null && player != null)
+                playerCollider = player.GetComponentInChildren<Collider2D>();
+            if (ownCollider == null || playerCollider == null) return;
+
+            Physics2D.IgnoreCollision(ownCollider, playerCollider, true);
+            phaseUntil = Time.time + config.phaseThroughSeconds;
+            phasing = true;
+        }
 
         public void Init(ManiacConfig maniacConfig, ManiacPatrolRoute patrolRoute)
         {
@@ -76,6 +98,16 @@ namespace TimeKiller.Maniac
             // The sight cone points where he's moving (or keeps its last aim while still).
             if (Motor.CurrentVelocity.sqrMagnitude > 0.04f)
                 Perception.FacingDirection = Motor.CurrentVelocity.normalized;
+
+            // Restore body collision only after the window AND once separated —
+            // re-enabling while overlapped would pop them apart violently.
+            if (phasing && Time.time >= phaseUntil &&
+                (playerCollider == null || !ownCollider.bounds.Intersects(playerCollider.bounds)))
+            {
+                if (playerCollider != null)
+                    Physics2D.IgnoreCollision(ownCollider, playerCollider, false);
+                phasing = false;
+            }
         }
 
         void FixedUpdate() => stateMachine.FixedTick(Time.fixedDeltaTime);
