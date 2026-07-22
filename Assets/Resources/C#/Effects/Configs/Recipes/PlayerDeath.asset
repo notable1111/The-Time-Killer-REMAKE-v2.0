@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41026f5ebbd43e444964728dfb13b486, type: 3}
+  m_Name: PlayerDeath
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Effects.EffectRecipe
+  particlePrefab: {fileID: 4553287630450876385, guid: 15483e51212e3d74886ea57291f4639a, type: 3}
+  particleScale: 1.6
+  clips:
+  - {fileID: 8300000, guid: 66d9098c71e15f6449ce754ebe11e9b5, type: 3}
+  volume: 0.9
+  pitchJitter: 0.03
+  shakeStrength: 0.6
+  shakeDuration: 0.4
+  particleLifetime: 3

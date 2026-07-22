@@ -1,33 +1,0 @@
-Echo Chamber Works Sound Pack License Agreement
-Effective Date: 06/02/2026
-This License Agreement ("Agreement") governs your use of Horror, Suspense, Dark Ambeince Soundscapes +  Oneshots (15 Ambience + 20 SFX) provided by Echo Chamber Works ("Licensor"). By downloading, installing, or using the Sound Packs, you ("Licensee") agree to the terms and conditions outlined in this Agreement.
-
-1. License Grant
-The Licensor grants the Licensee a non-exclusive, non-transferable, royalty-free license to use the Sound Packs in accordance with the terms of this Agreement. The Sound Packs may be used for the following purposes:
-	•	Commercial Use: Use in commercial game development, apps, multimedia projects, and other digital content. 
-	•	Modification: The Licensee may modify, edit, or combine the Sound Packs with other content for use in their projects. 
-	•	Integration: The Sound Packs can be integrated into games, apps, videos, websites, and other media. 
-2. Free and Paid Versions
-	•	Free Versions: The free versions of the Sound Packs are limited selections of the full packs provided to allow you to test or preview the quality and types of sounds included. These free versions are governed by the same terms as the paid versions. 
-	•	Paid Versions: The full, paid versions of the Sound Packs, priced at $5 USD each, include additional sounds and enhanced content. By purchasing the Sound Packs, the Licensee receives access to all sounds and rights granted under this Agreement for the full versions. 
-Both versions (free and paid) are subject to the same usage rights and restrictions outlined in this Agreement.
-3. Usage Rights
-	•	Commercial Projects: The Sound Packs can be used in commercial projects, including games, apps, and videos that are sold, monetized, or distributed for profit. 
-	•	Non-Transferable: The Licensee may not transfer, sublicense, or sell the Sound Packs, either in their original or modified form, to third parties. 
-	•	Redistribution: Redistribution of the Sound Packs or any of their parts, either for free or for sale, is strictly prohibited. The Sound Packs cannot be included in any collection, asset pack, or library that competes with the original Sound Packs. 
-4. Restrictions
-	•	No Standalone Use: The Sound Packs cannot be used as part of any product that provides standalone sound libraries or similar services (e.g., selling the Sound Packs as a collection of sounds). 
-	•	No Unlawful or Offensive Use: The Sound Packs cannot be used in any unlawful, harmful, or offensive content, including but not limited to content that promotes violence, hate speech, or explicit material. 
-	•	No Resale: The Sound Packs, in whole or in part, may not be resold, licensed, or redistributed in any form, either as is or integrated into other products, except as part of a larger work (such as a video game or multimedia project). 
-5. Ownership
-The Sound Packs remain the exclusive property of Echo Chamber Works. All rights not expressly granted to the Licensee are reserved by the Licensor. The Licensee does not acquire any ownership rights over the Sound Packs by downloading or using them.
-6. Warranty Disclaimer
-The Sound Packs are provided "as-is" without any warranties of any kind, either express or implied, including but not limited to the warranties of merchantability or fitness for a particular purpose. The Licensor makes no guarantees that the Sound Packs will meet the Licensee’s requirements or that they will be free from defects.
-7. Limitation of Liability
-The Licensor shall not be liable for any damages, including direct, indirect, incidental, or consequential damages, arising out of the use or inability to use the Sound Packs, even if the Licensor has been advised of the possibility of such damages.
-8. Termination
-This license will remain in effect until terminated. The Licensor may terminate this license if the Licensee fails to comply with any of the terms of this Agreement. Upon termination, the Licensee must immediately cease all use of the Sound Packs and delete all copies in their possession.
-9. Governing Law
-This Agreement shall be governed by and construed in accordance with the laws of India. Any disputes arising from this Agreement shall be subject to the exclusive jurisdiction of the courts in India.
-
-By downloading or using the Sound Packs (either free or paid), you acknowledge that you have read and agree to the terms and conditions of this License Agreement.

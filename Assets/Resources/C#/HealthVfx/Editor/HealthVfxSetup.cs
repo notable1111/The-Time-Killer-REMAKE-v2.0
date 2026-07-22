@@ -20,12 +20,6 @@ namespace TimeKiller.HealthVfx.EditorTools
         const string TextureFolder = "Assets/Resources/Assets/HealthVfx";
         const string BreathingClipPath = "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/strong breathe person.wav";
         const string HeartbeatClipPath = "Assets/Resources/Assets/HealthVfx/heartbeat.wav"; // synthesized in-house, license-free
-        const string DeathClipPath = "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/scary impact.wav";
-        static readonly string[] HitClipPaths =
-        {
-            "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/blood slpash 1.wav",
-            "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/blood splash 2.wav",
-        };
 
         [MenuItem("TimeKiller/Setup/22 - Add Health VFX (screen blood)")]
         public static void Build()
@@ -113,9 +107,7 @@ namespace TimeKiller.HealthVfx.EditorTools
             var (bandImageB, bandGroupB) = FullscreenLayer(canvasGo.transform, "BandOverlayB", subtleB);
             var (flashImage, flashGroup) = FullscreenLayer(canvasGo.transform, "HitFlash", splatter);
 
-            // Camera shake on hit: impulse source here, listener on the CM camera.
-            var impulse = root.AddComponent<Unity.Cinemachine.CinemachineImpulseSource>();
-            impulse.ImpulseDefinition.ImpulseDuration = 0.25f;
+            // Shake listener on the CM camera (impulse SOURCES live in EffectPlayer).
             var cineCam = GameObject.Find("CM_PlayerCamera");
             if (cineCam != null && cineCam.GetComponent<Unity.Cinemachine.CinemachineImpulseListener>() == null)
                 cineCam.AddComponent<Unity.Cinemachine.CinemachineImpulseListener>();
@@ -135,14 +127,7 @@ namespace TimeKiller.HealthVfx.EditorTools
             heartAudio.playOnAwake = false;
             heartAudio.spatialBlend = 0f;
 
-            var sfxGo = new GameObject("DamageSfx");
-            sfxGo.transform.SetParent(root.transform, false);
-            var sfxAudio = sfxGo.AddComponent<AudioSource>();
-            sfxAudio.playOnAwake = false;
-            sfxAudio.spatialBlend = 0f;
-
             var heartbeatClip = AssetDatabase.LoadAssetAtPath<AudioClip>(HeartbeatClipPath);
-            var deathClip = AssetDatabase.LoadAssetAtPath<AudioClip>(DeathClipPath);
             if (heartbeatClip == null) Debug.LogWarning("[TimeKiller Setup] heartbeat.wav missing — heart will be silent.");
 
             var director = root.AddComponent<HealthVfxDirector>();
@@ -157,15 +142,7 @@ namespace TimeKiller.HealthVfx.EditorTools
             so.FindProperty("flashGroup").objectReferenceValue = flashGroup;
             so.FindProperty("breathing").objectReferenceValue = breathing;
             so.FindProperty("heartAudio").objectReferenceValue = heartAudio;
-            so.FindProperty("sfxAudio").objectReferenceValue = sfxAudio;
             so.FindProperty("heartbeatClip").objectReferenceValue = heartbeatClip;
-            so.FindProperty("deathClip").objectReferenceValue = deathClip;
-            var hitClipsProp = so.FindProperty("hitClips");
-            hitClipsProp.arraySize = HitClipPaths.Length;
-            for (int i = 0; i < HitClipPaths.Length; i++)
-                hitClipsProp.GetArrayElementAtIndex(i).objectReferenceValue =
-                    AssetDatabase.LoadAssetAtPath<AudioClip>(HitClipPaths[i]);
-            so.FindProperty("impulse").objectReferenceValue = impulse;
             so.FindProperty("subtleSprite").objectReferenceValue = subtle;
             so.FindProperty("subtleSpriteB").objectReferenceValue = subtleB;
             so.FindProperty("criticalSprite").objectReferenceValue = critical;

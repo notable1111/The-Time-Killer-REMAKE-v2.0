@@ -2,6 +2,12 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-23 — CFXR effects integrated + teammate-checkout fix (Windows path limit)
+
+- **Cartoon FX Remaster Free integrated** (`Outsource/JMO Assets`, 66 prefabs, free): PlayerHit recipe now fires CFXR2 Blood (Directional), PlayerDeath uses CFXR2 Blood Shape Splash, and a NEW layered PlayerDeathSoul recipe releases a soul (CFXR2 Souls Escape) on death. Our hand-made BloodBurst remains the automatic fallback when CFXR is absent (Setup/23 logs a warning instead of breaking).
+- **Fixed: teammates couldn't clone/pull on Windows.** The Echo Chambers pack extracted with a double-nested 208-character path — past `C:\Users\...\` that exceeds the Windows 260-char limit, so git checkout failed mid-way ("cannot install the project") and left broken working copies. Folder flattened to `EchoChambersAmbience/Ambience + OneShots`, duplicate copy of all 15 files deleted; repo's longest path is now 144 chars. Teammates with a broken clone: discard local changes → pull (or re-clone fresh); optional safety: `git config core.longpaths true`; open with Unity **6000.4.10f1** exactly.
+- Playtested: CFXR blood spray on hit, death splash + respawn cleanup.
+
 ## 2026-07-22 (later) — Health VFX: the screen IS the health bar + audio stash + centered camera
 
 - **HealthVfx** (`C#/HealthVfx`, Setup/22): diegetic health, no UI. Bands: 3 HP clean · 2 HP subtle edge blood + red vignette · 1 HP heavy blood + desaturation + breathing = "next hit kills". Every hit: blood splatter flash (slams in at 118% scale) + Cinemachine camera shake + blood-splash SFX (pitch-jittered); death: impact sting.

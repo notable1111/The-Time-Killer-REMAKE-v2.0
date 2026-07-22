@@ -29,11 +29,9 @@ namespace TimeKiller.HealthVfx
         [SerializeField] CanvasGroup flashGroup;
         [SerializeField] AudioSource breathing;
         [SerializeField] AudioSource heartAudio;   // PlayOneShot lub-dub, synced to the visual systole
-        [SerializeField] AudioSource sfxAudio;     // hit splashes / death impact
         [SerializeField] AudioClip heartbeatClip;
-        [SerializeField] AudioClip[] hitClips;
-        [SerializeField] AudioClip deathClip;
-        [SerializeField] CinemachineImpulseSource impulse;
+        // Impact juice (world blood burst, splash SFX, camera shake, death
+        // sting) moved to C#/Effects recipes — this director is screen-state only.
         [SerializeField] Sprite subtleSprite;
         [SerializeField] Sprite subtleSpriteB;
         [SerializeField] Sprite criticalSprite;
@@ -74,14 +72,12 @@ namespace TimeKiller.HealthVfx
             flashGroup.alpha = 0f;
             EventBus.Subscribe<PlayerHealthChangedEvent>(OnHealthChanged);
             EventBus.Subscribe<PlayerHitEvent>(OnHit);
-            EventBus.Subscribe<PlayerDiedEvent>(OnDied);
         }
 
         void OnDestroy()
         {
             EventBus.Unsubscribe<PlayerHealthChangedEvent>(OnHealthChanged);
             EventBus.Unsubscribe<PlayerHitEvent>(OnHit);
-            EventBus.Unsubscribe<PlayerDiedEvent>(OnDied);
         }
 
         void OnHealthChanged(PlayerHealthChangedEvent evt)
@@ -126,25 +122,9 @@ namespace TimeKiller.HealthVfx
 
         void OnHit(PlayerHitEvent evt)
         {
-            if (sfxAudio != null && hitClips != null && hitClips.Length > 0)
-            {
-                sfxAudio.pitch = 1f + Random.Range(-config.hitPitchJitter, config.hitPitchJitter);
-                sfxAudio.PlayOneShot(hitClips[Random.Range(0, hitClips.Length)], config.hitSoundVolume);
-            }
             flashGroup.alpha = config.hitFlashAlpha;
             if (flashImage != null)
                 flashImage.rectTransform.localScale = Vector3.one * config.hitFlashPunchScale;
-            if (impulse != null)
-                impulse.GenerateImpulse(new Vector3(config.hitShake, config.hitShake * 0.6f, 0f));
-        }
-
-        void OnDied(PlayerDiedEvent evt)
-        {
-            if (sfxAudio != null && deathClip != null)
-            {
-                sfxAudio.pitch = 1f;
-                sfxAudio.PlayOneShot(deathClip, config.deathSoundVolume);
-            }
         }
 
         void Update()

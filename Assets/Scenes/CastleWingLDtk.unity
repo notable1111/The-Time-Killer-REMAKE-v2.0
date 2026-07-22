@@ -8960,13 +8960,7 @@ MonoBehaviour:
   flashGroup: {fileID: 390826016}
   breathing: {fileID: 250613169}
   heartAudio: {fileID: 1067828562}
-  sfxAudio: {fileID: 2003193941}
   heartbeatClip: {fileID: 8300000, guid: 3b9d682fc92302c4cbcae731037136de, type: 3}
-  hitClips:
-  - {fileID: 8300000, guid: d657a88db1f94684491199873047c0c9, type: 3}
-  - {fileID: 8300000, guid: d89936a512be28f4c845da34e5c62c6d, type: 3}
-  deathClip: {fileID: 8300000, guid: 66d9098c71e15f6449ce754ebe11e9b5, type: 3}
-  impulse: {fileID: 1028951753}
   subtleSprite: {fileID: -8972683969782662031, guid: 43aa332f8ff6271459ece4a37109c910, type: 3}
   subtleSpriteB: {fileID: -582297970623809093, guid: 765c516272a039a4db8b24779365ec6e, type: 3}
   criticalSprite: {fileID: 8727816746817745307, guid: 103a563c5b5d0bb4b967e56d8ca40500, type: 3}
@@ -11597,6 +11591,53 @@ SortingGroup:
   m_SortingOrder: 0
   m_SortAtRoot: 0
   m_Sort3DAs2D: 0
+--- !u!1 &1275936156
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1275936158}
+  - component: {fileID: 1275936157}
+  m_Layer: 0
+  m_Name: PlayerHitEffects
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1275936157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1275936156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db04206211b932e4198df74e0636bcb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Effects.PlayerHitEffects
+  hitRecipe: {fileID: 11400000, guid: bb8c85c3de4f0504486bcb3a428fdc6e, type: 2}
+  deathRecipe: {fileID: 11400000, guid: 4564c3a5b51fbd147905ab1886e16b4e, type: 2}
+  deathSoulRecipe: {fileID: 11400000, guid: 7aed7cff94fe6a842a2c1dab92e5bf96, type: 2}
+--- !u!4 &1275936158
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1275936156}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1307004480
 GameObject:
   m_ObjectHideFlags: 0
@@ -17098,3 +17139,4 @@ SceneRoots:
   - {fileID: 1352600602}
   - {fileID: 5072343}
   - {fileID: 1028951755}
+  - {fileID: 1275936158}

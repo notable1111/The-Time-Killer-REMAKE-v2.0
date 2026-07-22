@@ -88,6 +88,14 @@ Diegetic health — no HP bar, the screen is the health bar (design 2026-07-22).
 - Setup: menu `TimeKiller/Setup/22` (also run by Setup/18). Dev cheat: **F7 = take 1 hit** (respects i-frames).
 - Camera note: `CameraConfig.lookAheadDistance` set to **0** (user decision 2026-07-22) — player stays dead-center; the look-ahead system remains available via the slider.
 
+### Effects (`C#/Effects/`, namespace `TimeKiller.Effects`) — the "Feel-lite" juice system
+One juice moment = ONE asset. `EffectPlayer.Play(recipe, worldPos)` fires a full impact package; adding a new effect to the game = creating a recipe asset, zero new code.
+- **EffectRecipe** (SO) — particle prefab (+scale/lifetime), random SFX clips (+volume/pitch jitter), Cinemachine shake (strength/duration). CFXR Free prefabs drop straight into the particle slot when imported.
+- **EffectPlayer** (static) — lazily builds its own runtime rig (audio source + impulse source), instantiates/auto-destroys particles. No scene setup needed.
+- **PlayerHitEffects** — binds `PlayerHitEvent` → PlayerHit recipe (world blood burst + splash SFX + shake) and `PlayerDiedEvent` → PlayerDeath recipe (bigger burst + impact sting + heavy shake). Impact juice lives HERE; HealthVfxDirector is screen-state only (bands/heartbeat/breathing/flash).
+- BloodBurst particle prefab: built by Setup/23 from droplet sprites cropped out of the CC0 splats (`Tools/VfxPipeline`) — real assets, not placeholders. URP Particles/Unlit material, gravity-arced droplets, sorting order 5.
+- Setup: menu `TimeKiller/Setup/23` (also run by Setup/18).
+
 ## Planned
 
 - `Player` — sanity
