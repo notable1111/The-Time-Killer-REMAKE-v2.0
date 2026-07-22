@@ -24,5 +24,6 @@ A 2.5D survival-horror game built in **Unity 6000.4.10f1**.
 ## Asset credits (dev assets)
 
 - Player character: [New_Leaf — Top-Down 8-Direction Character](https://new-leaf.itch.io/top-down-8-direction-character-animated-sprite-pack) (free version, credit required)
+- Maniac (killer enemy): [Maranza — TopDown Horror Pixel Art Characters Sprites](https://maranza.itch.io/assets) (free, credit required — commercial use author-approved)
 - Previous dev character: [xzany — Adventurer 2D Top-Down](https://xzany.itch.io/top-down-adventurer-character) (kept in Outsource as fallback)
 - Footstep sounds: [Kenney — RPG Audio](https://kenney.nl/assets/rpg-audio) (CC0)

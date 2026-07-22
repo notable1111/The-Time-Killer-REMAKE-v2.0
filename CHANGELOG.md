@@ -2,6 +2,15 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-22 (later) — THE MANIAC v1 + 3-point player health (first gameplay systems!)
+
+- **Maniac** (`C#/Maniac`, Setup/20+21): the killer is in the game — patrol/investigate/chase/attack state machine, hearing (footstep loudness × 9-unit radius — walk quiet, run loud), sight (7 units, 140° cone aimed by movement, walls block via filtered linecast), breadcrumb-trail chase (follows the player's path through doorways, zero pathfinding), chase 5.2 vs player run 4.5 (design choice: faster than run; balanced by the generous 2.5s lose-sight valve). Patrols the whole wing loop — the servant passage is deliberately his blind spot. All tunables in `ManiacConfig.asset`.
+- **Player health** (`C#/Player`, Setup/19): the 3-HP team decision is live — PlayerHitEvent (bus-decoupled) → −1 HP + red flash + shove away + 1.5s invulnerability; death v1 = respawn at spawn with full HP (placeholder rule until save/death design). Events: PlayerHealthChangedEvent / PlayerDiedEvent for future UI/audio.
+- **CheatHotkeys** (Core, dev-only): F5 god mode, F6 refill — features register their own keys; shown in the F1 overlay.
+- Maniac sprites: free maranza pack (TopDown Horror Characters — credited in README, commercial use author-approved), killer look = "Pacient stage_two" bandaged madman; 8-direction walk + idle stills + death clips generated from the sheet (rows CCW-from-Down = FacingDirection order).
+- Fixed: respawn teleport silently overridden by Rigidbody2D interpolation (now body.position + SyncTransforms).
+- Playtested (Claude, in-editor): full hunt loop — heard→investigate→spotted→chase→3 hits→death→respawn, plus cone blind-spot and lose-sight de-aggro all verified.
+
 ## 2026-07-22 (later) — Map v2 ground floor: kitchen, armory, library, servant passage + torches
 
 - Map v2 authored ENTIRELY in CastleWing.ldtk (user-approved draft; gallery + undercroft levels drafted but parked by choice — `Tools/MapPipeline/mapv2_generate.py` re-adds them): **Kitchen** (south of Guardroom, corridor through its south wall), **Armory** (east of Guardroom), **Library** (east of Great Chamber), **Servant Passage** — hidden door in the Hall's south wall → long dark passage under the map → Kitchen. +412 floor cells, collision + camera zones regenerated (17 zones), all audited: 0 gaps, 0 collision-on-floor, BFS connectivity = every room reachable.

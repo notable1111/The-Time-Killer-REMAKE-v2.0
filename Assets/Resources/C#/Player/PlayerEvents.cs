@@ -29,4 +29,25 @@ namespace TimeKiller.Player
         public bool IsRunning;
         public float Loudness; // 0..1
     }
+
+    /// Published by anything that damages the player (maniac attack, future
+    /// hazards). PlayerHealth consumes it — attackers never touch the player.
+    public struct PlayerHitEvent
+    {
+        public int Damage;
+        public UnityEngine.Vector2 SourcePosition; // shove pushes away from here
+    }
+
+    /// Fired whenever health changes (UI, audio, sanity system subscribe).
+    public struct PlayerHealthChangedEvent
+    {
+        public int Current;
+        public int Max;
+    }
+
+    /// Fired on death (v1: followed by an immediate respawn — placeholder rule).
+    public struct PlayerDiedEvent
+    {
+        public UnityEngine.Vector2 Position;
+    }
 }

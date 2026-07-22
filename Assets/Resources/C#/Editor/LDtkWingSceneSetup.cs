@@ -72,6 +72,7 @@ namespace TimeKiller.EditorTools
             PlayerAnimationSetup.Generate();
             PlayerFootstepSetup.Setup();
             BlobShadowSetup.AddShadow();
+            TimeKiller.Player.EditorTools.PlayerHealthSetup.Setup();  // 3 HP + cheat hotkeys
             var player = Object.FindAnyObjectByType<PlayerController>();
             if (player != null)
             {

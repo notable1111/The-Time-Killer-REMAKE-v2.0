@@ -65,8 +65,23 @@ Flow: `IInputSource` → states → `PlayerMotor` → `Rigidbody2D`.
 - **Switch status:** SampleScene (script tilemaps) is still the main scene; CastleWingLDtk becomes primary only after team playtest approval. After the switch, map editing = LDtk editor only (Setup/9/14 tile painting retires).
 - **Map v2 (ground floor, LDtk-only — NOT in SampleScene):** Kitchen (south of Guardroom), Armory (east of Guardroom), Library (east of Great Chamber), Servant Passage (hidden door in the hall's south wall → dark under-map passage → Kitchen; hall south collider auto-split around the door by Setup/18). Torches in the new rooms + corridors; vertical connectors and the passage stay dark. UpperGallery/Undercroft levels parked in `Tools/MapPipeline/mapv2_generate.py` (generator + validator + preview renderer — the offline map pipeline; run from repo root with Python 3, then reimport + Setup/18).
 
+### Player health (`C#/Player/`, part of the Player feature)
+- **PlayerHealth** — the 3-point health system (team decision; no stamina). Listens for `PlayerHitEvent` on the bus (attackers never reference the player), applies damage + invulnerability window + shove impulse away from the source + red hit-flash, publishes `PlayerHealthChangedEvent` / `PlayerDiedEvent`. v1 death rule (placeholder until save/death design): respawn at spawn with full HP.
+- **PlayerHealthConfig** (SO) — maxHealth(3), i-frame seconds, shove impulse, death rule. Asset: `C#/Player/Configs/PlayerHealthConfig.asset`.
+- **CheatHotkeys** (Core) — dev-only hotkey registry (compiled out of release). Features register their own cheats: F5 god mode, F6 refill health. Setup: menu `TimeKiller/Setup/19` (also run by Setup/18).
+
+### Maniac (`C#/Maniac/`, namespace `TimeKiller.Maniac`)
+The killer. Design (interview 2026-07-22): hearing+sight hybrid, patrols the wing loop, chase FASTER than player run (5.2 vs 4.5) balanced by a generous lose-sight timer; catch = 1 HP hit + shove. Flow: `ManiacPerception` (senses) → states → `ManiacMotor` → `Rigidbody2D`.
+- **ManiacController** — composition root; owns the state machine (Patrol/Investigate/Chase/Attack in `ManiacStates.cs`), publishes `ManiacStateChangedEvent`, aims the sight cone along movement.
+- **ManiacPerception** — hearing: subscribes `PlayerFootstepEvent`, heard when distance < loudness × hearingRadius (running is loud — the stealth choice). Sight: range + cone + LinecastAll that walls block (self/player/triggers filtered). Publishes `ManiacHeardNoiseEvent` / `ManiacSpottedPlayerEvent`.
+- **ManiacMotor** — destination steering on Rigidbody2D, same accel/brake pattern as PlayerMotor. No pathfinding by design.
+- **ManiacBreadcrumbs** — chase navigation: records the player's positions while visible; he follows the trail through the same doorways the player used.
+- **ManiacPatrolRoute** — waypoint loop object (gizmo-drawn). The servant passage is deliberately NOT on the route — the player's blind-spot escape.
+- **ManiacConfig** (SO) — every tunable: speeds, hearing radius, sight range/cone, lose-sight seconds (the balancing valve), attack damage/range/cooldown, patrol pacing. Asset: `C#/Maniac/Configs/ManiacConfig.asset`.
+- Scene setup: menu `TimeKiller/Setup/20 - Create Maniac In Scene` — REFUSES to run without the Nightmare Slashers pack under `Outsource/NightmareSlashers` (no invisible enemies / no placeholder art). Animation slicing pass comes once the killer look is picked from the pack.
+
 ## Planned
 
-- `Player` — stamina / health / sanity
-- Environment — darkness + player light (deferred by choice), side-wall trims, more hall variety
-- `Core` — dev cheat hotkeys (god mode, refill stats) once stats exist
+- `Player` — sanity
+- `Maniac` — animation set from Nightmare Slashers pack (slicing setup), hiding-spot interaction, de-aggro polish
+- Environment — darkness + player light (deferred by choice), AI furniture props for map v2 rooms

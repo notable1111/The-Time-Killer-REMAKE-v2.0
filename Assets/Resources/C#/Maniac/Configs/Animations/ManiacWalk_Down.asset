@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85738f08ff23ea640a9e0c32f69a7e87, type: 3}
+  m_Name: ManiacWalk_Down
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Core.SpriteAnimationClip
+  frames:
+  - {fileID: 53170560, guid: a955ef265d740c540a85762205c83b3f, type: 3}
+  - {fileID: -1483955184, guid: a955ef265d740c540a85762205c83b3f, type: 3}
+  - {fileID: -245836075, guid: a955ef265d740c540a85762205c83b3f, type: 3}
+  - {fileID: 219414142, guid: a955ef265d740c540a85762205c83b3f, type: 3}
+  framesPerSecond: 9
+  loop: 1
+  eventFrames: 

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09dc4099957da8b48bc2c6f096229616, type: 3}
+  m_Name: ManiacAnimationSet
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Maniac.ManiacAnimationSet
+  walk:
+  - {fileID: 11400000, guid: 4460f73f76733d643bff2e87fbff1cf0, type: 2}
+  - {fileID: 11400000, guid: 8ad1cd87274b1bf4890d6fbe5b927f2d, type: 2}
+  - {fileID: 11400000, guid: f1407747307b196448ba0359b21bad92, type: 2}
+  - {fileID: 11400000, guid: b12a5d0b410557e40a568b9d7bf16e5b, type: 2}
+  - {fileID: 11400000, guid: c06966b93d86f1348b4ca33f6b187cae, type: 2}
+  - {fileID: 11400000, guid: 4a3ac376b5c255747aaad6eeed6b34a9, type: 2}
+  - {fileID: 11400000, guid: 10857620c325b8544bfa40f38926935f, type: 2}
+  - {fileID: 11400000, guid: 11ea968b9aa90254383687d9068afb5d, type: 2}
+  idle:
+  - {fileID: 11400000, guid: c77786216d216fd4ba3f96a995eec70c, type: 2}
+  - {fileID: 11400000, guid: 69ee10bd3b695234f80dfa5d46cdda62, type: 2}
+  - {fileID: 11400000, guid: 0c709c2e941482644aaec4b2fb87a6fb, type: 2}
+  - {fileID: 11400000, guid: 69d63af1f3aaade4ca62755948cc0a1c, type: 2}
+  - {fileID: 11400000, guid: 2820688eea80992409dc05ba66888d48, type: 2}
+  - {fileID: 11400000, guid: 793232bfe67e2d74e888003741bf7da1, type: 2}
+  - {fileID: 11400000, guid: 71b8048074c315f4b90835cb51799572, type: 2}
+  - {fileID: 11400000, guid: 0cd572e1087a0b149b2dbf2e7dbb56d1, type: 2}
+  death: {fileID: 11400000, guid: 10e98472713e87c4b931849da01b9414, type: 2}
+  minAnimationSpeed: 0.4
+  speedForNormalPlayback: 5.2
