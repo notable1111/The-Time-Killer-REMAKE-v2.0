@@ -2,6 +2,15 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-22 (later) — Map v2 ground floor: kitchen, armory, library, servant passage + torches
+
+- Map v2 authored ENTIRELY in CastleWing.ldtk (user-approved draft; gallery + undercroft levels drafted but parked by choice — `Tools/MapPipeline/mapv2_generate.py` re-adds them): **Kitchen** (south of Guardroom, corridor through its south wall), **Armory** (east of Guardroom), **Library** (east of Great Chamber), **Servant Passage** — hidden door in the Hall's south wall → long dark passage under the map → Kitchen. +412 floor cells, collision + camera zones regenerated (17 zones), all audited: 0 gaps, 0 collision-on-floor, BFS connectivity = every room reachable.
+- Hall south collider split around the hidden servant door (approved; hand-tuned Y/height preserved, snapshot file untouched as pre-split record).
+- Torch pass: kitchen/armory/library + their corridors lit (north-face placement matching v1 rooms); vertical connectors and the servant passage stay dark by design.
+- Setup/18 hardened: camera-zone conversion now anchors on the Floor layer's min cell (same anchor as map alignment) — level growth in any direction can't desync the confiner; fixed a passage collision-gap bug found in Claude's playtest (connectivity check added to the pipeline).
+- Tools/MapPipeline: map generator + validator + preview renderer committed (parked levels live here).
+- Playtested (Claude, in-editor): Hall → servant passage → Kitchen → Guardroom → Armory, and Great Chamber → Library. New rooms are undressed — AI furniture props are the next step.
+
 ## 2026-07-22 (later) — LDtk-driven scene (side-by-side): map fully in CastleWing.ldtk
 
 - CastleWing.ldtk is now the single source of truth: tiles + new **Collision IntGrid layer** (286 wall cells, 100% coverage rule — audited 0 gaps / 0 collision-on-floor before import) + **9 CameraZone entities** (the Cinemachine confiner zones, editable visually in the LDtk editor).

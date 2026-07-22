@@ -29,10 +29,11 @@ namespace TimeKiller.EditorTools
         const string LitMatPath = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Lit-Default.mat";
 
         // LDtk cell space is y-down with origin at the level's top-left. The
-        // verified mapping to script-world coords: worldX = cx - 12,
-        // worldY = 37 - cy — the map root is shifted so both agree (the exact
-        // offset is computed from the imported Floor tilemap, not hardcoded).
-        const float FloorWorldMinX = -10f, FloorWorldMinY = 0f;
+        // map root is shifted so the Floor tilemap's min corner lands exactly
+        // here in world space (v2: chapel x=-10 is leftmost, kitchen y=-12 is
+        // lowest). Camera zones use the same floor-min anchor, so both stay
+        // consistent no matter how the level grows.
+        const float FloorWorldMinX = -10f, FloorWorldMinY = -12f;
 
         // Sorting orders copied from the script-built scene (Setup/9).
         static readonly (string name, int order)[] LayerOrders =
@@ -56,9 +57,12 @@ namespace TimeKiller.EditorTools
             if (mapRoot == null) return;
             Restyle(mapRoot);
 
-            // Hand-tuned hall boxes on top of the IntGrid colliders.
+            // Hand-tuned hall boxes on top of the IntGrid colliders, then split
+            // the south box around the servant-passage hidden door (approved —
+            // same pattern as the east/west doorway splits; tuned Y preserved).
             var hallColliders = new GameObject("HallColliders");
-            HallColliderGuard.ApplyTo(hallColliders);
+            if (HallColliderGuard.ApplyTo(hallColliders))
+                SplitSouthBoxForServantDoor(hallColliders);
 
             AddGlobalLight();
 
@@ -196,6 +200,31 @@ namespace TimeKiller.EditorTools
         static string LayerNameOf(Component c) =>
             c.name == "Tiles" && c.transform.parent != null ? c.transform.parent.name : c.name;
 
+        // The servant passage's hidden door pierces the hall's south collider
+        // at x 8..10. Split that box into two segments around the gap, keeping
+        // the hand-tuned Y offset and height exactly.
+        static void SplitSouthBoxForServantDoor(GameObject holder)
+        {
+            const float doorLeft = 8f, doorRight = 10f;
+            foreach (var box in holder.GetComponents<BoxCollider2D>())
+            {
+                bool southBand = box.size.x > 10f && box.offset.y < 2f;
+                if (!southBand) continue;
+                float left = box.offset.x - box.size.x / 2f, right = box.offset.x + box.size.x / 2f;
+                if (doorLeft <= left || doorRight >= right) continue;
+
+                var west = holder.AddComponent<BoxCollider2D>();
+                west.offset = new Vector2((left + doorLeft) / 2f, box.offset.y);
+                west.size = new Vector2(doorLeft - left, box.size.y);
+                var east = holder.AddComponent<BoxCollider2D>();
+                east.offset = new Vector2((doorRight + right) / 2f, box.offset.y);
+                east.size = new Vector2(right - doorRight, box.size.y);
+                Object.DestroyImmediate(box);
+                Debug.Log("[TimeKiller Setup] Hall south collider split around the servant door (tuned Y preserved).");
+                return;
+            }
+        }
+
         // ---------- lighting / player ----------
 
         static void AddGlobalLight()
@@ -250,13 +279,18 @@ namespace TimeKiller.EditorTools
             if (body == null) body = boundsGo.AddComponent<Rigidbody2D>();
             body.bodyType = RigidbodyType2D.Static;
 
-            float levelCellHeight = level.PxHei / 16f;
+            // Anchor on the Floor layer's min/max cells — the same reference the
+            // map alignment uses — so growth in any direction can't break this.
+            var floorTiles = level.LayerInstances.First(l => l.Identifier == "Floor").GridTiles;
+            int floorCxMin = floorTiles.Min(t => t.Px[0]) / 16;
+            int floorCyMax = floorTiles.Max(t => t.Px[1]) / 16;
+
             foreach (var e in entities)
             {
                 // px is the zone's top-left in LDtk space; convert to script-world.
                 float w = e.Width / 16f, h = e.Height / 16f;
-                float xMin = e.Px[0] / 16f - 12f;
-                float yMax = levelCellHeight - e.Px[1] / 16f - 3f;
+                float xMin = FloorWorldMinX + (e.Px[0] / 16f - floorCxMin);
+                float yMax = FloorWorldMinY + (floorCyMax + 1 - e.Px[1] / 16f);
                 var box = boundsGo.AddComponent<BoxCollider2D>();
                 box.isTrigger = true;
                 box.offset = new Vector2(xMin + w / 2f, yMax - h / 2f);

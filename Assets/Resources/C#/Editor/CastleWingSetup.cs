@@ -300,9 +300,15 @@ namespace TimeKiller.EditorTools
                 new Vector2(28.5f, 12.5f), new Vector2(35.5f, 12.5f),    // room B
                 new Vector2(24f, 32.5f), new Vector2(31f, 32.5f),        // room C
                 new Vector2(-7.5f, 32.5f), new Vector2(-3.5f, 32.5f),    // room D
+                // --- map v2 rooms (positions = north wall face, +2.5 over floor top)
+                new Vector2(28.5f, -0.5f), new Vector2(35.5f, -0.5f),    // kitchen (skips the x30-32 corridor cut)
+                new Vector2(42.5f, 12.5f), new Vector2(47.5f, 12.5f),    // armory
+                new Vector2(43f, 32.5f), new Vector2(49f, 32.5f),        // library
+                new Vector2(39f, 9.5f),                                  // armory corridor
+                new Vector2(38f, 29.5f),                                 // library corridor
             })
                 Torch(torches.transform, p);
-            // The two vertical connector corridors stay UNLIT on purpose — dark passages.
+            // Vertical connectors + the servant passage stay UNLIT on purpose — dark passages.
 
             if (!includeHallDressing) return;
 
