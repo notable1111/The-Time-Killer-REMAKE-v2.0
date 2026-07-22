@@ -96,6 +96,12 @@ One juice moment = ONE asset. `EffectPlayer.Play(recipe, worldPos)` fires a full
 - BloodBurst particle prefab: built by Setup/23 from droplet sprites cropped out of the CC0 splats (`Tools/VfxPipeline`) — real assets, not placeholders. URP Particles/Unlit material, gravity-arced droplets, sorting order 5.
 - Setup: menu `TimeKiller/Setup/23` (also run by Setup/18).
 
+### Audio (`C#/Audio/`, namespace `TimeKiller.Audio`) — the tension radar
+The music IS the threat detector (interview 2026-07-23). One layer at a time, crossfaded (priority: Safe > Chase > Tense > Calm), driven ONLY by bus events — no reference to the maniac.
+- **AudioDirector** — maps maniac state to layers: Patrol→Calm (5 creepy ambiences), Investigate→Tense (4 tense), Chase/Attack→Chase (3 tracks, random per chase). Safe zones (config rects = the servant passage) play the safe-room theme when not actively chased. Stings: random jumpscare on `ManiacSpottedPlayerEvent` (4s cooldown), Dark Riser on first `ManiacHeardNoiseEvent` out of Calm (8s cooldown — running is audibly punished), death sting on `PlayerDiedEvent`. Two crossfading music sources + one sting source. Debug overlay shows current layer + track.
+- **AudioConfig** (SO) — all track arrays, per-layer volumes, sting cooldowns, crossfade time, safe-zone rects. Asset: `C#/Audio/Configs/`.
+- Tracks: PSX Horror Music pack (royalty-free, credited). Setup: menu `TimeKiller/Setup/24` (also run by Setup/18).
+
 ## Planned
 
 - `Player` — sanity

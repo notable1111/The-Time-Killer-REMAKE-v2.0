@@ -75,6 +75,7 @@ namespace TimeKiller.EditorTools
             TimeKiller.Player.EditorTools.PlayerHealthSetup.Setup();  // 3 HP + cheat hotkeys
             TimeKiller.HealthVfx.EditorTools.HealthVfxSetup.Build();  // screen-blood health presentation
             TimeKiller.Effects.EditorTools.EffectsSetup.Build();      // effect recipes (hit/death juice)
+            TimeKiller.Audio.EditorTools.AudioSetup.Build();          // tension-radar music + stings
             var player = Object.FindAnyObjectByType<PlayerController>();
             if (player != null)
             {

@@ -2,6 +2,14 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-23 — Audio tension radar: the music is the threat detector
+
+- **AudioDirector** (`C#/Audio`, Setup/24): one crossfading music layer at a time, priority Safe > Chase > Tense > Calm, driven purely by bus events. Patrol→Calm (5 creepy ambiences), Investigate→Tense (4 tracks), Chase/Attack→Chase (3 tracks, random per chase). The servant passage plays the safe-room theme when not actively chased (safe zones = config rects).
+- Stings: random jumpscare on spotted (4s cooldown), Dark Riser the first time he hears you from Calm (running is audibly punished), death sting.
+- All 18 music tracks + stings wired from the PSX Horror Music pack (royalty-free, credited). F1 overlay shows the current layer + track.
+- User tuning: safe-room volume 0.4 → 0.28 (sanctuary whispers).
+- Playtested — full radar tour in one run: Calm → riser+ambush → Chase (Track 2) → Tense on escape → Calm → second chase picked Track 3 (variety confirmed) → Safe in the passage.
+
 ## 2026-07-23 — Maniac v1.1: relentless chase + fair escape (playtest-driven)
 
 Three fixes from the user's playtest, one design: he never stops — but every hit hands you a real escape window.

@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da98478eabe5eb8458f9f7f9c4d69c06, type: 3}
+  m_Name: AudioConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Audio.AudioConfig
+  calmTracks:
+  - {fileID: 8300000, guid: 538c6c1c33a10494d9d4baaa38a512dd, type: 3}
+  - {fileID: 8300000, guid: a0d7116810d228042be4e4798226a244, type: 3}
+  - {fileID: 8300000, guid: 4859f69fc0a86a14da39ad088ef457dd, type: 3}
+  - {fileID: 8300000, guid: 4e6239716e0648547baeb82986a8b0f9, type: 3}
+  - {fileID: 8300000, guid: b05c2b65d3bc41b4db974869b3b7be04, type: 3}
+  tenseTracks:
+  - {fileID: 8300000, guid: 8200ed0f0aba7b74d8cf9c3ceb5ef748, type: 3}
+  - {fileID: 8300000, guid: c64e6e8be8e50d74e81c46da0d6f8bd0, type: 3}
+  - {fileID: 8300000, guid: 09602d7117bb8d74f9edbaea40a63278, type: 3}
+  - {fileID: 8300000, guid: e5dcf9afbdc189b44b914a2703e88598, type: 3}
+  chaseTracks:
+  - {fileID: 8300000, guid: 404bcb26e65227241887140295d472a3, type: 3}
+  - {fileID: 8300000, guid: 93ad47d986689cb48bc7b357507d6c35, type: 3}
+  - {fileID: 8300000, guid: 1f4f8c9904503ff4399c21e91786151f, type: 3}
+  safeTracks:
+  - {fileID: 8300000, guid: 29c3520760b2d2c46b5a6a6304a7c36e, type: 3}
+  - {fileID: 8300000, guid: 436e9dce10de9074f96059eaae480d07, type: 3}
+  - {fileID: 8300000, guid: e5294e7eab514e944ac81d498f677771, type: 3}
+  calmVolume: 0.35
+  tenseVolume: 0.5
+  chaseVolume: 0.75
+  safeVolume: 0.28
+  spottedStings:
+  - {fileID: 8300000, guid: 009508ea1ac75794490df9721a67b922, type: 3}
+  - {fileID: 8300000, guid: d603b2bcf5acf4245a1f0b7366591156, type: 3}
+  - {fileID: 8300000, guid: a568d631663f98c40bdfa98681ec5aef, type: 3}
+  heardRiser: {fileID: 8300000, guid: c3119d6ff9af02d4ba17b170fba9f461, type: 3}
+  deathSting: {fileID: 8300000, guid: db54117cd496bc649a55db4bf03a0e13, type: 3}
+  stingVolume: 0.85
+  spottedStingCooldown: 4
+  riserCooldown: 8
+  crossfadeSeconds: 1.6
+  safeZones:
+  - serializedVersion: 2
+    x: 8
+    y: -3
+    width: 2
+    height: 3
+  - serializedVersion: 2
+    x: 8
+    y: -8
+    width: 2
+    height: 5
+  - serializedVersion: 2
+    x: 10
+    y: -8
+    width: 16
+    height: 2
