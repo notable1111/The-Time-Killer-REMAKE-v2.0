@@ -20,6 +20,7 @@ namespace TimeKiller.Maniac
 
         public bool CanSeePlayer { get; private set; }
         public Vector2 LastSeenPosition { get; private set; }
+        public Vector2 LastSeenDirection { get; private set; } = Vector2.zero; // which way the player was moving when last visible (flee bias for the search belief map)
         public float LastSeenTime { get; private set; } = float.NegativeInfinity;
         public bool HasUnhandledNoise { get; private set; }
         public Vector2 LastNoisePosition { get; private set; }
@@ -74,7 +75,11 @@ namespace TimeKiller.Maniac
             {
                 if (!CanSeePlayer)
                     EventBus.Publish(new ManiacSpottedPlayerEvent { PlayerPosition = player.position });
-                LastSeenPosition = player.position;
+                Vector2 now = player.position;
+                Vector2 delta = now - LastSeenPosition;
+                if (delta.sqrMagnitude > 0.0004f) // moving — remember the flee direction
+                    LastSeenDirection = delta.normalized;
+                LastSeenPosition = now;
                 LastSeenTime = Time.time;
             }
             CanSeePlayer = seenNow;

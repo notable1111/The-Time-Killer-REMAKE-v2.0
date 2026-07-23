@@ -57,6 +57,9 @@ namespace TimeKiller.Navigation
         public bool InBounds(int x, int y) => x >= 0 && x < cols && y >= 0 && y < rows;
         public bool Walkable(int x, int y) => InBounds(x, y) && walkable[y * cols + x];
 
+        /// Walkability at a world point (for other systems — e.g. the search belief map).
+        public bool IsWalkable(Vector2 world) { var c = WorldToCell(world); return Walkable(c.x, c.y); }
+
         public Vector2Int WorldToCell(Vector2 world)
         {
             Vector2 local = (world - origin) / cell;

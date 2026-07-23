@@ -117,17 +117,20 @@ namespace TimeKiller.Maniac
         public override void Exit() => maniac.Breadcrumbs.Clear();
     }
 
-    /// Lost you. Instead of snapping back to patrol, he HUNTS: checks where
-    /// you vanished, then sweeps the nearest patrol waypoints, pausing to scan
-    /// his sight cone at each. Re-acquire sight -> Chase; fresh noise ->
-    /// Investigate; run out of spots -> give up to Patrol. The servant passage
-    /// isn't on the patrol route, so it stays a genuine blind-spot escape.
+    /// Lost you. Instead of snapping back to patrol, he HUNTS with a belief map
+    /// (PlayerBeliefMap): probability seeded at your last-seen spot, biased the
+    /// way you fled, spreading along corridors and COLLAPSING wherever he looks
+    /// and doesn't find you. He paths to the likeliest cell, scans, and never
+    /// re-checks cleared areas. The brain decides WHEN to give up (Search utility
+    /// decays); this state decides WHERE. The servant passage stays a real escape
+    /// (it's walkable so belief can flow there, but he only goes if it's likeliest).
     public class SearchState : ManiacStateBase
     {
-        readonly List<Vector2> points = new List<Vector2>();
-        int index;
+        PlayerBeliefMap belief;
+        Vector2 target;
         float pointDeadline;
         float lookUntil;
+        float nextStep;
         bool looking;
         Vector2 scanBase;
 
@@ -136,69 +139,81 @@ namespace TimeKiller.Maniac
         public override void Enter()
         {
             maniac.Perception.ConsumeNoise();   // this hunt answers the alert
-            BuildPoints();
-            index = 0;
-            GoToCurrent();
+            EnsureMap();
+            belief?.Seed(maniac.Perception.LastSeenPosition, maniac.Perception.LastSeenDirection);
+            nextStep = 0f;
+            PickTarget();
         }
 
-        void BuildPoints()
+        void EnsureMap()
         {
-            points.Clear();
-            Vector2 origin = maniac.Perception.LastSeenPosition;
-            points.Add(origin);                 // where they vanished
+            if (belief != null || maniac.Nav == null || !maniac.Nav.Ready) return;
+            belief = new PlayerBeliefMap(maniac.Nav.WorldBounds, 1f, maniac.Nav.IsWalkable);
+        }
 
-            var route = maniac.Route;
-            int extra = Mathf.Max(0, maniac.Config.searchPoints - 1);
-            if (route != null && route.Count > 0 && extra > 0)
+        void PickTarget()
+        {
+            if (belief != null && belief.BestTarget(out var t))
             {
-                var nearest = Enumerable.Range(0, route.Count)
-                    .OrderBy(i => Vector2.Distance(origin, route.Waypoint(i)))
-                    .Take(extra);
-                foreach (int i in nearest) points.Add(route.Waypoint(i));
+                looking = false;
+                target = t;
+                maniac.Nav.MoveTo(target, maniac.Config.searchSpeed);
+                pointDeadline = Time.time + maniac.Config.searchTravelTimeout;
+            }
+            else
+            {
+                // Belief exhausted (checked everywhere likely) — scan in place
+                // until the brain gives up (Search utility decays -> Patrol).
+                BeginLook(float.MaxValue);
             }
         }
 
-        void GoToCurrent()
+        void BeginLook(float until)
         {
-            looking = false;
-            if (index >= points.Count)
-            {
-                // Out of spots: scan in place until the brain pulls him out
-                // (Search's utility decays, then Patrol or a new stimulus wins).
-                looking = true;
-                lookUntil = float.MaxValue;
-                maniac.Nav.Stop();
-                scanBase = maniac.Perception.FacingDirection.sqrMagnitude > 0.01f
-                    ? maniac.Perception.FacingDirection.normalized : Vector2.down;
-                return;
-            }
-            maniac.Nav.MoveTo(points[index], maniac.Config.searchSpeed);
-            pointDeadline = Time.time + maniac.Config.searchTravelTimeout;
+            looking = true;
+            lookUntil = until;
+            maniac.Nav.Stop();
+            scanBase = maniac.Perception.FacingDirection.sqrMagnitude > 0.01f
+                ? maniac.Perception.FacingDirection.normalized : Vector2.down;
         }
 
         public override void Tick(float deltaTime)
         {
+            // Keep the belief field alive: spread it, and collapse whatever he
+            // can currently see (confirmed-empty cells drop to zero).
+            if (belief != null && Time.time >= nextStep)
+            {
+                nextStep = Time.time + 0.25f;
+                belief.Step();
+                belief.Observe(maniac.Motor.Position, maniac.Perception.FacingDirection,
+                    maniac.Config.sightRange, maniac.Config.sightConeAngle * 0.5f, HasLineOfSight);
+            }
+
             if (looking)
             {
                 maniac.Nav.Stop();
                 // Sweep the sight cone side-to-side so a peeking player is caught.
                 float sweep = Mathf.Sin(Time.time * maniac.Config.searchScanSpeed) * (maniac.Config.searchScanAngle * 0.5f);
                 maniac.Perception.FacingDirection = Rotate(scanBase, sweep);
-                if (Time.time >= lookUntil) { index++; GoToCurrent(); }
+                if (Time.time >= lookUntil) PickTarget();
                 return;
             }
 
-            maniac.Nav.MoveTo(points[index], maniac.Config.searchSpeed);
+            maniac.Nav.MoveTo(target, maniac.Config.searchSpeed);
             if (maniac.Nav.ReachedDestination(maniac.Config.waypointTolerance) || Time.time >= pointDeadline)
+                BeginLook(Time.time + maniac.Config.searchLookSeconds);
+        }
+
+        // Physics line of sight for the belief map's Observe (walls block).
+        bool HasLineOfSight(Vector2 a, Vector2 b)
+        {
+            foreach (var hit in Physics2D.LinecastAll(a, b, maniac.Config.sightBlockers))
             {
-                looking = true;
-                lookUntil = Time.time + maniac.Config.searchLookSeconds;
-                maniac.Nav.Stop();
-                // Scan around whatever way he's currently facing.
-                scanBase = maniac.Perception.FacingDirection.sqrMagnitude > 0.01f
-                    ? maniac.Perception.FacingDirection.normalized
-                    : Vector2.down;
+                if (hit.collider == null || hit.collider.isTrigger) continue;
+                if (hit.collider.transform.root == maniac.transform.root) continue;
+                return false;
             }
+            return true;
         }
 
         static Vector2 Rotate(Vector2 v, float degrees)

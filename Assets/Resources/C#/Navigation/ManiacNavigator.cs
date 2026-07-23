@@ -30,9 +30,15 @@ namespace TimeKiller.Navigation
         Vector2 lastDest;
         float nextRepath;
 
+        Bounds bounds;
+
         public bool Ready => grid != null;
         public int PathCount => path != null ? path.Count : 0;
         public Vector2 CurrentWaypoint => (path != null && index < path.Count) ? path[index] : motor.Position;
+
+        /// For other systems (the search belief map): the sampled world bounds and walkability.
+        public Bounds WorldBounds => bounds;
+        public bool IsWalkable(Vector2 world) => grid != null && grid.IsWalkable(world);
 
         void Awake() => motor = GetComponent<ManiacMotor>();
 
@@ -41,8 +47,8 @@ namespace TimeKiller.Navigation
         /// Re-sample the world (call after the layout changes — opened doors, etc.).
         public void Rebuild()
         {
-            var b = ComputeWorldBounds();
-            grid = new WalkabilityGrid(b, 0.5f, clearance); // 0.5 spacing, integer-aligned (catches thin wall strips)
+            bounds = ComputeWorldBounds();
+            grid = new WalkabilityGrid(bounds, 0.5f, clearance); // 0.5 spacing, integer-aligned (catches thin wall strips)
             finder = new GridPathfinder(grid);
         }
 

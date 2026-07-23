@@ -2,6 +2,10 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-24 (later 2) — Maniac smart-search: belief map
+
+Losing sight now triggers *reasoning*, not a rote sweep. `Maniac/PlayerBeliefMap.cs` is a probability field ("where did the player go?"): seeded at the last-seen spot and biased forward along the direction the player was fleeing (`ManiacPerception.LastSeenDirection`), it spreads along walkable corridors, and — the key move — **collapses to zero wherever he looks and doesn't find you**, so he never re-checks cleared ground. `SearchState` paths (via the A* navigator) to the highest-probability cell, scans, then moves to the next likeliest; the brain still decides *when* to give up. Pure (walkability + line-of-sight are delegates) → unit-tested (collapse-on-look, flee bias, never-into-walls); live lifecycle verified (seeded → hunted toward the flee spot → belief collapsed → gave up to Patrol).
+
 ## 2026-07-24 (later) — Audio pack delivered via Git LFS
 
 The horror music the tension radar uses is now actually in the repo. Trimmed the 1.6GB Horror Sounds pack: removed macOS junk + the unused Fantasy pack (~73MB), and committed the **22 tracks the game references** (687MB) via **Git LFS** (`*.wav` already LFS-tracked). The ~817MB of unauditioned tracks stay gitignored/local for future layer sorting. AudioConfig's clip references now resolve on a fresh clone. Follow-up: re-encode the committed WAVs to OGG (~10× smaller) once an audio encoder is available — 687MB brushes the free LFS tier.
