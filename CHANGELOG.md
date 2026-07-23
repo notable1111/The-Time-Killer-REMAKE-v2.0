@@ -2,6 +2,19 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-24 — Maniac AI overhaul + escape balance + audio wiring
+
+**Maniac AI** — he stops being predictable and stops getting stuck:
+- **Utility-AI brain** (`Maniac/ManiacBrain.cs`): replaces hard-coded state transitions with weighted scoring — every frame each behavior (Patrol/Investigate/Search/Chase) gets a utility from considerations (line of sight, time-since-seen, noise recency × proximity) and the highest wins, with a stickiness bonus against flip-flop. Decisions now *emerge* from competing scores (e.g. a fresh noise pulls him off a search). States are pure behaviors; the brain owns transitions. Attack swing + the Outlast wardrobe-march stay reactive. Pure `Score()` is unit-tested (7 scenarios). F1 overlay shows live P/I/S/C scores. Tunables in `ManiacConfig` "Brain".
+- **Custom grid A\* pathfinding** (`C#/Navigation/`: WalkabilityGrid + GridPathfinder + ManiacNavigator): he now routes *around* walls/pillars instead of grinding into them. Patrol/Investigate/Search/wardrobe-march path around obstacles (chase keeps the breadcrumb trail). Grid samples the physics world at 0.5-unit **integer-aligned** nodes (this map's wall colliders are thin strips on integer coords — a coarse grid missed them), ALL layers (walls live on several), binary-heap A* + line-of-sight string-pull. ~0.2ms/query, clean routes to all 12 patrol waypoints.
+- **Search behavior** (`SearchState`): losing sight no longer snaps him back to patrol — he sweeps your last-seen spot + nearest waypoints, scanning his sight cone at each, before giving up. The servant passage stays off the search route (still a real blind-spot escape).
+
+**Post-hit escape balance** (`PlayerHealthConfig`): you can actually get away now. Invulnerability 1.5→2.2s (was *shorter* than the burst — he re-hit you), adrenaline 1.3×/2.5s→1.55×/4s (run 6.98 vs his chase 5.2 = +1.78/s for 4s ≈ break-sight-and-corner distance), shove 8→11.
+
+**Dev tool** (`Camera/DebugManiacCam.cs`): press **P** to snap the camera to the maniac, P again to return — editor/dev-only, for watching his behavior.
+
+**Audio** — the tension radar upgraded to the new Horror Sounds pack, re-sorted by the user's ear: new **Mystery/Approach** layer added between Dread and Investigate (driven by hand-placed `mysteryZones`); layers renamed Dread/Investigate (was Calm/Tense); tracks wired via Setup/24 from the pack, stings still on the PSX pack. NOTE: the 1.6GB Horror Sounds pack is **gitignored** (wired in code, kept local, delivered separately — trim + Git LFS follow-up); AudioConfig references resolve once the pack is present.
+
 ## 2026-07-23 (later) — Workflow upgrade: Claude fully integrated with the editor
 
 Research-driven tooling pass (verified deep-research report): Claude now works in the editor programmatically instead of screenshot-clicking.

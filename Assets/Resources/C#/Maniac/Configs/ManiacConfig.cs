@@ -30,8 +30,22 @@ namespace TimeKiller.Maniac
         [Tooltip("Layers that block line of sight (walls).")]
         public LayerMask sightBlockers = ~0;
 
+        [Header("Search (the lost-sight hunt — replaces the abrupt give-up)")]
+        [Tooltip("Speed while sweeping for you after losing sight — alert, between patrol and investigate.")]
+        public float searchSpeed = 2.6f;
+        [Tooltip("How many spots he checks before giving up. First is your last-seen position; the rest are the nearest patrol waypoints (known-reachable).")]
+        public int searchPoints = 3;
+        [Tooltip("Seconds he stops to scan his sight cone at each search spot.")]
+        public float searchLookSeconds = 1.7f;
+        [Tooltip("Anti-stuck: max seconds to reach a search spot before moving to the next.")]
+        public float searchTravelTimeout = 4f;
+        [Tooltip("Total degrees he sweeps his sight cone side-to-side while looking (catches a peeking player).")]
+        public float searchScanAngle = 120f;
+        [Tooltip("How fast the scan sweeps.")]
+        public float searchScanSpeed = 2f;
+
         [Header("Chase (the balancing valve)")]
-        [Tooltip("GENEROUS on purpose: seconds after losing line of sight before he gives up and investigates your last seen spot.")]
+        [Tooltip("GENEROUS on purpose: seconds after losing line of sight before he gives up and searches your last seen area.")]
         public float loseSightSeconds = 2.5f;
         [Tooltip("Seconds between breadcrumbs recorded while chasing (he follows the player's trail through corridors).")]
         public float breadcrumbInterval = 0.15f;
@@ -53,6 +67,20 @@ namespace TimeKiller.Maniac
         public float bodyMass = 400f;
         [Tooltip("After his hit lands the player can slip THROUGH him for this long — otherwise his unpushable body can pin a cornered player (design 2026-07-23). Collision restores once they separate.")]
         public float phaseThroughSeconds = 2.5f;
+
+        [Header("Brain (utility AI — scores each behavior, highest wins)")]
+        [Tooltip("Baseline pull toward Patrol when nothing else scores. The floor every other behavior must beat.")]
+        public float brainPatrolBaseline = 0.15f;
+        [Tooltip("Peak weight of the Search urge right after losing sight.")]
+        public float brainSearchWeight = 0.9f;
+        [Tooltip("Seconds after last seeing you that he keeps hunting (Search fades to 0 over this).")]
+        public float brainSearchMemory = 8f;
+        [Tooltip("Peak weight of Investigate for a fresh, close noise.")]
+        public float brainNoiseWeight = 0.8f;
+        [Tooltip("Seconds over which a heard noise loses its pull.")]
+        public float brainNoiseMemory = 5f;
+        [Tooltip("Bonus added to whatever he's currently doing — stops rapid flip-flopping between behaviors.")]
+        public float brainStickiness = 0.1f;
 
         [Header("Patrol")]
         [Tooltip("How close to a waypoint counts as reached.")]

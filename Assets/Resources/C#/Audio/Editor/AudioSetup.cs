@@ -1,7 +1,8 @@
 // Menu: TimeKiller/Setup/24 - Setup Audio Director (tension music).
-// Creates AudioConfig.asset, wires the PSX pack tracks (royalty-free,
-// credited in README) into the four layers + stings, and builds the
-// AudioDirector object with its three AudioSources.
+// Creates/updates AudioConfig.asset, wires the user's ear-sorted Horror Sounds
+// tracks (2026-07-23) into Dread/Mystery/Investigate/Chase/Safe + Menu, keeps
+// the PSX-pack stings, and builds the AudioDirector object with its sources.
+// Music root: Outsource/Horror Sounds. Stings root: the PSX pack (unchanged).
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -12,7 +13,8 @@ namespace TimeKiller.Audio.EditorTools
     public static class AudioSetup
     {
         const string ConfigPath = "Assets/Resources/C#/Audio/Configs/AudioConfig.asset";
-        const string MusicRoot = "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX";
+        const string HorrorRoot = "Assets/Resources/Outsource/Horror Sounds";
+        const string PsxRoot = "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX";
 
         [MenuItem("TimeKiller/Setup/24 - Setup Audio Director (tension music)")]
         public static void Build()
@@ -25,25 +27,42 @@ namespace TimeKiller.Audio.EditorTools
                 AssetDatabase.CreateAsset(config, ConfigPath);
             }
 
-            config.calmTracks = Clips("Ambience Tracks",
-                "Creepy Ambience 1 master", "Creepy Ambience 2 Master", "Creepy Ambience 3 Master",
-                "Creepy Ambience 4 Track", "Creepy Ambience 5 track");
-            config.tenseTracks = Clips("Ambience Tracks",
-                "Tense Ambience 1 Master", "Tense Ambience 2", "Tense Ambience 3 Track ", "Tense Ambience 4");
-            config.chaseTracks = Clips("Chase Tracks",
-                "Chase Track 1 Master", "Chase Track 2 Master", "Chase Track 3 Master");
-            config.safeTracks = Clips("Safe Room Tracks",
-                "Safe Room- Safe Point Track Master", "Safe Room Track 2 Master", "Safe Room Track 3");
-            config.spottedStings = Clips("SFX", "Jumpscare Sfx", "Jumpscare Sfx 2", "Jumpscare SFX 3");
-            config.heardRiser = Clip("SFX", "Dark Riser");
-            config.deathSting = Clip("SFX", "Death Sfx");
+            // --- Music layers: the user's ear-sort of the Horror Sounds pack ---
+            config.dreadTracks = Music(
+                "Music/Insidious Fog.wav", "Music/Haunted Manor.wav", "Music/Shadow.wav");
+            config.mysteryTracks = Music(
+                "Music/Forgotten Asylum.wav", "Music/Entity Behind Glass.wav",
+                "Music/Blood Moon Ritual.wav", "Music/Necrotic Decay.wav");
+            config.investigateTracks = Music(
+                "Music/Abyssal Depths.wav", "Music/Breathing Walls.wav",
+                "Horror_Music_Pack_Starter_Kit/WAV_LIGHT_TENSION_LOOP_The_Urge_to_Kill.wav",
+                "Music/Deep Creeping Horror.wav", "Music/It's in the Blood.wav");
+            config.chaseTracks = Music(
+                "Horror_Music_Pack_Starter_Kit/WAV_TENSION_LOOP_The_Wood_Monster.wav",
+                "Music/Containment Breach.wav",
+                "Horror_Music_Pack_Starter_Kit/WAV_MENU_FULL_Systolic_Menace.wav");
+            config.safeTracks = Music(
+                "Horror_Music_Pack_Starter_Kit/WAV_AMBIENCE_LOOP_Mirrored_Reflections.wav",
+                "AWakingDream_I.wav", "Music/Whispers in the Void.wav");
+            config.menuTracks = Music(
+                "Music/Toxic Corridor.wav", "Music/Mutation Chamber.wav",
+                "Music/Phantom Echoes.wav", "Music/Desolate Wasteland.wav");
+
+            // --- Stings stay on the PSX pack (not part of the music re-sort) ---
+            config.spottedStings = new[]
+            {
+                Psx("SFX", "Jumpscare Sfx"), Psx("SFX", "Jumpscare Sfx 2"), Psx("SFX", "Jumpscare SFX 3"),
+            }.Where(c => c != null).ToArray();
+            config.heardRiser = Psx("SFX", "Dark Riser");
+            config.deathSting = Psx("SFX", "Death Sfx");
+
             EditorUtility.SetDirty(config);
             AssetDatabase.SaveAssets();
 
-            int wired = config.calmTracks.Length + config.tenseTracks.Length + config.chaseTracks.Length
-                + config.safeTracks.Length + config.spottedStings.Length;
-            if (wired < 15)
-                Debug.LogWarning($"[TimeKiller Setup] Only {wired} tracks wired — check the PSX pack paths.");
+            int music = config.dreadTracks.Length + config.mysteryTracks.Length + config.investigateTracks.Length
+                + config.chaseTracks.Length + config.safeTracks.Length;
+            if (music < 15)
+                Debug.LogWarning($"[TimeKiller Setup] Only {music} music tracks wired — check the Horror Sounds paths (WAVs must be imported).");
 
             var old = GameObject.Find("AudioDirector");
             if (old != null) Undo.DestroyObjectImmediate(old);
@@ -59,7 +78,11 @@ namespace TimeKiller.Audio.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
 
             UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(root.scene);
-            Debug.Log($"[TimeKiller Setup] Audio director ready: {wired} tracks across Calm/Tense/Chase/Safe + stings. The music is your threat radar now.");
+            Debug.Log($"[TimeKiller Setup] Audio director ready: {music} music tracks across "
+                + $"Dread({config.dreadTracks.Length})/Mystery({config.mysteryTracks.Length})/"
+                + $"Investigate({config.investigateTracks.Length})/Chase({config.chaseTracks.Length})/"
+                + $"Safe({config.safeTracks.Length}) + Menu({config.menuTracks.Length}) + stings. "
+                + "The music is your threat radar now.");
         }
 
         static AudioSource Source(GameObject root, string name)
@@ -72,13 +95,17 @@ namespace TimeKiller.Audio.EditorTools
             return source;
         }
 
-        static AudioClip[] Clips(string folder, params string[] names) =>
-            names.Select(n => Clip(folder, n)).Where(c => c != null).ToArray();
+        // Music by path relative to the Horror Sounds root (extension included).
+        static AudioClip[] Music(params string[] relPaths) =>
+            relPaths.Select(p => LoadAt($"{HorrorRoot}/{p}")).Where(c => c != null).ToArray();
 
-        static AudioClip Clip(string folder, string name)
+        // Stings from the PSX pack (mp3 in named subfolders).
+        static AudioClip Psx(string folder, string name) => LoadAt($"{PsxRoot}/{folder}/{name}.mp3");
+
+        static AudioClip LoadAt(string assetPath)
         {
-            var clip = AssetDatabase.LoadAssetAtPath<AudioClip>($"{MusicRoot}/{folder}/{name}.mp3");
-            if (clip == null) Debug.LogWarning($"[TimeKiller Setup] Track not found: {folder}/{name}.mp3");
+            var clip = AssetDatabase.LoadAssetAtPath<AudioClip>(assetPath);
+            if (clip == null) Debug.LogWarning($"[TimeKiller Setup] Track not found: {assetPath}");
             return clip;
         }
     }

@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: PlayerHealthConfig
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Player.PlayerHealthConfig
   maxHealth: 3
-  invulnerabilitySeconds: 1.5
-  shoveImpulse: 8
+  invulnerabilitySeconds: 2.2
+  shoveImpulse: 11
   hitFlashSeconds: 0.15
+  adrenalineMultiplier: 1.55
+  adrenalineSeconds: 4
   respawnOnDeath: 1

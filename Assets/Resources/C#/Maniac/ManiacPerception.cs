@@ -23,6 +23,7 @@ namespace TimeKiller.Maniac
         public float LastSeenTime { get; private set; } = float.NegativeInfinity;
         public bool HasUnhandledNoise { get; private set; }
         public Vector2 LastNoisePosition { get; private set; }
+        public float LastNoiseTime { get; private set; } = float.NegativeInfinity; // for the brain's noise-recency score
         public Vector2 FacingDirection { get; set; } = Vector2.down; // set by controller from velocity
 
         public void Init(ManiacConfig maniacConfig)
@@ -53,6 +54,7 @@ namespace TimeKiller.Maniac
             if (Vector2.Distance(transform.position, step.Position) > heardRadius) return;
 
             LastNoisePosition = step.Position;
+            LastNoiseTime = Time.time;
             HasUnhandledNoise = true;
             EventBus.Publish(new ManiacHeardNoiseEvent { NoisePosition = step.Position });
         }

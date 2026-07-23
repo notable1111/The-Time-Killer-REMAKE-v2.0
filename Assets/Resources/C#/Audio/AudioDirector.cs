@@ -1,8 +1,10 @@
 // The tension radar. Listens to the maniac's events on the bus (never
 // references him directly) and keeps ONE music layer playing at a time with
-// crossfades: Safe (inside the servant passage) > Chase > Tense > Calm.
-// Stings: jumpscare on spotted, dark riser when he first hears you (from
-// Calm only), death sting. Fully removable — delete the object, game runs.
+// crossfades. Priority (high→low): Chase > Safe > Investigate > Mystery > Dread.
+// Mystery is the "about to enter / act" approach dread, driven by hand-placed
+// mysteryZones. Stings: jumpscare on spotted, dark riser when he first hears
+// you (from an unaware layer), death sting. Fully removable — delete the
+// object, game runs.
 using TimeKiller.Core;
 using TimeKiller.Maniac;
 using TimeKiller.Player;
@@ -12,7 +14,7 @@ namespace TimeKiller.Audio
 {
     public class AudioDirector : MonoBehaviour
     {
-        public enum Layer { Calm, Tense, Chase, Safe }
+        public enum Layer { Dread, Mystery, Investigate, Chase, Safe }
 
         [SerializeField] AudioConfig config;
         [SerializeField] AudioSource musicA;
@@ -61,9 +63,10 @@ namespace TimeKiller.Audio
 
         void OnHeard(ManiacHeardNoiseEvent evt)
         {
-            // Only the FIRST suspicion out of calm gets the riser — constant
-            // re-triggers while already tense would wear it out.
-            if (currentLayer != Layer.Calm || Time.time < nextRiser) return;
+            // Only the FIRST suspicion from an unaware layer gets the riser —
+            // constant re-triggers while already alert would wear it out.
+            bool unaware = currentLayer == Layer.Dread || currentLayer == Layer.Mystery;
+            if (!unaware || Time.time < nextRiser) return;
             if (config.heardRiser != null)
                 stings.PlayOneShot(config.heardRiser, config.stingVolume);
             nextRiser = Time.time + config.riserCooldown;
@@ -101,14 +104,20 @@ namespace TimeKiller.Audio
         Layer DesiredLayer()
         {
             bool chased = maniacState == nameof(ChaseState) || maniacState == nameof(AttackState);
-            if (!chased && InSafeZone()) return Layer.Safe;
             if (chased) return Layer.Chase;
-            if (maniacState == nameof(InvestigateState)) return Layer.Tense;
-            return Layer.Calm;
+            if (InSafeZone()) return Layer.Safe;
+            // Both "he heard you" and "he's hunting where he lost you" keep the tension up.
+            if (maniacState == nameof(InvestigateState) || maniacState == nameof(SearchState)) return Layer.Investigate;
+            if (InMysteryZone()) return Layer.Mystery;
+            return Layer.Dread;
         }
 
-        bool InSafeZone()
+        bool InSafeZone() => InAnyZone(config.safeZones);
+        bool InMysteryZone() => InAnyZone(config.mysteryZones);
+
+        bool InAnyZone(Rect[] zones)
         {
+            if (zones == null || zones.Length == 0) return false;
             if (player == null)
             {
                 var controller = Object.FindAnyObjectByType<PlayerController>();
@@ -116,7 +125,7 @@ namespace TimeKiller.Audio
                 player = controller.transform;
             }
             Vector2 p = player.position;
-            foreach (var zone in config.safeZones)
+            foreach (var zone in zones)
                 if (zone.Contains(p)) return true;
             return false;
         }
@@ -125,20 +134,22 @@ namespace TimeKiller.Audio
         {
             var pool = layer switch
             {
-                Layer.Tense => config.tenseTracks,
+                Layer.Mystery => config.mysteryTracks,
+                Layer.Investigate => config.investigateTracks,
                 Layer.Chase => config.chaseTracks,
                 Layer.Safe => config.safeTracks,
-                _ => config.calmTracks,
+                _ => config.dreadTracks,
             };
             return pool != null && pool.Length > 0 ? pool[Random.Range(0, pool.Length)] : null;
         }
 
         float LayerVolume(Layer layer) => layer switch
         {
-            Layer.Tense => config.tenseVolume,
+            Layer.Mystery => config.mysteryVolume,
+            Layer.Investigate => config.investigateVolume,
             Layer.Chase => config.chaseVolume,
             Layer.Safe => config.safeVolume,
-            _ => config.calmVolume,
+            _ => config.dreadVolume,
         };
 
         void BeginCrossfade(AudioClip next, float volume)

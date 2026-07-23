@@ -3,6 +3,7 @@
 // publishes state changes on the EventBus, feeds the perception cone with his
 // movement direction. Built in the scene by TimeKiller/Setup/20.
 using TimeKiller.Core;
+using TimeKiller.Navigation;
 using TimeKiller.Player;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ namespace TimeKiller.Maniac
     [RequireComponent(typeof(ManiacMotor))]
     [RequireComponent(typeof(ManiacPerception))]
     [RequireComponent(typeof(ManiacBreadcrumbs))]
+    [RequireComponent(typeof(ManiacNavigator))]
     public class ManiacController : MonoBehaviour
     {
         [SerializeField] ManiacConfig config;
@@ -21,9 +23,11 @@ namespace TimeKiller.Maniac
         public ManiacMotor Motor { get; private set; }
         public ManiacPerception Perception { get; private set; }
         public ManiacBreadcrumbs Breadcrumbs { get; private set; }
+        public ManiacNavigator Nav { get; private set; }
 
         public PatrolState Patrol { get; private set; }
         public InvestigateState Investigate { get; private set; }
+        public SearchState Search { get; private set; }
         public ChaseState Chase { get; private set; }
         public AttackState Attack { get; private set; }
 
@@ -37,6 +41,7 @@ namespace TimeKiller.Maniac
         public Vector2? CompromisedSpot { get; private set; }
 
         readonly StateMachine stateMachine = new StateMachine();
+        ManiacBrain brain;
         Transform player;
         Collider2D ownCollider;
         Collider2D playerCollider;
@@ -69,6 +74,8 @@ namespace TimeKiller.Maniac
             Motor = GetComponent<ManiacMotor>();
             Perception = GetComponent<ManiacPerception>();
             Breadcrumbs = GetComponent<ManiacBreadcrumbs>();
+            Nav = GetComponent<ManiacNavigator>();
+            if (Nav == null) Nav = gameObject.AddComponent<ManiacNavigator>(); // existing scene maniac
             if (config == null) Debug.LogError("[ManiacController] ManiacConfig not assigned.");
             if (route == null) Debug.LogError("[ManiacController] Patrol route not assigned.");
 
@@ -78,8 +85,10 @@ namespace TimeKiller.Maniac
 
             Patrol = new PatrolState(this);
             Investigate = new InvestigateState(this);
+            Search = new SearchState(this);
             Chase = new ChaseState(this);
             Attack = new AttackState(this);
+            brain = new ManiacBrain(this);
 
             stateMachine.StateChanged += OnStateChanged;
         }
@@ -95,12 +104,41 @@ namespace TimeKiller.Maniac
             stateMachine.ChangeState(Patrol);
             DebugOverlay.Watch("Maniac", () => stateMachine.Current?.GetType().Name ?? "none");
             DebugOverlay.Watch("Maniac Sees", () => Perception.CanSeePlayer ? "PLAYER!" : "-");
+            DebugOverlay.Watch("Brain", () =>
+            {
+                var s = brain.LastScores;
+                return $"P{s[0]:F2} I{s[1]:F2} S{s[2]:F2} C{s[3]:F2}";
+            });
         }
 
         public void ChangeState(IState next) => stateMachine.ChangeState(next);
 
+        static ManiacBehavior BehaviorOf(IState s) =>
+            s is ChaseState || s is AttackState ? ManiacBehavior.Chase :
+            s is SearchState ? ManiacBehavior.Search :
+            s is InvestigateState ? ManiacBehavior.Investigate :
+            ManiacBehavior.Patrol;
+
+        IState StateOf(ManiacBehavior b) => b switch
+        {
+            ManiacBehavior.Chase => Chase,
+            ManiacBehavior.Search => Search,
+            ManiacBehavior.Investigate => Investigate,
+            _ => Patrol,
+        };
+
         void Update()
         {
+            // The utility brain chooses the high-level behavior. Attack is a
+            // committed swing and the Outlast wardrobe-march (CompromisedSpot) is
+            // reactive — the brain owns everything else.
+            var current = stateMachine.Current;
+            if (brain != null && !(current is AttackState) && !CompromisedSpot.HasValue)
+            {
+                var want = StateOf(brain.Decide(BehaviorOf(current)));
+                if (want != current) ChangeState(want);
+            }
+
             stateMachine.Tick(Time.deltaTime);
             // The sight cone points where he's moving (or keeps its last aim while still).
             if (Motor.CurrentVelocity.sqrMagnitude > 0.04f)
@@ -129,6 +167,7 @@ namespace TimeKiller.Maniac
             EventBus.Unsubscribe<TimeKiller.Hiding.PlayerUnhidEvent>(OnPlayerUnhid);
             DebugOverlay.Unwatch("Maniac");
             DebugOverlay.Unwatch("Maniac Sees");
+            DebugOverlay.Unwatch("Brain");
         }
 
         void OnPlayerHid(TimeKiller.Hiding.PlayerHidEvent evt)
