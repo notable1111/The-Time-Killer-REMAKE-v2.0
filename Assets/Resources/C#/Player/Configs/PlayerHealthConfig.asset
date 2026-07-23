@@ -18,4 +18,4 @@ MonoBehaviour:
   hitFlashSeconds: 0.15
   adrenalineMultiplier: 1.55
   adrenalineSeconds: 4
-  respawnOnDeath: 1
+  respawnOnDeath: 0

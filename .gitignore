@@ -81,3 +81,4 @@ __pycache__/
 # to shrink the committed set. macOS junk + the unused Fantasy pack were trimmed.
 /[Aa]ssets/[Rr]esources/[Oo]utsource/Horror Sounds/
 /[Aa]ssets/[Rr]esources/[Oo]utsource/Horror Sounds.meta
+/Clock.png

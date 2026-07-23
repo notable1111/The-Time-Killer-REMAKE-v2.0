@@ -13,15 +13,19 @@ namespace TimeKiller.Testing
         public Vector2 MoveInput { get; private set; }
         public bool RunHeld { get; private set; }
         public bool InteractPressed { get; private set; }
+        public bool SkillCheckPressed { get; private set; }
 
         public Vector2? Target;              // world position to walk toward
         public bool Run;                     // sprint toward the target
         public float arriveTolerance = 0.15f;
 
         bool interactQueued;
+        bool skillCheckQueued;
 
         /// Queue a single E press (consumed on the next frame, like a real tap).
         public void QueueInteract() => interactQueued = true;
+        /// Queue a single Space press (clock-repair skill-check).
+        public void QueueSkillCheck() => skillCheckQueued = true;
 
         public bool Arrived => Target == null;
 
@@ -30,6 +34,8 @@ namespace TimeKiller.Testing
             // One-frame interact pulse, exactly like a physical key tap.
             InteractPressed = interactQueued;
             interactQueued = false;
+            SkillCheckPressed = skillCheckQueued;
+            skillCheckQueued = false;
 
             RunHeld = Run;
 

@@ -2,6 +2,28 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-24 (later 3) — The escape loop: fix the clocks, open the gate, get out
+
+The game now has a win condition *and* a lose condition — a run can be finished, and it can be ended.
+
+**Objectives** (`C#/Objectives/`, namespace `TimeKiller.Objectives`) — the DbD-style core loop: three broken clocks scattered across the map, each repaired through a **SPACE skill-check** mini-game (a marker sweeps a bar; hit the green zone for progress, miss for a small penalty plus a quiet noise the maniac may hear). Fix all three and the exit gate unlocks; reach it and you escape. `ClockObjective` (broken/fixed sprites + green Light2D + a static registry so spawn order never matters), `ClockRepair` (player-side mini-game, reads the new `IInputSource.SkillCheckPressed`), `ObjectiveManager` (tally → `AllClocksFixedEvent` → win), `ExitDoor`, `ObjectiveHUD`, `ClockConfig` (SO). Menu `Setup/28`.
+
+**Hand-placed on the real map** — clocks sit in the three far corners, each beside a wardrobe: chapel NW `(-7, 29.45)`, kitchen S `(37, -6.5)`, library NE `(46.5, 20.8)`. The gate is on the west corridor's north wall `(-3, 6.45)` — visible-but-locked from spawn, so you see the way out in the first seconds and then have to cross the map three times. Every spot verified clear of walls, furniture and corridor mouths. Placement is protected the same way as HidingSpots/Furniture: Setup/28 refuses to rebuild if `Clocks` exists.
+
+**Real gate art** — PixelLab (`create_map_object`, side view, 128×192): an iron-banded oak double door in a weathered stone arch, replacing the grey placeholder quad. The open state was composited from the locked sprite's arch + the generated swung leaves + a baked moonlit void, so **both states share a pixel-identical frame** — opening reads as doors moving, not the gate morphing. 64 PPU → exactly the 2-cell wall segment it hangs on. The open gate swaps to an **unlit** material so the night beyond glows on its own.
+
+**Endgame audio** — the biggest moment in the game is no longer silent:
+- The unlock fires a deliberately **non-positional** deep impact: the whole castle hears the gate give way.
+- The open gate runs a looping **3D wind beacon** (linear rolloff, ~26 units) so you can navigate back to it by ear across a dark map.
+- New **Endgame music layer** in AudioDirector, ranked `Chase > Endgame > Safe > Investigate > Mystery > Dread`, latched by `AllClocksFixedEvent`. Plus an escape sting on `GameWonEvent`.
+- **The maniac hears it too.** New Core event `WorldNoiseEvent{Position, Loudness, AlwaysHeard}` — noises made by the world rather than by the player's feet. `ManiacPerception` subscribes alongside footsteps; `AlwaysHeard` skips his hearing radius, so he learns where the exit is and starts heading over. Verified: he walked from (31, 24) all the way to the gate. The final stretch is now the tensest part of the run.
+
+**Run flow** (`C#/Core/GameFlow.cs` + `RunEndScreen.cs`, menu `Setup/29`) — **death now ends the run** (`respawnOnDeath` off; flip it back on for forgiving map-testing). `RunPhase{Playing,Won,Lost}` + `RunEndedEvent`: Core owns the run timer, freezes `Time.timeScale`, and handles **R** (scene reload) / **Esc** (quit). Core stays ignorant of clocks and maniacs — features *publish* the ending (ObjectiveManager on the win, PlayerHealth on the last hit point), and the clock tally reaches the screen through an optional `GameFlow.ProvideSummary` hook. The uGUI end screen fades on *unscaled* time (the game is frozen) and shows the headline, `survived m:ss · X / N clocks fixed`, and the restart prompt. Setup/29 also registers the scene in Build Settings — `LoadScene` can't find an unlisted scene, so restart would silently fail without it.
+
+Verified live: real killing blow → `Lost`, no respawn; escape → `Won`; restart → scene reloaded with clocks 0/3, full health, gate re-locked, timeScale 1, endgame music flag cleared. Console clean. Endgame track and escape sting are placeholder picks awaiting an ear-sort.
+
+Shrank the committed audio ~12×. Re-encoded the 22 used tracks from WAV to OGG (Vorbis q5, ~134 kbit/s — transparent for game music) via ffmpeg, re-pointed `AudioSetup.cs` to `.ogg`, re-ran Setup/24 so AudioConfig references the OGGs (verified: all 22 clips resolve, 0 null), and removed the WAVs. Fresh clones now pull ~58MB instead of 687MB. (The original WAV objects still sit in LFS *history* from the earlier delivery commit — an optional history rewrite would reclaim that storage; the working tree and new clones are already small.)
+
 ## 2026-07-24 (later 2) — Maniac smart-search: belief map
 
 Losing sight now triggers *reasoning*, not a rote sweep. `Maniac/PlayerBeliefMap.cs` is a probability field ("where did the player go?"): seeded at the last-seen spot and biased forward along the direction the player was fleeing (`ManiacPerception.LastSeenDirection`), it spreads along walkable corridors, and — the key move — **collapses to zero wherever he looks and doesn't find you**, so he never re-checks cleared ground. `SearchState` paths (via the A* navigator) to the highest-probability cell, scans, then moves to the next likeliest; the brain still decides *when* to give up. Pure (walkability + line-of-sight are delegates) → unit-tested (collapse-on-look, flee bias, never-into-walls); live lifecycle verified (seeded → hunted toward the flee spot → belief collapsed → gave up to Patrol).

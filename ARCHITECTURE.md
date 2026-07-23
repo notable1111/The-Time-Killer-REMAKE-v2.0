@@ -18,6 +18,9 @@ How the systems of The Time Killer Remake connect. Update this file whenever a s
 - **EventBus** — static typed publish/subscribe (`EventBus.Publish(new SomeEvent{...})`). The only sanctioned way for systems to talk across features.
 - **ServiceLocator** — registry for long-lived services (`Register<T>` / `Get<T>`).
 - **StateMachine + IState** — reusable state machine driven by `Tick`/`FixedTick`.
+- **GameFlow** — the shape of one run: `RunPhase{Playing,Won,Lost}`, the run timer, the `Time.timeScale` freeze on the ending beat, **R** to restart (full scene reload — the only reset that can't leak stale state) and **Esc** to quit. Knows nothing about clocks or maniacs: features end a run by publishing `RunEndedEvent{Won, Headline}`, and an optional `GameFlow.ProvideSummary(Func<string>)` hook lends the end screen a one-line objective summary. Scene object built by `Setup/29`, which also registers the scene in Build Settings (restart is a `LoadScene`).
+- **RunEndScreen** — the win/lose canvas (uGUI, sortingOrder 900). Fades on `unscaledDeltaTime` because the game itself is frozen; shows headline, `survived m:ss · X / N clocks fixed`, and the restart prompt.
+- **WorldNoiseEvent** (`WorldEvents.cs`) — noises made by the *world* rather than by the player's feet (the gate crashing open; future props, glass, traps). `{Position, Loudness, AlwaysHeard}`; each listener decides whether it hears it, so nothing here depends on the Maniac feature existing.
 - **DebugOverlay** — F1 overlay: FPS + any values features register via `DebugOverlay.Watch(label, getter)`. Compiled out of release builds.
 - **CoreConfig** (SO) — overlay tunables. Asset: `C#/Core/Configs/CoreConfig.asset`.
 
@@ -107,7 +110,7 @@ One juice moment = ONE asset. `EffectPlayer.Play(recipe, worldPos)` fires a full
 
 ### Audio (`C#/Audio/`, namespace `TimeKiller.Audio`) — the tension radar
 The music IS the threat detector (interview 2026-07-23). One layer at a time, crossfaded (priority: Safe > Chase > Tense > Calm), driven ONLY by bus events — no reference to the maniac.
-- **AudioDirector** — layer priority Chase > Safe > Investigate > **Mystery** > Dread. Chase/Attack→Chase; safe zones (config rects = the servant passage)→Safe when not chased; Investigate/Search→Investigate; **mysteryZones (hand-placed) → Mystery** — the "about to enter/act" approach dread; else Dread (the far-patrol bed, was "Calm"). Stings: random jumpscare on `ManiacSpottedPlayerEvent` (4s cooldown), Dark Riser on first `ManiacHeardNoiseEvent` from an unaware layer (Dread/Mystery), death sting on `PlayerDiedEvent`. Two crossfading music sources + one sting source. F1 overlay shows current layer + track.
+- **AudioDirector** — layer priority Chase > **Endgame** > Safe > Investigate > **Mystery** > Dread. Endgame latches on `AllClocksFixedEvent` (the gate is open — nothing sounds calm again except being seen) and clears on a scene reload. Gate-unlock sting is deliberately non-positional (the whole castle hears it); escape sting on `GameWonEvent`. Chase/Attack→Chase; safe zones (config rects = the servant passage)→Safe when not chased; Investigate/Search→Investigate; **mysteryZones (hand-placed) → Mystery** — the "about to enter/act" approach dread; else Dread (the far-patrol bed, was "Calm"). Stings: random jumpscare on `ManiacSpottedPlayerEvent` (4s cooldown), Dark Riser on first `ManiacHeardNoiseEvent` from an unaware layer (Dread/Mystery), death sting on `PlayerDiedEvent`. Two crossfading music sources + one sting source. F1 overlay shows current layer + track.
 - **AudioConfig** (SO) — track arrays per layer (dread/mystery/investigate/chase/safe/menu), per-layer volumes, sting cooldowns, crossfade time, safeZones + mysteryZones rects. Asset: `C#/Audio/Configs/`. Tracks wired by `Setup/24` from the **Horror Sounds** pack (user's ear-sort), stings from the PSX pack. ⚠️ The 1.6GB Horror Sounds pack is **gitignored** (kept local; delivered separately — trim + Git LFS). AudioConfig's clip refs resolve once the pack is present.
 - Tracks: PSX Horror Music pack (royalty-free, credited). Setup: menu `TimeKiller/Setup/24` (also run by Setup/18).
 
@@ -121,6 +124,18 @@ Design (interview 2026-07-23): **E** to enter/exit a wardrobe; **the Outlast rul
 - Art: AI-generated wardrobes (approved 2026-07-23) — style A flat-top (hall/guardroom/kitchen), style B gothic crown (chapel/great chamber/library), closed+ajar states each, in `Assets/Resources/Assets/Hiding/`. Seven spots: six original + armory (Setup/27, additive — refuses to run if the armory already has one).
 - Fix that rode along: `PlayerAnimationDriver.IsMovingState` is now an explicit Walk/Run list — unknown states (Hiding) no longer play run-clip frame events that would publish phantom footstep noise.
 - Setup: menu `TimeKiller/Setup/25` (also run by Setup/18).
+
+### Objectives (`C#/Objectives/`, namespace `TimeKiller.Objectives`) — the win condition
+The core loop (design 2026-07-24, DbD-inspired): **fix 3 clocks → the exit gate unlocks → escape**. Removable — delete the `Clocks` object and the game still runs.
+- **ClockObjective** — one clock: broken/fixed sprite swap, green Light2D that lights when repaired, repair progress, and a **static registry + `AnyFixed` event** so spawn order never matters.
+- **ClockRepair** (on the Player) — the mini-game: **E** to start, then a marker sweeps a bar and **SPACE** inside the green zone adds progress; a miss costs a little and emits a quiet noise (via `PlayerFootstepEvent`) he may hear. Progress persists; the maniac inside `interruptRange` kicks you out. Reads `IInputSource.SkillCheckPressed` — the same seam co-op/AI input uses.
+- **ObjectiveManager** — tallies fixed vs total, fires `AllClocksFixedEvent` on the last one, publishes `RunEndedEvent` on the win, and lends its tally to the end screen via `GameFlow.ProvideSummary`.
+- **ExitDoor** — locked/open sprite states sharing a pixel-identical stone arch, a blocking collider while locked, a 3D **wind beacon** loop you can navigate back to once it's open, a local creak, and a map-wide `WorldNoiseEvent` on opening so the maniac learns where the exit is. Swaps to an unlit material when open so the night beyond self-glows.
+- **ObjectiveHUD** — IMGUI counter + skill-check bar; hides itself once `GameFlow.Phase != Playing` (the end screen owns the screen from then on).
+- **ClockConfig** (SO) — repair tunables. Asset: `C#/Objectives/Configs/`.
+- **PROTECTED PLACEMENT** — same class as HidingSpots and Furniture: Setup/28 refuses to rebuild if a `Clocks` object exists. Hand-placed spots are recorded as the seed constants in `ClocksSetup.cs`.
+- **Map gotcha worth remembering:** doors belong on **north** walls — south walls render an Overhead band that draws over anything standing there.
+- Art: clock (PixelLab, from the user's reference) in `Assets/Resources/Assets/Objectives/Clock/`; gate in `.../Door/`. Setup: menu `TimeKiller/Setup/28`.
 
 ### Furniture (map v2 props, `FurnitureSetup.cs` in `C#/Editor/`)
 Lived-in dressing for the map-v2 rooms (interview 2026-07-23): kitchen 10 props, armory 9, library 10 (bookcase reused), 28 unique sprites in `Assets/Resources/Assets/Furniture/`.

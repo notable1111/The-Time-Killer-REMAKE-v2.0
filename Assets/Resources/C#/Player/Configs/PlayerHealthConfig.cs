@@ -25,8 +25,9 @@ namespace TimeKiller.Player
         [Tooltip("How long the burst lasts. He never stops chasing — this is your window to break away and reach a hiding spot.")]
         public float adrenalineSeconds = 4f;
 
-        [Header("Death (v1 placeholder rule)")]
-        [Tooltip("Until the save/death design exists: respawn at the spawn point with full health.")]
-        public bool respawnOnDeath = true;
+        [Header("Death")]
+        [Tooltip("OFF (design 2026-07-24): losing your last hit point ends the run — GameFlow shows the lose screen and R restarts. " +
+                 "Turn ON to go back to the old forgiving rule (respawn at spawn with full health) while testing the map.")]
+        public bool respawnOnDeath;
     }
 }

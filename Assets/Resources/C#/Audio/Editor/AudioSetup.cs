@@ -15,6 +15,7 @@ namespace TimeKiller.Audio.EditorTools
         const string ConfigPath = "Assets/Resources/C#/Audio/Configs/AudioConfig.asset";
         const string HorrorRoot = "Assets/Resources/Outsource/Horror Sounds";
         const string PsxRoot = "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX";
+        const string EchoRoot = "Assets/Resources/Outsource/Audio/EchoChambersAmbience";
 
         [MenuItem("TimeKiller/Setup/24 - Setup Audio Director (tension music)")]
         public static void Build()
@@ -55,6 +56,16 @@ namespace TimeKiller.Audio.EditorTools
             }.Where(c => c != null).ToArray();
             config.heardRiser = Psx("SFX", "Dark Riser");
             config.deathSting = Psx("SFX", "Death Sfx");
+
+            // --- Endgame: the gate is open, the run for the door. CANDIDATES —
+            // swap by ear in the AudioConfig inspector; nothing else uses these.
+            config.endgameTracks = new[]
+            {
+                Psx("Chase Tracks", "Chase Track 2 Master"),
+                Psx("Combat Tracks", "Combat Track 2 master"),
+            }.Where(c => c != null).ToArray();
+            config.gateUnlockSting = Echo("Deep Impact_1");
+            config.escapeSting = Echo("Whoosh_1");
 
             EditorUtility.SetDirty(config);
             AssetDatabase.SaveAssets();
@@ -101,6 +112,9 @@ namespace TimeKiller.Audio.EditorTools
 
         // Stings from the PSX pack (mp3 in named subfolders).
         static AudioClip Psx(string folder, string name) => LoadAt($"{PsxRoot}/{folder}/{name}.mp3");
+
+        // One-shots from the Echo Chambers pack (wav).
+        static AudioClip Echo(string name) => LoadAt($"{EchoRoot}/OneShots/{name}.wav");
 
         static AudioClip LoadAt(string assetPath)
         {

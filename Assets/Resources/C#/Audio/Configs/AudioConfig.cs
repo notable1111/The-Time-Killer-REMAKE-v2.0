@@ -25,6 +25,8 @@ namespace TimeKiller.Audio
         public AudioClip[] chaseTracks;
         [Tooltip("Safe — inside a sanctuary (servant passage).")]
         public AudioClip[] safeTracks;
+        [Tooltip("Endgame — every clock is fixed and the gate is open. Outranks all but Chase.")]
+        public AudioClip[] endgameTracks;
         [Tooltip("Menu — future title screen (not driven by the director yet).")]
         public AudioClip[] menuTracks;
 
@@ -34,11 +36,16 @@ namespace TimeKiller.Audio
         [FormerlySerializedAs("tenseVolume")] [Range(0f, 1f)] public float investigateVolume = 0.5f;
         [Range(0f, 1f)] public float chaseVolume = 0.75f;
         [Range(0f, 1f)] public float safeVolume = 0.28f; // quieter than dread — sanctuary whispers (user tuning 2026-07-23)
+        [Range(0f, 1f)] public float endgameVolume = 0.6f;
 
         [Header("Stings")]
         public AudioClip[] spottedStings;  // jumpscare the instant he sees you
         public AudioClip heardRiser;       // dark riser when your noise reaches him
         public AudioClip deathSting;
+        [Tooltip("The last clock lands and the gate gives way — heard map-wide, wherever you are.")]
+        public AudioClip gateUnlockSting;
+        [Tooltip("You step through the gate. Win.")]
+        public AudioClip escapeSting;
         [Range(0f, 1f)] public float stingVolume = 0.85f;
         [Tooltip("Seconds between spotted stings (re-acquiring sight mid-chase shouldn't restack them).")]
         public float spottedStingCooldown = 4f;

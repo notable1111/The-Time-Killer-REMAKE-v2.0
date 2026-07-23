@@ -33,6 +33,7 @@ namespace TimeKiller.Maniac
             EventBus.Subscribe<PlayerFootstepEvent>(OnFootstep);
             EventBus.Subscribe<PlayerHidEvent>(OnPlayerHid);
             EventBus.Subscribe<PlayerUnhidEvent>(OnPlayerUnhid);
+            EventBus.Subscribe<WorldNoiseEvent>(OnWorldNoise);
         }
 
         void OnDestroy()
@@ -40,6 +41,7 @@ namespace TimeKiller.Maniac
             EventBus.Unsubscribe<PlayerFootstepEvent>(OnFootstep);
             EventBus.Unsubscribe<PlayerHidEvent>(OnPlayerHid);
             EventBus.Unsubscribe<PlayerUnhidEvent>(OnPlayerUnhid);
+            EventBus.Unsubscribe<WorldNoiseEvent>(OnWorldNoise);
         }
 
         void OnPlayerHid(PlayerHidEvent evt) => PlayerHidden = true;
@@ -54,10 +56,28 @@ namespace TimeKiller.Maniac
             float heardRadius = config.hearingRadius * Mathf.Clamp01(step.Loudness);
             if (Vector2.Distance(transform.position, step.Position) > heardRadius) return;
 
-            LastNoisePosition = step.Position;
+            Notice(step.Position);
+        }
+
+        // World noises (the escape gate crashing open, future props). AlwaysHeard
+        // ones cut through the radius — he KNOWS the way out just opened.
+        void OnWorldNoise(WorldNoiseEvent noise)
+        {
+            if (config == null) return;
+            if (!noise.AlwaysHeard)
+            {
+                float heardRadius = config.hearingRadius * Mathf.Clamp01(noise.Loudness);
+                if (Vector2.Distance(transform.position, noise.Position) > heardRadius) return;
+            }
+            Notice(noise.Position);
+        }
+
+        void Notice(Vector2 position)
+        {
+            LastNoisePosition = position;
             LastNoiseTime = Time.time;
             HasUnhandledNoise = true;
-            EventBus.Publish(new ManiacHeardNoiseEvent { NoisePosition = step.Position });
+            EventBus.Publish(new ManiacHeardNoiseEvent { NoisePosition = position });
         }
 
         void Update()

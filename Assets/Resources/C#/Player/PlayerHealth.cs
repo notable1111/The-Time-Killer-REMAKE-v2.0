@@ -93,7 +93,12 @@ namespace TimeKiller.Player
             if (Current <= 0)
             {
                 EventBus.Publish(new PlayerDiedEvent { Position = transform.position });
-                if (config.respawnOnDeath)
+                if (!config.respawnOnDeath)
+                {
+                    // The run is over — GameFlow freezes time and shows the screen.
+                    EventBus.Publish(new RunEndedEvent { Won = false, Headline = "HE CAUGHT YOU" });
+                }
+                else
                 {
                     // Teleport through the RIGIDBODY — writing transform.position
                     // alone gets overridden by interpolation on the next physics step.
