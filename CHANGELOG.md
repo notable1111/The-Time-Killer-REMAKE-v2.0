@@ -2,6 +2,10 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-24 (later) — Audio pack delivered via Git LFS
+
+The horror music the tension radar uses is now actually in the repo. Trimmed the 1.6GB Horror Sounds pack: removed macOS junk + the unused Fantasy pack (~73MB), and committed the **22 tracks the game references** (687MB) via **Git LFS** (`*.wav` already LFS-tracked). The ~817MB of unauditioned tracks stay gitignored/local for future layer sorting. AudioConfig's clip references now resolve on a fresh clone. Follow-up: re-encode the committed WAVs to OGG (~10× smaller) once an audio encoder is available — 687MB brushes the free LFS tier.
+
 ## 2026-07-24 — Maniac AI overhaul + escape balance + audio wiring
 
 **Maniac AI** — he stops being predictable and stops getting stuck:

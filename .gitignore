@@ -75,7 +75,9 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 __pycache__/
 
-# Large audio pack (1.6GB) — wired in code, but too big for git.
-# Delivered separately (trim to used tracks + Git LFS). Kept local so the game runs.
+# Horror Sounds pack: the 22 tracks the game USES are committed via Git LFS
+# (force-added past this rule). The rest (unauditioned tracks kept local for
+# future layers) stays ignored — too big for the repo. Re-encode to OGG later
+# to shrink the committed set. macOS junk + the unused Fantasy pack were trimmed.
 /[Aa]ssets/[Rr]esources/[Oo]utsource/Horror Sounds/
 /[Aa]ssets/[Rr]esources/[Oo]utsource/Horror Sounds.meta
