@@ -35,6 +35,11 @@ namespace TimeKiller.Player
             boostUntil = Time.time + seconds;
         }
 
+        /// Swap who drives this character (scripted playtests, future co-op/AI).
+        /// Pass null to re-fetch whatever IInputSource sits on the GameObject.
+        public void SetInputSource(IInputSource source) =>
+            Input = source ?? GetComponent<IInputSource>();
+
         void Awake()
         {
             Motor = GetComponent<PlayerMotor>();

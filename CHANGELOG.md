@@ -2,6 +2,17 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-23 (later) — Workflow upgrade: Claude fully integrated with the editor
+
+Research-driven tooling pass (verified deep-research report): Claude now works in the editor programmatically instead of screenshot-clicking.
+- **unity-mcp bridge** (CoplayDev v10.1.0, MIT, pinned): 48 editor tools over HTTP — menu execution, console reading, scene/object management, tests. Registered for Claude Code in the project `.mcp.json`.
+- **GameEye** (Editor): render any world position to PNG through the real URP pipeline — programmatic screenshots, edit or play mode, plus objective image metrics (luminance).
+- **Automated playtests** (`C#/Testing` + `PlayerController.SetInputSource()`): TestDriver possesses the player through ScriptedInputSource (the co-op/AI input seam), walks waypoints, presses E, reports JSON status; TestTelemetry records bus events. First live run: walked spawn→hall wardrobe, got spotted 18×, hit 6×, died 2×, then hid successfully in the user's hand-placed wardrobe — all hands-free.
+- **SmokeCheck** (menu TimeKiller/Test): read-only scene integrity gate (rig, spots, sprites, camera) — run before every push.
+- **PixelLab MCP** (hosted): pixel-art generation service wired into `.mcp.json`; auth via `PIXELLAB_API_TOKEN` env var — teammates set their own, no secrets in the repo. Acceptance test shipped: kitchen crates + sacks regenerated (the old palette-quantize red tint is gone), processed through the RF-palette pipeline, verified in-game via GameEye.
+- Editor settings for headless play: InteractionMode NoThrottling + runInBackground (play mode keeps ticking while Claude drives from the terminal).
+- Housekeeping: `__pycache__/` gitignored.
+
 ## 2026-07-23 — Map v2 furnished (100%) + hiding feel pass
 
 - **Furniture** (Setup/26): 28 AI-generated props dress the map-v2 rooms — kitchen (table, hearth w/ cauldron, shelf, chopping block, bench, barrel, firewood, sacks, crates, stool), armory (sword/spear racks, armor stand, shield, chest, anvil, training dummy, arrow barrel, grindstone), library (2 bookcase styles ×3, candle-lit desk, lectern, globe, tattered armchair, book stack, flickering candelabra, scroll table). Mixed colliders per team decision: big furniture blocks at its feet, small dressing is walk-through; all props Y-sort with the player + blob shadows.

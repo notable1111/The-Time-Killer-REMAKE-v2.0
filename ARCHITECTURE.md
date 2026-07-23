@@ -120,6 +120,15 @@ Lived-in dressing for the map-v2 rooms (interview 2026-07-23): kitchen 10 props,
 - **Art pipeline** (`Tools/ArtPipeline/process_props.py`): AI prop sheets (Recraft V4.1, RF-Castle palette hint, flat magenta key background) → magenta key-out → connected-component slicing → per-prop downscale to 16 PPU targets → quantize to the full 57-color RF Castle tileset palette → labeled contact sheet for approval. Per-room shadow-lift (`BRIGHTEN` gamma/gain) — kitchen ships lifted (0.78/1.18) after the first pass came out too murky.
 - Setup: menu `TimeKiller/Setup/26` (furniture) + `27` (armory wardrobe).
 
+### Agent tooling (Claude's workflow, 2026-07-23)
+Claude drives the editor programmatically instead of screen control:
+- **unity-mcp bridge** (`com.coplaydev.unity-mcp` v10.1.0 pinned in manifest; project `.mcp.json` registers it for Claude Code at `http://127.0.0.1:8080/mcp`). 48 tools: execute menu items, run tests, read console, manage scenes/objects. Server runs inside the editor: Window → MCP for Unity.
+- **PixelLab MCP** (`.mcp.json`, hosted at api.pixellab.ai/mcp) — purpose-built pixel-art generation (map objects, characters, 4/8-direction views, animations, tilesets). Auth via `PIXELLAB_API_TOKEN` env var (NOT in the repo — set your own from pixellab.ai). Output is quantized to the RF palette by `Tools/ArtPipeline` before it enters the game (first shipped assets: kitchen crates + sacks).
+- **GameEye** (`C#/Editor/GameEye.cs`) — renders any world position through a URP camera to PNG (edit or play mode): programmatic screenshots for visual verification. Torch flicker only animates in play mode.
+- **SmokeCheck** (`C#/Editor/SmokeCheck.cs`, menu TimeKiller/Test) — read-only scene integrity report (player rig, maniac, hiding spots + sprites, furniture, null sprites, camera rig) as JSON; the pre-push gate. Plain report instead of Unity Test Framework because the project has no asmdefs (UTF test assemblies can't reference Assembly-CSharp).
+- **Automated playtests** (`C#/Testing/`, namespace `TimeKiller.Testing`) — `TestDriver` static cockpit (Possess/MoveTo/PressInteract/Status/Release) drives the player through **ScriptedInputSource**, a programmable `IInputSource` swapped in via the new `PlayerController.SetInputSource()` (the co-op/AI seam made official). **TestTelemetry** records bus events (hits, deaths, spotted, hides, min maniac distance) with zero hooks in gameplay code. Keyboard is suspended, never destroyed; `Release()` restores it.
+- Editor prefs set for headless play: InteractionMode = NoThrottling, PlayerSettings.runInBackground — play mode must keep ticking while Claude works from the terminal.
+
 ## Planned
 
 - `Player` — sanity
