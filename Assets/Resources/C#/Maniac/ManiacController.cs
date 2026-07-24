@@ -104,6 +104,12 @@ namespace TimeKiller.Maniac
             stateMachine.ChangeState(Patrol);
             DebugOverlay.Watch("Maniac", () => stateMachine.Current?.GetType().Name ?? "none");
             DebugOverlay.Watch("Maniac Sees", () => Perception.CanSeePlayer ? "PLAYER!" : "-");
+            DebugOverlay.Watch("Awareness", () =>
+            {
+                int pct = Mathf.RoundToInt(Perception.Awareness * 100f);
+                int bars = Mathf.RoundToInt(Perception.Awareness * 10f);
+                return $"[{new string('|', bars)}{new string('.', 10 - bars)}] {pct}% {Perception.Level}";
+            });
             DebugOverlay.Watch("Brain", () =>
             {
                 var s = brain.LastScores;
@@ -167,6 +173,7 @@ namespace TimeKiller.Maniac
             EventBus.Unsubscribe<TimeKiller.Hiding.PlayerUnhidEvent>(OnPlayerUnhid);
             DebugOverlay.Unwatch("Maniac");
             DebugOverlay.Unwatch("Maniac Sees");
+            DebugOverlay.Unwatch("Awareness");
             DebugOverlay.Unwatch("Brain");
         }
 

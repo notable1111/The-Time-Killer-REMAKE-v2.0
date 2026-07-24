@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/CastleWingLDtk.unity
     guid: 8f79ed70ab675d34d9ab3f3033a5c3c5
+  - enabled: 1
+    path: Assets/Scenes/Catacombs.unity
+    guid: b3e62da2e865c4947b049ed0ca7138be
   m_configObjects: {}

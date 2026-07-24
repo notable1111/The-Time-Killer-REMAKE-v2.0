@@ -1,0 +1,25 @@
+{
+ "Def": {
+  "__cHei": 40,
+  "__cWid": 64,
+  "cachedPixelData": {
+   "averageColors": "",
+   "opaqueTiles": ""
+  },
+  "customData": [],
+  "embedAtlas": null,
+  "enumTags": [],
+  "identifier": "Catacombs",
+  "padding": 0,
+  "pxHei": 640,
+  "pxWid": 1024,
+  "relPath": "../../Outsource/RogueFantasyCatacombs/mainlevbuild.png",
+  "savedSelections": [],
+  "spacing": 0,
+  "tags": [],
+  "tagsSourceEnumUid": null,
+  "tileGridSize": 16,
+  "uid": 506
+ },
+ "Rects": null
+}

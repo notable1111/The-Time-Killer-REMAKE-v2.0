@@ -13,6 +13,8 @@ namespace TimeKiller.EditorTools
         {
             "Assets/Resources/Outsource/RF Castle/Sliced/mainlevbuild.png",
             "Assets/Resources/Outsource/RF Castle/Sliced/decorative.png",
+            // Catacombs level (Setup/30) draws from this sheet.
+            "Assets/Resources/Outsource/RogueFantasyCatacombs/mainlevbuild.png",
         };
 
         [MenuItem("TimeKiller/Setup/15 - Prep LDtk Textures (RGBA32)")]

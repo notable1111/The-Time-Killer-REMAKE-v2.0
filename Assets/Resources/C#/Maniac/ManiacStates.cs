@@ -25,6 +25,7 @@ namespace TimeKiller.Maniac
     {
         int waypointIndex;
         float pauseUntil;
+        float waypointDeadline;   // give up on a waypoint he can't reach
 
         public PatrolState(ManiacController maniac) : base(maniac) { }
 
@@ -32,6 +33,7 @@ namespace TimeKiller.Maniac
         {
             waypointIndex = maniac.Route.ClosestIndex(maniac.Motor.Position);
             pauseUntil = 0f;
+            waypointDeadline = Time.time + maniac.Config.patrolWaypointTimeout;
         }
 
         public override void Tick(float deltaTime)
@@ -40,10 +42,13 @@ namespace TimeKiller.Maniac
             if (Time.time < pauseUntil) { maniac.Nav.Stop(); return; }
 
             maniac.Nav.MoveTo(maniac.Route.Waypoint(waypointIndex), config.patrolSpeed);
-            if (maniac.Nav.ReachedDestination(config.waypointTolerance))
+            // Advance when reached OR when he's spent too long trying — a waypoint
+            // wedged against a pillar/corner must never freeze the whole patrol.
+            if (maniac.Nav.ReachedDestination(config.waypointTolerance) || Time.time >= waypointDeadline)
             {
                 waypointIndex = (waypointIndex + 1) % Mathf.Max(1, maniac.Route.Count);
                 pauseUntil = Time.time + config.waypointPauseSeconds;
+                waypointDeadline = pauseUntil + config.patrolWaypointTimeout;
             }
         }
     }
@@ -106,12 +111,22 @@ namespace TimeKiller.Maniac
                 return;
             }
 
-            // Losing sight is no longer a hard transition — the brain lowers
-            // Chase's utility as time-since-seen grows (generous valve) and Search
-            // takes over once the trail is truly cold. Here he just keeps pursuing.
-            var target = maniac.Breadcrumbs.NextTarget(maniac.Motor.Position, config.waypointTolerance)
-                         ?? perception.LastSeenPosition;
-            maniac.Motor.MoveTo(target, config.chaseSpeed);
+            // MOVEMENT. If he can SEE you, line of sight is clear by definition —
+            // beeline straight at you (fast, relentless, no hesitation). The moment
+            // a wall comes between you (sight lost), PATH AROUND it via the A* grid
+            // instead of sliding along it: he follows your breadcrumb trail through
+            // the doorways you took, not into the wall. This is what stops the
+            // "chases stupidly around walls" look — chase now navigates like search.
+            if (perception.CanSeePlayer)
+            {
+                maniac.Motor.MoveTo(perception.LastSeenPosition, config.chaseSpeed);
+            }
+            else
+            {
+                var target = maniac.Breadcrumbs.NextTarget(maniac.Motor.Position, config.waypointTolerance)
+                             ?? perception.LastSeenPosition;
+                maniac.Nav.MoveTo(target, config.chaseSpeed);
+            }
         }
 
         public override void Exit() => maniac.Breadcrumbs.Clear();
@@ -153,7 +168,9 @@ namespace TimeKiller.Maniac
 
         void PickTarget()
         {
-            if (belief != null && belief.BestTarget(out var t))
+            // Stride to a belief spot a few units out (not the adjacent cell), so he
+            // hunts in confident strides and ranges outward toward where you fled.
+            if (belief != null && belief.BestTargetBeyond(maniac.Motor.Position, 3f, out var t))
             {
                 looking = false;
                 target = t;

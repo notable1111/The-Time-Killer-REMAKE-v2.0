@@ -82,3 +82,35 @@ __pycache__/
 /[Aa]ssets/[Rr]esources/[Oo]utsource/Horror Sounds/
 /[Aa]ssets/[Rr]esources/[Oo]utsource/Horror Sounds.meta
 /Clock.png
+
+# Unity template leftovers. These reappear whenever a package is reimported.
+# None of them is referenced by our code, scenes or ProjectSettings — the URP
+# assets we actually use live in Assets/Resources/Assets/Rendering. Committing
+# them means every teammate's Unity regenerates them slightly differently and
+# the diff lands in the next pull as a conflict.
+/[Aa]ssets/Settings/
+/[Aa]ssets/Settings.meta
+/[Aa]ssets/TutorialInfo/
+/[Aa]ssets/TutorialInfo.meta
+/[Aa]ssets/Readme.asset
+/[Aa]ssets/Readme.asset.meta
+/[Aa]ssets/InputSystem_Actions.inputactions
+/[Aa]ssets/InputSystem_Actions.inputactions.meta
+# TextMesh Pro essentials: 3.6 MB of package-owned files, and nothing in the
+# project uses TMPro. Unity re-imports them on demand if we ever add TMP text.
+/[Aa]ssets/TextMesh Pro/
+/[Aa]ssets/TextMesh Pro.meta
+
+# Editor screenshots from automated playtests — local debug output, not art.
+/[Aa]ssets/Screenshots/
+/[Aa]ssets/Screenshots.meta
+
+# Map-pipeline backups (CastleWing.ldtk.pre-*.bak). Git is the backup.
+*.bak
+*.bak.meta
+
+# Horror Engine (Retro Horror Template) — paid Asset Store asset, Unity EULA.
+# Reference-only: we adapt IDEAS, never commit its source to the public repo.
+# Kept at repo root (OUTSIDE Assets/) so Unity doesn't compile it — its scripts
+# target old Cinemachine and break the build. Read it for patterns; don't import.
+/_HorrorEngine_Reference/

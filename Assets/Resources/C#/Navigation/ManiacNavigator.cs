@@ -28,12 +28,17 @@ namespace TimeKiller.Navigation
         List<Vector2> path;
         int index;
         Vector2 lastDest;
+        Vector2 dest;        // the destination the caller actually wants (for ReachedDestination)
+        bool hasPath;        // did the last repath find a real route? false = unreachable
         float nextRepath;
 
         Bounds bounds;
 
         public bool Ready => grid != null;
         public int PathCount => path != null ? path.Count : 0;
+        /// False when the current destination has no route (unreachable) — states
+        /// can retarget instead of walking a straight line into a wall.
+        public bool HasPath => hasPath;
         public Vector2 CurrentWaypoint => (path != null && index < path.Count) ? path[index] : motor.Position;
 
         /// For other systems (the search belief map): the sampled world bounds and walkability.
@@ -48,7 +53,10 @@ namespace TimeKiller.Navigation
         public void Rebuild()
         {
             bounds = ComputeWorldBounds();
-            grid = new WalkabilityGrid(bounds, 0.5f, clearance); // 0.5 spacing, integer-aligned (catches thin wall strips)
+            // 0.5 spacing, integer-aligned (catches thin wall strips). Seed the
+            // flood-fill from the maniac himself — he stands on real floor, so the
+            // kept region is exactly the reachable interior (void dropped).
+            grid = new WalkabilityGrid(bounds, 0.5f, clearance, transform.position);
             finder = new GridPathfinder(grid);
         }
 
@@ -70,32 +78,41 @@ namespace TimeKiller.Navigation
         }
 
         /// Move toward dest, pathing around obstacles. States poll ReachedDestination.
-        public void MoveTo(Vector2 dest, float moveSpeed)
+        public void MoveTo(Vector2 target, float moveSpeed)
         {
-            if (grid == null || finder == null) { motor.MoveTo(dest, moveSpeed); return; }
+            dest = target;
+            if (grid == null || finder == null) { hasPath = false; motor.MoveTo(target, moveSpeed); return; }
 
             bool needRepath = path == null
-                || Vector2.Distance(dest, lastDest) > repathDistance
+                || Vector2.Distance(target, lastDest) > repathDistance
                 || Time.time >= nextRepath;
             if (needRepath)
             {
-                lastDest = dest;
+                lastDest = target;
                 nextRepath = Time.time + repathInterval;
-                var p = finder.FindPath(motor.Position, dest);
-                if (p != null && p.Count > 0) { path = p; index = 0; }
-                else { motor.MoveTo(dest, moveSpeed); return; } // no path — best effort straight
+                var p = finder.FindPath(motor.Position, target);
+                if (p != null && p.Count > 0) { path = p; index = 0; hasPath = true; }
+                else { path = null; hasPath = false; motor.MoveTo(target, moveSpeed); return; } // unreachable — best-effort straight; ReachedDestination stays false so the state retargets
             }
 
-            if (path == null || index >= path.Count) { motor.MoveTo(dest, moveSpeed); return; }
+            if (path == null || index >= path.Count) { motor.MoveTo(target, moveSpeed); return; }
             while (index < path.Count - 1 && Vector2.Distance(motor.Position, path[index]) <= waypointTolerance)
                 index++;
             motor.MoveTo(path[index], moveSpeed);
         }
 
-        public bool ReachedDestination(float tol) =>
-            path == null || index >= path.Count
-            || Vector2.Distance(motor.Position, path[path.Count - 1]) <= tol;
+        // "Arrived" ONLY when he's actually AT the destination. A null/failed path
+        // is NOT arrival — the old bug returned true for it, so an unreachable
+        // search target read as "reached" and he stood scanning in place forever.
+        public bool ReachedDestination(float tol)
+        {
+            if (grid == null || finder == null)                    // navigator off: straight-line
+                return Vector2.Distance(motor.Position, dest) <= tol;
+            if (!hasPath) return false;                            // unreachable target -> not arrived
+            return Vector2.Distance(motor.Position, dest) <= tol
+                || (path != null && index >= path.Count);
+        }
 
-        public void Stop() { path = null; motor.Stop(); }
+        public void Stop() { path = null; hasPath = false; motor.Stop(); }
     }
 }

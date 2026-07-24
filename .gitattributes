@@ -1,6 +1,44 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
+# ===== Unity YAML — the #1 source of pull conflicts on this project =====
+# Two separate things are going on here, and both matter:
+#
+# 1. `-text` switches OFF the `* text=auto` normalization above. Unity always
+#    writes LF; git on Windows was checking these back out as CRLF, so a
+#    teammate who merely OPENED the project got a whole-file diff on every
+#    scene. Two people with whole-file diffs = a guaranteed conflict on pull,
+#    even when nobody edited the same object.
+#
+# 2. `merge=unityyamlmerge` routes conflicts through Unity's own YAML merge
+#    tool, which understands objects and components instead of raw lines.
+#    Line-based merging of a .unity file produces YAML that still "merges"
+#    but loads as a corrupt scene — worse than an honest conflict.
+#    Each dev enables the driver once; see TEAM_SETUP.md. Without it git
+#    just falls back to the normal merge, i.e. no worse than before.
+*.unity      -text merge=unityyamlmerge
+*.prefab     -text merge=unityyamlmerge
+*.asset      -text merge=unityyamlmerge
+*.mat        -text merge=unityyamlmerge
+*.anim       -text merge=unityyamlmerge
+*.controller -text merge=unityyamlmerge
+*.overrideController -text merge=unityyamlmerge
+*.physicMaterial2D   -text merge=unityyamlmerge
+*.playable   -text merge=unityyamlmerge
+*.mask       -text merge=unityyamlmerge
+*.terrainlayer -text merge=unityyamlmerge
+*.spriteatlas  -text merge=unityyamlmerge
+
+# .meta files are small and merge fine line-by-line, but they must not be
+# EOL-normalized either — a rewritten .meta detaches a GUID from its asset.
+*.meta -text
+
+# LDtk project/level/tileset files are machine-generated JSON. Never normalize;
+# regenerate from Tools/MapPipeline instead of hand-merging a conflict.
+*.ldtk  -text
+*.ldtkl -text
+*.ldtkt -text
+
 # ===== Git LFS — binary game assets =====
 # Images
 *.png filter=lfs diff=lfs merge=lfs -text

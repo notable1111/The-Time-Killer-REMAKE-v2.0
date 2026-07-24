@@ -40,8 +40,10 @@ namespace TimeKiller.Maniac
         bool In(int x, int y) => x >= 0 && x < cols && y >= 0 && y < rows;
         bool Walk(int x, int y) => In(x, y) && walkable(CellCenter(x, y));
 
-        /// Drop belief at the last-seen spot, weighted forward along the flee direction.
-        public void Seed(Vector2 lastSeen, Vector2 fleeDir, int forwardCells = 4)
+        /// Drop belief at the last-seen spot, weighted forward along the flee
+        /// direction — a long trail, so he COMMITS to hunting where you ran, not
+        /// just where he lost you.
+        public void Seed(Vector2 lastSeen, Vector2 fleeDir, int forwardCells = 8)
         {
             Array.Clear(prob, 0, prob.Length);
             Stamp(lastSeen, 1f);
@@ -49,7 +51,7 @@ namespace TimeKiller.Maniac
             {
                 Vector2 dir = fleeDir.normalized;
                 for (int k = 1; k <= forwardCells; k++)
-                    Stamp(lastSeen + dir * (k * cell), 1f - 0.15f * k); // fades ahead
+                    Stamp(lastSeen + dir * (k * cell), 1f - 0.08f * k); // long, slow fade ahead
             }
             Normalize();
         }
@@ -107,8 +109,11 @@ namespace TimeKiller.Maniac
                 }
         }
 
-        /// Highest-probability walkable cell. False when belief is effectively exhausted.
-        public bool BestTarget(out Vector2 world, float minMass = 0.02f)
+        /// Highest-probability walkable cell. Returns while ANY belief remains, so
+        /// he keeps ranging (as Observe collapses cells he's checked, the peak moves
+        /// outward to the unchecked frontier) — give-up is the brain's memory timer,
+        /// not a hard mass floor that used to freeze him in place.
+        public bool BestTarget(out Vector2 world, float minMass = 0.0002f)
         {
             int best = -1; float bestP = minMass;
             for (int i = 0; i < prob.Length; i++)
@@ -116,6 +121,24 @@ namespace TimeKiller.Maniac
             if (best < 0) { world = Vector2.zero; return false; }
             world = CellCenter(best % cols, best / cols);
             return true;
+        }
+
+        /// Highest-belief cell at least minDist from 'from', so he STRIDES to a real
+        /// destination and scans there instead of micro-stepping cell by cell —
+        /// reads as a confident hunter. Falls back to the global best when nothing
+        /// far enough carries belief.
+        public bool BestTargetBeyond(Vector2 from, float minDist, out Vector2 world, float minMass = 0.0002f)
+        {
+            int best = -1; float bestP = minMass; float minDistSq = minDist * minDist;
+            for (int i = 0; i < prob.Length; i++)
+            {
+                if (prob[i] <= minMass) continue;
+                Vector2 c = CellCenter(i % cols, i / cols);
+                if ((c - from).sqrMagnitude < minDistSq) continue;
+                if (prob[i] > bestP) { bestP = prob[i]; best = i; }
+            }
+            if (best >= 0) { world = CellCenter(best % cols, best / cols); return true; }
+            return BestTarget(out world, minMass); // nothing far enough — take the global best
         }
 
         public float TotalMass()

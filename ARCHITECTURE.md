@@ -153,6 +153,34 @@ Claude drives the editor programmatically instead of screen control:
 - **Automated playtests** (`C#/Testing/`, namespace `TimeKiller.Testing`) — `TestDriver` static cockpit (Possess/MoveTo/PressInteract/Status/Release) drives the player through **ScriptedInputSource**, a programmable `IInputSource` swapped in via the new `PlayerController.SetInputSource()` (the co-op/AI seam made official). **TestTelemetry** records bus events (hits, deaths, spotted, hides, min maniac distance) with zero hooks in gameplay code. Keyboard is suspended, never destroyed; `Release()` restores it.
 - Editor prefs set for headless play: InteractionMode = NoThrottling, PlayerSettings.runInBackground — play mode must keep ticking while Claude works from the terminal.
 
+### Catacombs level (second map, data-driven placement)
+
+`CastleWing.ldtk` holds **two** levels: `CastleWing` and `Catacombs`. The catacombs use their own tileset (`Catacombs`, from `Outsource/RogueFantasyCatacombs/mainlevbuild.png`) via `overrideTilesetUid` on each tile layer, so both levels share one LDtk project, one importer configuration and one set of sorting orders.
+
+Authoring is offline and re-runnable:
+
+```
+python Tools/MapPipeline/mapv3_catacombs.py   # regenerate the level + room data
+python Tools/MapPipeline/validate_v2.py       # gaps / collision-on-floor, both levels
+python Tools/MapPipeline/render_catacombs.py  # composite PNG preview + schematic
+```
+
+The generator writes three things and refuses to write any of them if BFS from the player spawn cannot reach every floor cell:
+- the `Catacombs` level in `CastleWing.ldtk`;
+- `Assets/Resources/Assets/Maps/CastleWing/Catacombs.ldtkt` — LDtkToUnity resolves tilesets through these exported files, and a tileset without one fails to import;
+- `Assets/Resources/Assets/Maps/CatacombsRooms.json` — **world-space** room rects and the full walkable-cell set.
+
+**Layer contract (do not break):** the `Floor` layer contains ONLY walkable cells. `validate_v2.py`, the gap audit and this document all treat Floor-layer tiles as the definition of walkable ground. The background rock mass therefore lives on `Rug` (sorts -15: above Floor -20, below WallFace -10, and it never overlaps cobble).
+
+**Scene:** `Setup/30` builds `Catacombs.unity`, unpacking the imported prefab and deleting the CastleWing level so this scene holds the catacombs only. Because it is unpacked, **a reimport does not update the scene — re-run Setup/30 after editing the map.** The Floor tilemap's min cell is pinned to world (0,0); `CatacombsRooms.json` exports against exactly that anchor.
+
+**Gameplay placement:** `Setup/31` calls the existing setup scripts (28 clocks, 25 hiding, 20 maniac, 29 run flow) and then relocates what they created onto positions derived from the room data. The castle's hand-tuned coordinates are never touched. `CatacombsRooms.Anchor()` returns a floor cell with 3 cells of solid rock behind it and clear floor on both flanks, trying north → east → west, never south (south walls render an Overhead band that draws over anything standing there). A shared 3×3 reservation set stops two props claiming the same wall.
+
+**Camera bounds:** the generator emits ONE map-wide `CameraZone` (carved area + 2 cells), not per-room zones. `CinemachineConfiner2D` fits the whole **viewport** inside the bounding shape, so any zone smaller than the viewport (~16×7 world units) makes the confiner park the camera on some other region and the player goes off-screen. If per-room "camera rooms" are ever wanted, every zone must be inflated well beyond the largest supported viewport — sizing a zone to its room is the bug.
+
+**Verification:** `Setup/32` audits the open scene. Note that the Collision layer's `CompositeCollider2D` uses `geometryType = Outlines`, i.e. EDGE colliders with no fill — asking "is this rock cell solid?" with a point query always returns nothing, and is the wrong question. The audit instead replicates `WalkabilityGrid` (0.5 spacing, integer-aligned nodes, 0.9 clearance, blocked = non-trigger hit on a null/Static body), floods from the spawn, and asserts the reachable set is exactly the walkable region: no leak out, nothing unreachable. It runs map integrity with props ignored (a solid clock legitimately makes its own cell unwalkable) and then separately checks no room is walled off by props.
+
+
 ## Planned
 
 - `Player` — sanity

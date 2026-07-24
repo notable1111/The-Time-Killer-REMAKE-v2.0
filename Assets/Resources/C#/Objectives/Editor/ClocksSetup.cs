@@ -91,6 +91,7 @@ namespace TimeKiller.Objectives.EditorTools
             light.pointLightOuterRadius = 4.5f;
             light.pointLightInnerRadius = 0.6f;
             light.enabled = false;
+            NoShadows(light); // no ShadowCaster2D in this scene — shadows are pure overhead
 
             var clock = go.AddComponent<ClockObjective>();
             var so = new SerializedObject(clock);
@@ -142,6 +143,7 @@ namespace TimeKiller.Objectives.EditorTools
             light.pointLightOuterRadius = 6f;
             light.pointLightInnerRadius = 0.8f;
             light.enabled = false;
+            NoShadows(light);
 
             // 3D wind loop: once the gate is open this is how you find your way
             // back to it across a dark map. Silent until then.
@@ -192,6 +194,15 @@ namespace TimeKiller.Objectives.EditorTools
             importer.SetTextureSettings(settings);
             importer.SaveAndReimport();
             return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        }
+
+        // Light2D defaults 2D shadows ON; with no ShadowCaster2D in the scene that
+        // is a per-light render pass drawing nothing. Turn it off at creation.
+        static void NoShadows(Light2D light)
+        {
+            var so = new SerializedObject(light);
+            var prop = so.FindProperty("m_ShadowsEnabled");
+            if (prop != null) { prop.boolValue = false; so.ApplyModifiedPropertiesWithoutUndo(); }
         }
 
         static ObjectiveManager BuildManager(Transform parent)

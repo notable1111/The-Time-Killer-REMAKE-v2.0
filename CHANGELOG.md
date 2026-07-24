@@ -2,6 +2,72 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-24 — Team onboarding fixes: teammates could not open or pull the project
+
+Three separate causes behind the errors teammates hit. All fixed in-repo; the
+one-time machine setup each of them still has to do is in **TEAM_SETUP.md**.
+
+- **"No 'git' executable was found"** — `Packages/manifest.json` depended on
+  `com.coplaydev.unity-mcp` via a **git URL**. Unity resolves those by shelling
+  out to `git` on PATH, and GUI clients (GitHub Desktop, Fork, Sourcetree) ship
+  a private git that is not on PATH — so a teammate could clone but Unity could
+  not resolve packages. The package was a solo dev bridge, not a game
+  dependency, so it is **removed from the manifest**.
+- **"There are unresolved conflicts in the working directory"** — `.gitattributes`
+  had only `* text=auto`, so Unity's LF-written scenes were checked out as CRLF
+  on Windows. Merely opening the project produced a whole-file diff on every
+  scene, and two people with whole-file diffs conflict on pull even when nobody
+  edited the same object. Unity YAML (`.unity/.prefab/.asset/.mat/.anim/...`),
+  `.meta` and LDtk files are now `-text` (no normalization) and routed to
+  `merge=unityyamlmerge`, so conflicts go through Unity's object-aware merge
+  instead of a line-based one that silently produces corrupt scenes.
+- **Unity template leftovers now ignored** — `Assets/Settings/`,
+  `Assets/TextMesh Pro/`, `Assets/TutorialInfo/`, `Assets/Readme.asset`,
+  `InputSystem_Actions`. Nothing references them (the URP assets the game uses
+  live in `Assets/Resources/Assets/Rendering/`), every Unity install regenerates
+  them differently, and that diff landed in the next pull as a conflict. Editor
+  playtest screenshots and `*.bak` map backups are ignored too.
+
+**Caught while reviewing the diff:** the same URP-template import had overwritten
+`Assets/Scenes/SampleScene.unity` with the template's default scene — 114
+GameObjects down to 3 — and given it a **new GUID**. Restored from HEAD, scene
+and `.meta` together. Documented in TEAM_SETUP.md so it is recognised next time.
+
+## 2026-07-24 (later 4) — Catacombs: a second, fully playable level, generated and proved
+
+A whole new level built the way the castle *should* have been built: the map is generated from data, and every gameplay position is **derived from that same data** instead of hand-typed. Nothing can spawn inside a wall by construction.
+
+**Map** — a new `Catacombs` level inside `CastleWing.ldtk` (42×41 cells, 709 walkable), drawn from the Rogue Fantasy Catacombs sheet. A crypt carved from solid rock: every non-floor cell is filled with rock tiles, so there are no black voids and the rooms read as excavated. 14 areas arranged as a **double loop** — stair_hall → nave → north_hall → loop_north → loop_east → loop_link → nave — never a dead-end tree, so a chase always has an exit.
+
+**`Tools/MapPipeline/mapv3_catacombs.py`** — re-runnable generator (replaces its own level/tileset rather than appending duplicates). It emits three artifacts: the level itself, the `Catacombs.ldtkt` tileset export the Unity importer requires, and `CatacombsRooms.json` with **world-space** room rectangles + the full walkable-cell set. Tile picks were measured off a coordinate-labelled grid overlay of the sheet, not guessed — floor cols 19–22 × rows 21–23, wall face cols 17–21 × rows 17–19, rock mass cols 46–49 × rows 26–29.
+
+**Correctness gates, in this order:**
+- Generator refuses to write unless BFS from the spawn reaches all 709 floor cells.
+- `validate_v2.py`: 0 collider gaps, 0 collision-on-floor (CastleWing unchanged at 1135 / 0 / 0).
+- `Setup/32` in-engine audit: 0 leaks out of the walkable region, 0/709 unreachable, all 14 rooms still reachable with props solid.
+
+**`Setup/30`** builds `Catacombs.unity` from the level (unpacks the prefab and drops the CastleWing level, so this scene holds the catacombs only — **re-run it after map edits; it does not auto-update**). Floor tilemap min cell is pinned to world (0,0), which is the same anchor `CatacombsRooms.json` exports against.
+
+**`Setup/31`** places the escape loop by *calling* Setup/28/25/20/29 and then relocating what they produce onto derived positions — no fork, no parameterisation, castle scene untouched. 3 clocks (west_crypt / east_ossuary / loop_east), gate on north_hall's north wall, 6 wardrobes, 12-waypoint patrol ring with the maniac spawning at index 5 (far side from the player), 12 torches. Re-runnable.
+
+**`CatacombsRooms.Anchor()`** finds a *real* wall segment: 3 cells of solid rock behind, clear floor on both flanks, checked against the actual floor set. It tries north → east → west and never south (south walls render an Overhead band that draws over anything standing there). This is what stopped a clock being placed in `west_crypt`'s north edge, which is actually the doorway into `cistern`.
+
+**Bugs this pipeline caught before they shipped** — worth recording, because each one is invisible by eye:
+1. Using the `Floor` layer as background fill broke the pipeline's "Floor layer == walkable" invariant and produced 494 phantom gaps. Rock mass moved to `Rug`.
+2. LDtkToUnity needs an exported `.ldtkt` per tileset; a new tileset silently fails to import without one. Now emitted by the generator.
+3. Wardrobes were being placed standing inside clocks — the reservation set was per-prop-type instead of shared.
+4. Reserving only horizontal neighbours works for north walls but not east/west ones, where props stack vertically. Now a full 3×3 claim.
+5. `validate_v2.py` never actually did the connectivity check `ARCHITECTURE.md` credited it with.
+
+**Camera bounds bug (found by the user on first play, fixed same session)** — the level shipped unplayable: you spawned in `stair_hall` and the camera sat 25 units north in `north_hall`, so the player was off-screen with no way to tell where they were. Cause: camera zones were emitted **sized to the room rectangle** (stair_hall = 8×5), but `CinemachineConfiner2D` clamps the camera so the whole **viewport** (~16×7 world units) fits inside the shape. With every zone smaller than the viewport, the confiner parked the camera on `north_hall` — the only zone large enough — regardless of the player. Fixed by emitting a single map-wide zone (38×36, whole carved area + 2 cells). `Setup/32` now asserts camera bounds exceed the viewport at up to 2.4 aspect **and** that all 709 walkable cells fall inside them, so this cannot regress silently. Lesson: camera zones are sized against the **viewport**, never against the room.
+
+**Playtest fixes (user feedback: "maniac is small, clock placed wrong on the wall, map looks empty")**
+- **Maniac was knee-high.** `Setup/31` called `ManiacSetup` (20) but never `ManiacAnimationSetup` (21), so he kept the raw unsliced `stage_one.png` at Unity's default PPU 100 — 17x31 px became **0.17 x 0.31 world units**. Setup/21 slices `stage_two.png` into 32x32 frames at PPU 32 (1.0 units); a further 1.5x transform scale puts him at **1.50 x 1.50**, the player's height but broader. The capsule collider is divided by the same factor so his physical footprint stays 0.60 x 0.60 — scaling it too would have made him 0.90 wide, exactly the WalkabilityGrid clearance, and he would have snagged on every corner. Rule: **never call Setup/20 without Setup/21.**
+- **Clock floated up the wall.** Props anchored at cell + 0.45, so a 2.33-unit clock ran from +0.31 to +2.64 — three quarters of it above the floor cell. Anchors now sit at cell + 0.12, giving a full unit on the floor.
+- **Map was bare** (2 decorative tiles in the whole level). Added a decoration pass, all deterministic so regeneration is reproducible: a second cobble patch mixed into **30%** of floor cells to break up the repeating 4x3 tile, a chains-and-skulls wall variant on **22%** of wall columns, and **19 sarcophagus niches** set into the chamber walls (3 rows tall, only where there is genuinely 3 cells of rock behind, so a tomb can never be carved into a doorway). Niche cells are exported in `CatacombsRooms.json` and reserved before gameplay placement, so a clock never stands inside a tomb.
+
+**Playtest** — 191 FPS, maniac patrols and pathfinds through the new geometry, nav grid 2498/7920 walkable (31.5%, flood-fill correctly discarding the rock interior), HUD `CLOCKS 0/3`, zero runtime errors.
+
 ## 2026-07-24 (later 3) — The escape loop: fix the clocks, open the gate, get out
 
 The game now has a win condition *and* a lose condition — a run can be finished, and it can be ended.

@@ -5,6 +5,14 @@
 // A node is BLOCKED when a static, non-trigger collider (wall or big furniture)
 // overlaps it; dynamic bodies (player, maniac) are ignored so they never block
 // themselves. Sampled once at startup — call Rebuild if the world opens (doors).
+//
+// CONNECTIVITY (2026-07-24): after sampling, we flood-fill from a known-reachable
+// seed (the maniac) and BLOCK every walkable cell not connected to it. Reason:
+// the empty space OUTSIDE the castle has no wall colliders, so it sampled as
+// "walkable" — 71% of the grid was unreachable void. The belief-map search then
+// targeted those voids -> FindPath null -> the maniac froze. Dropping the void
+// fixes pathing AND the search in one move.
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TimeKiller.Navigation
@@ -24,7 +32,7 @@ namespace TimeKiller.Navigation
         // layers too). The player/maniac (dynamic) and camera zones (triggers)
         // are filtered out below, so no LayerMask is needed — and none can be
         // misconfigured to silently drop walls (that bug cost us once).
-        public WalkabilityGrid(Bounds worldBounds, float cellSize, float clearance)
+        public WalkabilityGrid(Bounds worldBounds, float cellSize, float clearance, Vector2 reachableSeed)
         {
             cell = cellSize;
             origin = new Vector2(Mathf.Floor(worldBounds.min.x), Mathf.Floor(worldBounds.min.y));
@@ -35,6 +43,41 @@ namespace TimeKiller.Navigation
             for (int y = 0; y < rows; y++)
                 for (int x = 0; x < cols; x++)
                     walkable[y * cols + x] = !Blocked(CellCenter(x, y), box);
+
+            KeepReachableFrom(reachableSeed);
+        }
+
+        // Flood-fill (4-neighbour, which matches A*'s no-corner-cut connectivity)
+        // from the seed; block every walkable cell it can't reach — the void.
+        void KeepReachableFrom(Vector2 seedWorld)
+        {
+            var seed = NearestWalkable(seedWorld);
+            if (!Walkable(seed.x, seed.y)) return; // no floor near the seed — leave the grid untouched
+
+            var reached = new bool[cols * rows];
+            var frontier = new Queue<Vector2Int>();
+            reached[seed.y * cols + seed.x] = true;
+            frontier.Enqueue(seed);
+            while (frontier.Count > 0)
+            {
+                var c = frontier.Dequeue();
+                Visit(c.x + 1, c.y, reached, frontier);
+                Visit(c.x - 1, c.y, reached, frontier);
+                Visit(c.x, c.y + 1, reached, frontier);
+                Visit(c.x, c.y - 1, reached, frontier);
+            }
+
+            for (int i = 0; i < walkable.Length; i++)
+                if (walkable[i] && !reached[i]) walkable[i] = false;
+        }
+
+        void Visit(int x, int y, bool[] reached, Queue<Vector2Int> frontier)
+        {
+            if (x < 0 || y < 0 || x >= cols || y >= rows) return;
+            int i = y * cols + x;
+            if (reached[i] || !walkable[i]) return;
+            reached[i] = true;
+            frontier.Enqueue(new Vector2Int(x, y));
         }
 
         static bool Blocked(Vector2 center, Vector2 box)

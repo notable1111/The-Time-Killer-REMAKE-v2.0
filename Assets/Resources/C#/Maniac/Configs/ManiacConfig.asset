@@ -21,13 +21,30 @@ MonoBehaviour:
   investigateSeconds: 5
   sightRange: 7
   sightConeAngle: 140
+  proximityRange: 1.9
   sightBlockers:
     serializedVersion: 2
     m_Bits: 4294967295
+  searchSpeed: 2.6
+  searchPoints: 3
+  searchLookSeconds: 1.7
+  searchTravelTimeout: 4
+  searchScanAngle: 120
+  searchScanSpeed: 2
   loseSightSeconds: 2.5
   breadcrumbInterval: 0.15
   damage: 1
   attackRange: 0.9
   attackCooldown: 1.6
+  attackRecoverySeconds: 0.35
+  seenEnterWindow: 1.25
+  bodyMass: 400
+  phaseThroughSeconds: 2.5
+  brainPatrolBaseline: 0.15
+  brainSearchWeight: 0.95
+  brainSearchMemory: 14
+  brainNoiseWeight: 0.8
+  brainNoiseMemory: 5
+  brainStickiness: 0.1
   waypointTolerance: 0.4
   waypointPauseSeconds: 1.2

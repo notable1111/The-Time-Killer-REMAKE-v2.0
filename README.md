@@ -9,9 +9,19 @@ A 2.5D survival-horror game built in **Unity 6000.4.10f1**.
 
 ## Getting started (teammates)
 
-1. Install [Git LFS](https://git-lfs.com) and run `git lfs install` once (needed for art/audio files).
-2. Clone the repo, open the folder with Unity **6000.4.10f1** (exact version — Unity Hub will offer to install it).
-3. Open `Assets/Scenes/SampleScene.unity` and press Play.
+> **Read [TEAM_SETUP.md](TEAM_SETUP.md) first.** It is a one-time setup and it is
+> what prevents the two errors everyone hits: *"No 'git' executable was found"*
+> and *"There are unresolved conflicts in the working directory"*. It also has
+> the recovery steps if you are already stuck.
+
+1. Install [Git for Windows](https://git-scm.com/download/win) — a GUI client alone is not enough, Unity needs `git` on PATH.
+2. Install [Git LFS](https://git-lfs.com) and run `git lfs install` once (needed for art/audio files).
+3. Enable Unity's YAML merge driver (see TEAM_SETUP.md step 3) — without it, pulled scenes merge into corrupt files.
+4. Clone the repo, open the folder with Unity **6000.4.10f1** (exact version — Unity Hub will offer to install it).
+5. Open a playable scene and press Play — `Assets/Scenes/CastleWingLDtk.unity` (castle wing) or `Assets/Scenes/Catacombs.unity` (catacombs). These two are the scenes in Build Settings; `SampleScene.unity` is an older hall kept for reference.
+
+**Always close Unity before pulling.** Unity rewrites scene and `.meta` files
+while it runs, which turns an otherwise clean pull into a conflict.
 
 ## Project rules
 
