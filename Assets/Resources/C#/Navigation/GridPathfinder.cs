@@ -2,6 +2,24 @@
 // heuristic. A line-of-sight "string pull" pass then collapses the stair-step
 // cell path into a few natural straight-line waypoints, so the maniac walks
 // like a person rather than tracing the grid. Returns world-space waypoints.
+//
+// BODY WIDTH (2026-07-25). Two reasons characters used to scrape along walls,
+// both fixed here, and both fixed in a way that can never make a route fail:
+//
+//  1. The string pull tested a HAIRLINE: one cell-wide Bresenham line between
+//     the two waypoints. A diagonal shortcut whose centre line just clears a
+//     corner still drags a 0.55-wide body through it. It now demands the whole
+//     body width of clearance — and when a shortcut is refused the smoother
+//     simply keeps the corner, i.e. falls back to the raw A* cells, which are
+//     body-safe by construction (every node was sampled with the body box).
+//     Stricter smoothing can only ever ADD waypoints, never lose a path.
+//
+//  2. A* had no reason to stay off walls: hugging one costs exactly what
+//     walking down the middle costs, and diagonals made hugging cheaper. A
+//     small penalty on low-clearance cells now buys the corridor's centre.
+//     It is a COST, not a block, so a one-tile doorway is still taken when it
+//     is the only way through. The octile heuristic stays admissible because
+//     the penalty is never negative.
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,7 +28,26 @@ namespace TimeKiller.Navigation
     public class GridPathfinder
     {
         readonly WalkabilityGrid grid;
-        public GridPathfinder(WalkabilityGrid grid) => this.grid = grid;
+
+        // How many cells of clearance this agent's body actually needs. A cell's
+        // clearance counts whole cells to the nearest BLOCKED NODE, and the wall
+        // surface may sit half a sample box nearer than that node's centre — so
+        // the body radius alone would under-count. Minimum 1: a walkable cell.
+        readonly int requiredCells;
+        readonly int preferredCells;   // the roomier margin A* pays a little to keep
+
+        const float Sqrt2 = 1.41421356f;
+        const float HugPenalty = 0.35f;  // extra cost per missing cell of margin, per step
+
+        /// bodyRadius = half the agent's collider width, in world units. 0 keeps
+        /// the old hairline behaviour (used by callers that have no body).
+        public GridPathfinder(WalkabilityGrid grid, float bodyRadius = 0f)
+        {
+            this.grid = grid;
+            float needed = bodyRadius + grid.SampleBox * 0.5f;
+            requiredCells = Mathf.Max(1, Mathf.CeilToInt(needed / grid.CellSize));
+            preferredCells = requiredCells + 1;
+        }
 
         static readonly Vector2Int[] Dirs =
         {
@@ -18,7 +55,9 @@ namespace TimeKiller.Navigation
             new Vector2Int(1, 1), new Vector2Int(1, -1), new Vector2Int(-1, 1), new Vector2Int(-1, -1),
         };
 
-        const float Sqrt2 = 1.41421356f;
+        /// Cells of clearance this agent needs — NavDebugView paints anything
+        /// below it as "walkable, but this body would scrape".
+        public int RequiredClearanceCells => requiredCells;
 
         // Null when no path exists. Otherwise a list of world points ending at goalWorld.
         // Binary-heap open set + lazy deletion (a node may sit in the heap more than
@@ -50,7 +89,7 @@ namespace TimeKiller.Navigation
                         (!grid.Walkable(cur.x + d.x, cur.y) || !grid.Walkable(cur.x, cur.y + d.y)))
                         continue; // no cutting across a wall corner
                     float step = (d.x != 0 && d.y != 0) ? Sqrt2 : 1f;
-                    float tentative = g[cur] + step;
+                    float tentative = g[cur] + step + HugCost(nb);
                     if (!g.TryGetValue(nb, out var gn) || tentative < gn)
                     {
                         came[nb] = cur;
@@ -106,6 +145,17 @@ namespace TimeKiller.Navigation
             }
         }
 
+        // Walking within `preferredCells` of a wall costs a little extra, growing
+        // as the gap shrinks. Along a long wall this accumulates every step, so
+        // the open middle wins easily; through a doorway it is paid once or twice
+        // and the route still goes through. Never blocks, so never breaks a path.
+        float HugCost(Vector2Int c)
+        {
+            int clear = grid.ClearanceCells(c.x, c.y);
+            int missing = preferredCells - clear;
+            return missing > 0 ? HugPenalty * missing : 0f;
+        }
+
         static float Heur(Vector2Int a, Vector2Int b)
         {
             int dx = Mathf.Abs(a.x - b.x), dy = Mathf.Abs(a.y - b.y);
@@ -144,16 +194,29 @@ namespace TimeKiller.Navigation
             return result;
         }
 
-        // Bresenham walkability check between two world points.
+        // Bresenham check between two world points — but asking for the BODY's
+        // clearance at every step, not merely "is this cell walkable". A shortcut
+        // is only taken when the whole body fits along it; otherwise StringPull
+        // keeps the corner and we walk the safe A* cells instead.
+        //
+        // Each segment's own two end cells are exempt: those are cells the raw A*
+        // path already occupies, and one of them is often legitimately tight — the
+        // player pressed into a corner, a clock bolted to a wall. Judging them
+        // would refuse every shortcut near such a spot and un-smooth the whole
+        // path for no gain. What matters is the ground the shortcut CROSSES.
         bool ClearLine(Vector2 a, Vector2 b)
         {
             Vector2Int ca = grid.WorldToCell(a), cb = grid.WorldToCell(b);
             int x0 = ca.x, y0 = ca.y, x1 = cb.x, y1 = cb.y;
             int dx = Mathf.Abs(x1 - x0), dy = Mathf.Abs(y1 - y0);
             int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, err = dx - dy;
+            bool first = true;
             while (true)
             {
                 if (!grid.Walkable(x0, y0)) return false;
+                bool ends = first || (x0 == x1 && y0 == y1);
+                if (!ends && grid.ClearanceCells(x0, y0) < requiredCells) return false;
+                first = false;
                 if (x0 == x1 && y0 == y1) break;
                 int e2 = 2 * err;
                 if (e2 > -dy) { err -= dy; x0 += sx; }

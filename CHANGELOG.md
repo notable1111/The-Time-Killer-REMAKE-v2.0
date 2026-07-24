@@ -2,6 +2,226 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-25 — You can now SEE where the AI can walk, and it stopped scraping walls
+
+The bot kept touching walls. The instinct was right and the cause was not in the
+bot: it was in `Navigation/`, the code the **maniac uses too**. Two faults, both
+invisible because nothing ever drew the map.
+
+**1. The path smoother tested a hairline.** `GridPathfinder.ClearLine` walked a
+one-cell-wide Bresenham line between waypoints. A diagonal shortcut whose *centre
+line* clears a corner still drags a 0.6-wide body straight through it. Measured
+against live physics, sweeping the maniac's actual `CapsuleCollider2D` along 3000
+candidate shortcuts:
+
+| | shortcuts accepted | real body **cannot** clear |
+|---|---|---|
+| old hairline test | 1852 | **70 (3.8%)** |
+| new body test | 1013 | **0 (0.0%)** |
+
+That 3.8% was the grinding. The fix cannot lose a route: a refused shortcut just
+keeps the corner, falling back to the raw A\* cells, which are body-safe by
+construction — stricter smoothing only ever *adds* waypoints. Verified on 300
+random routes: **0 null paths, 0 crossing a blocked cell**.
+
+**2. A\* had no reason to stay off walls.** Hugging one cost exactly what walking
+down the middle cost, and diagonals made hugging *cheaper*, so the shortest path
+was the wall. `WalkabilityGrid` now carries a **clearance field** (multi-source
+BFS out of every blocked cell, built after the reachability flood-fill so the
+dropped void counts as wall) and A\* pays a small penalty for low-clearance
+cells. A **cost, not a block** — a one-tile doorway is still taken when it is the
+only way through, and the octile heuristic stays admissible.
+
+**`bodyRadius` is not the sampling `clearance`.** They answer different questions
+— "can I walk *through* there" vs "can I stand *here*" — and conflating them is
+what made this bug survive. Converting a radius to cells adds half the sample
+box, because the wall surface can sit that much nearer than the blocked node.
+
+**And the part you asked for: `NavDebugView`.** Press **F3** in play mode to
+cycle every AI and paint its own map in the game view — red blocked · **yellow
+walkable-but-too-tight-for-this-body** · green open · cyan current route. Yellow
+is the point: "walkable" and "walkable by a body this wide" are different
+questions, and this bug lived in the gap. On CastleWing the maniac's grid is
+138×238; of his 3602 walkable cells, **1269 (35%) are yellow** — a third of the
+floor he can stand on is floor he cannot smoothly cut across. Agents register
+themselves, so **a new AI character joins the F3 cycle for free**. Unlit on
+purpose (URP 2D lights would black it out in the dark corners that matter), and
+compiled out of release builds like `DebugOverlay`.
+
+**Also:** `clockFixTimes` in the batch result row — the run-clock second each
+clock landed, on the same scale as `runSeconds`. A timeout row used to be a
+guess; now "found three by 0:40 then nothing" and "one at 3:10, never got time to
+work" are two visibly different shapes.
+
+## 2026-07-25 — The gate wedge: measured, and it was three bugs, not one
+
+47% of runs fixed every clock and then failed to leave, wedging at `(-4.5, 7.5)`
+beside the ExitDoor. The suspicion on record was that the bot was *overshooting* —
+standing above the win trigger. **Measured against the live colliders, that was
+wrong on the axis.** The real numbers:
+
+- Win trigger: `x[-3.90..-2.10] y[6.45..7.65]`; player feet collider is
+  `0.55 x 0.55` at transform `+(0,-0.35)`.
+- The wedge sits **inside the trigger's y range and 0.325 units west of its x
+  range**. It was never an overshoot — the bot was beside the door, not above it.
+
+Sweeping the player's actual body over the area found three compounding faults:
+
+1. **The steering target was inside solid wall.** `exit.position + up * 0.8` =
+   `(-3.00, 7.25)`. That point *is* in the trigger, but no body can occupy it —
+   only the trigger's **lower slice is standable** (`y[6.55..7.05]`); the upper
+   half is the wall the gate sprite hangs on. The bot was walking at a point it
+   could never reach.
+2. **A\* was routed at the gate itself, which is not on the grid.** The
+   walkability grid is baked while the gate is still **shut**, so the opening
+   reads as solid. A path to the gate therefore resolved to the nearest
+   walkable pocket — a **dead end 1.5m west, behind a wall**. Confirmed by
+   flood fill: seeded at the hall the door channel is unreachable, and seeded
+   at the channel the hall is unreachable. Two disconnected components.
+3. **`nav.Clear()` disabled the stuck detector at the one spot it was needed**,
+   so a failed last metre became an infinite press instead of a reported
+   failure — which is precisely what turned winnable runs into `stalled` rows.
+
+**Fixed in `EscapeState`:** path to a **doorstep** staging point
+(`gate + down*0.45` = `(-3.00, 6.00)`, which *is* on the grid) instead of the
+gate; arm the final push only when actually **squared up with the opening**
+(within 1.2 units, below the gate, |Δx| ≤ 0.6) rather than from anywhere within
+2.5; aim just inside the trigger's **near edge** (`trigger.min.y + 0.35`,
+derived from the live collider, not hardcoded); and carry a **local stall guard**
+so a failed push re-approaches instead of grinding.
+
+Verified against the live scene, with the gate in its **open** state (the earlier
+analysis was misled by measuring while it was locked): A\* finds a path to the
+staging point from the player start, from both far clocks, and **from the old
+wedge coordinate**; the push arms at the staging point and does **not** arm at
+the old wedge; and a simulated walk from staging fires `GameWonEvent` after
+0.56 units of travel.
+
+**Confirmed by a 10-run smoke batch** (`Bot_average`, seeds 2000–2009 @6x):
+
+| | baseline | after fix |
+|---|---|---|
+| escapes | **0** | **4** |
+| `stalled` at ExitDoor | **4** | **0** |
+| runs that fixed all 3 clocks | 6 | 5 (4 of them escaped) |
+
+All four escapes exited within 0.3 units of the same spot — `[-3.2, 6.5]`,
+`[-2.9, 6.5]`, `[-2.9, 6.5]`, `[-3.2, 6.5]` — and the win fires slightly *short*
+of the aim point because `GameWonEvent` triggers the moment the body overlaps the
+trigger. That reproducibility is the evidence the last metre is deterministic
+now, not lucky. **First escapes ever recorded at that gate.**
+
+*Ten runs cannot measure a win rate (±30 points at this n) — this was an
+instrument check, not the experiment.*
+
+**A regression caught and fixed mid-test.** The first cut of this change returned
+early from `Tick` when `KnownExit` was still null, without calling `Drive()`.
+`Retarget()` only sets a destination — `Drive()` is what walks it — so honest
+profiles (which must *see* the gate before they know it) stopped moving the
+instant the last clock was fixed and coasted to a timeout. Signature: 3 clocks
+fixed, `timeout`, stranded mid-map. Caught at run 3 of 10, batch aborted, void
+runs quarantined in `Tools/Playtest/results/void/` rather than left where
+`analyze.py` would aggregate them.
+
+**Still open, and not caused by this fix:** a second wedge site around the
+wardrobes (`stalled` at WardrobeA/WardrobeB), present in the baseline too; and
+seed 2002 timed out holding 3 clocks at 81% explored while the four escapes
+finished in 143–224s of the 480s budget — most likely a late third clock, but
+unexplained.
+
+## 2026-07-25 — The playtest harness survives a batch (run-11 post-mortem)
+
+The first 75-run batch stopped after 10 runs and **said nothing about it** — the
+results file just ended. Root-caused from `Editor.log` rather than guessed:
+
+`BatchRunner.cs` was saved at 00:30. The batch launched 40 seconds later from
+the **stale, already-loaded assembly**, because Unity only auto-refreshes when
+the editor regains focus. Runs 1–10 were clean (zero exceptions). At ~00:36 a
+refresh fired, noticed the pending change, and Unity did a **synchronous domain
+reload in Play Mode**. That killed the runner's coroutine mid-batch.
+
+It also nulled every non-serializable runtime field on the surviving scene
+objects — `PlayerController.Input` is an interface field, `BotPilot.memory` a
+plain C# object, and `Awake()` does not re-run on an object that already exists.
+Four components then threw every frame: **498,704 NullReferenceExceptions and a
+190 MB `Editor.log`**. The split is what makes it airtight — 0 exceptions during
+runs 1–10, all 498,704 after the reload.
+
+*The batch did not die of anything in the game. It died of its own source file
+being recompiled underneath it.*
+
+**Fixed, in four layers:**
+
+- `BatchGuard` holds `LockReloadAssemblies` + `DisallowAutoRefresh` for the
+  batch, so a compile request is deferred instead of executed. Verified against
+  a real forced reload: locked, `RequestScriptReload()` did nothing; released,
+  the same deferred reload fired at once. `TimeKiller/Setup/34` is the escape
+  hatch, because a leaked lock silently stops the editor compiling.
+- The window now flushes the AssetDatabase and refuses to enter Play Mode with a
+  compile pending — the stale-assembly launch can no longer happen at all.
+- If a reload happens anyway, an explicit `{"aborted":true,"reason":
+  "domain_reload","atRun":11}` row is written **before the domain dies**, and
+  Play Mode is stopped immediately so the scene cannot spam.
+
+**The deeper bug it exposed: failures that looked like data.** The harness had
+no way to say "I failed" — broken preconditions wrote *no row at all* (the batch
+silently shrank) and a wedged bot wrote an ordinary loss. That is worse than the
+crash: a silent instrument failure does not add noise, it biases every profile
+toward "flat", which is already the most likely wrong answer at this sample
+size. Runs now end as `escape` / `death` / `timeout` / `stalled` /
+`harness_error`, with an exception watchdog and a per-run preflight check that
+the player is actually wired. `analyze.py` splits faults out of the sample and
+prints a **HARNESS STATUS block before any number**, including what fraction of
+the planned runs are usable — a truncated batch is not a small batch, it is a
+biased one.
+
+## 2026-07-25 — Bot playtester: a simulated player that has to *find* the clocks
+
+Every balance number in this project was unverified — the maniac AI, the escape
+loop and the catacombs were all "needs playtest" — because verifying one change
+cost a human evening. A full playthrough now costs seconds, so *"is 4 clocks
+better than 3?"* gets answered by running it 200 times.
+
+**The design decision that matters:** the bot is a *player*, not an oracle.
+
+- It **does not know where the clocks are.** `BotMemory` promotes a clock,
+  wardrobe or the gate from "exists" to "known" only after the bot has had clear
+  line of sight to it from inside its sight range; until then it explores a
+  coarse grid of the castle looking. Requested explicitly — it has to feel
+  realistic, no cheating.
+- It **plays the skill check badly, on purpose.** `BotProfileConfig` adds a
+  reaction delay, *un-compensatable* reaction jitter, and perception noise on the
+  marker read. A naive bot reads `ClockRepair.Marker` and hits 100% forever —
+  a broken instrument that looks like it works.
+- Two profiles keep the cheat as a **labelled control**: `oracle_average` and
+  `oracle_expert` set `knowsEverything` and answer a different question ("how
+  hard once you have memorised the castle"). `analyze.py` never averages them
+  together with the honest profiles.
+- **The number that matters is the spread**, not any single win rate. Both
+  families win 95% -> trivial; both lose -> unfair.
+
+**Two bugs the harness found in its own first live run**, before a single batch:
+
+- It reported **0 hits out of 16** skill checks while the clock was visibly
+  being repaired. `QueueSkillCheck()` only sets a flag that `ScriptedInputSource`
+  turns into a press *next* frame, which `ClockRepair` reads the frame after
+  that; scoring on the next tick measured nothing. The scorer now waits for the
+  clock's progress to actually move.
+- It fixed all three clocks, walked to the gate and **did not win**. The win
+  trigger starts at y 6.45 and the bot's feet collider topped out at 6.41 — four
+  centimetres short. It stopped on the gate's coordinate; a human keeps holding
+  W and walks *through* the threshold. `EscapeState` now does the same. Real
+  players have about 0.15 units of margin there.
+
+**Also now measured:** `accidentalHides` — E is read by both `ClockRepair` and
+`PlayerHiding` at the same 2.2 range, and every CastleWing clock was hand-placed
+beside a wardrobe, so pressing E to repair can open the wardrobe instead.
+
+New: `C#/Testing/{BotProfileConfig, BotPath, BotMemory, BotPilot, BatchRunner}`,
+`Editor/BotPlaytestWindow` (menu `TimeKiller/Setup/33`),
+`TestDriver.PressSkillCheck/BotStart/BotStop`, `Tools/Playtest/analyze.py`.
+**No gameplay file was modified** — delete `C#/Testing/` and the game is intact.
+
 ## 2026-07-24 — Team onboarding fixes: teammates could not open or pull the project
 
 Three separate causes behind the errors teammates hit. All fixed in-repo; the

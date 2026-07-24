@@ -73,6 +73,43 @@ namespace TimeKiller.Testing
             return "{\"interactQueued\":true}";
         }
 
+        /// One Space tap — the clock-repair skill check. Without this the driver
+        /// could walk to a clock and start it but never finish one, so no
+        /// automated run could ever reach the win condition.
+        public static string PressSkillCheck()
+        {
+            if (scripted == null || !scripted.enabled) return "{\"error\":\"not possessed\"}";
+            scripted.QueueSkillCheck();
+            return "{\"skillCheckQueued\":true}";
+        }
+
+        /// Hand the possessed player over to the autonomous pilot. profile is a
+        /// BotProfileConfig asset name under Resources (e.g. "Bot_average").
+        public static string BotStart(string profile = "Bot_average", int seed = 1)
+        {
+            var pc = Object.FindAnyObjectByType<PlayerController>();
+            if (pc == null) return "{\"error\":\"no PlayerController (is Play Mode running?)\"}";
+            if (scripted == null || !scripted.enabled) Possess();
+
+            var config = Resources.Load<BotProfileConfig>("C#/Testing/Configs/" + profile);
+            if (config == null) return $"{{\"error\":\"profile '{profile}' not found — run TimeKiller/Setup/33\"}}";
+
+            var pilot = pc.GetComponent<BotPilot>();
+            if (pilot == null) pilot = pc.gameObject.AddComponent<BotPilot>();
+            pilot.enabled = true;
+            pilot.Begin(config, seed);
+            return $"{{\"bot\":\"{config.profileName}\",\"seed\":{seed},\"knowsEverything\":{(config.knowsEverything ? "true" : "false")}}}";
+        }
+
+        public static string BotStop()
+        {
+            var pc = Object.FindAnyObjectByType<PlayerController>();
+            var pilot = pc != null ? pc.GetComponent<BotPilot>() : null;
+            if (pilot != null) Object.Destroy(pilot);
+            if (scripted != null) { scripted.Target = null; scripted.Run = false; }
+            return "{\"botStopped\":true}";
+        }
+
         public static string Status()
         {
             var pc = Object.FindAnyObjectByType<PlayerController>();
@@ -81,7 +118,11 @@ namespace TimeKiller.Testing
             var ci = System.Globalization.CultureInfo.InvariantCulture;
             string arrived = scripted != null && scripted.Arrived ? "true" : "false";
             string tele = telemetry != null ? telemetry.Summary() : "null";
-            return $"{{\"pos\":[{pos.x.ToString("0.00", ci)},{pos.y.ToString("0.00", ci)}],\"arrived\":{arrived},\"telemetry\":{tele}}}";
+            var pilot = pc.GetComponent<BotPilot>();
+            string bot = pilot != null && pilot.Ready
+                ? $"{{\"goal\":\"{pilot.CurrentGoal}\",\"clocksKnown\":{pilot.Memory.ClocksKnown},\"explored\":\"{pilot.Memory.ExploredCount}/{pilot.Memory.ExplorableCount}\",\"skillChecks\":\"{pilot.SkillChecksHit}/{pilot.SkillChecksAttempted}\"}}"
+                : "null";
+            return $"{{\"pos\":[{pos.x.ToString("0.00", ci)},{pos.y.ToString("0.00", ci)}],\"arrived\":{arrived},\"bot\":{bot},\"telemetry\":{tele}}}";
         }
     }
 }

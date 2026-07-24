@@ -11,10 +11,12 @@ using UnityEngine;
 namespace TimeKiller.Navigation
 {
     [RequireComponent(typeof(ManiacMotor))]
-    public class ManiacNavigator : MonoBehaviour
+    public class ManiacNavigator : MonoBehaviour, INavDebugSource
     {
         [Tooltip("Overlap box per cell — larger = keeps him further off walls (his body radius). All collider layers count as walls; dynamic bodies and triggers are ignored automatically.")]
         [SerializeField] float clearance = 0.9f;
+        [Tooltip("Half his collider width. Path shortcuts must leave this much room, so he stops clipping corners. Read off the CapsuleCollider2D — it is NOT the same number as clearance above.")]
+        [SerializeField] float bodyRadius = 0.45f;
         [Tooltip("Repath when the destination moves at least this far.")]
         [SerializeField] float repathDistance = 1.0f;
         [Tooltip("Also repath at least this often (chasing a moving target).")]
@@ -57,8 +59,18 @@ namespace TimeKiller.Navigation
             // flood-fill from the maniac himself — he stands on real floor, so the
             // kept region is exactly the reachable interior (void dropped).
             grid = new WalkabilityGrid(bounds, 0.5f, clearance, transform.position);
-            finder = new GridPathfinder(grid);
+            finder = new GridPathfinder(grid, bodyRadius);
+            NavDebugView.Register(this);   // F3 in play mode paints this grid
         }
+
+        void OnDestroy() => NavDebugView.Unregister(this);
+
+        // --- INavDebugSource: lets NavDebugView show what he thinks the map is ---
+        public string NavLabel => "Maniac";
+        public WalkabilityGrid NavGrid => grid;
+        public GridPathfinder NavFinder => finder;
+        public IReadOnlyList<Vector2> NavPath => path;
+        public Vector2 NavPosition => motor != null ? motor.Position : (Vector2)transform.position;
 
         static Bounds ComputeWorldBounds()
         {
