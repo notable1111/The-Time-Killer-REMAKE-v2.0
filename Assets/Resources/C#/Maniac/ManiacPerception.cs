@@ -44,6 +44,30 @@ namespace TimeKiller.Maniac
         public Vector2 LastSeenPosition { get; private set; }
         public Vector2 LastSeenDirection { get; private set; } = Vector2.zero; // flee bias for the search belief map
         public float LastSeenTime { get; private set; } = float.NegativeInfinity;
+        // ---- suspicion accounting (for playtest telemetry) -------------------
+        // Measured HERE, per frame, rather than sampled by TestTelemetry at
+        // 4 Hz. The suspicion band is routinely shorter than one sample: at
+        // awarenessFillRate 2.6 the climb from suspicionThreshold to spotted
+        // takes under 0.25s under good exposure, so a sampler misses most
+        // crossings outright and reports a calm game that isn't one.
+
+        /// Seconds Suspicious while still actively sensing something — the
+        /// stalking beat, and the only part of this band that reflects LEVEL
+        /// design rather than tuning.
+        public float StalkSeconds { get; private set; }
+
+        /// Seconds Suspicious while sensing nothing — the forgetting tail after
+        /// he loses you. Structurally capped at
+        /// (1 - suspicionThreshold) / awarenessDrainRate per lost contact, so it
+        /// is a property of the CONFIG, not the level. Kept apart from
+        /// StalkSeconds precisely so it can never be read as tension.
+        public float FadeSeconds { get; private set; }
+
+        /// Times suspicion first flickered up from Unaware — the "did he see
+        /// me?" beat. Counted as events because durations here are short enough
+        /// to be lost to any sampling rate.
+        public int SuspicionEpisodes { get; private set; }
+
         public bool HasUnhandledNoise { get; private set; }
         public Vector2 LastNoisePosition { get; private set; }
         public float LastNoiseTime { get; private set; } = float.NegativeInfinity;
@@ -96,7 +120,11 @@ namespace TimeKiller.Maniac
         void HearNoise(Vector2 position)
         {
             SetNoise(position);
-            EventBus.Publish(new ManiacHeardNoiseEvent { NoisePosition = position });
+            EventBus.Publish(new ManiacHeardNoiseEvent
+            {
+                NoisePosition = position,
+                Cause = NoiseCause.Sound
+            });
         }
 
         void SetNoise(Vector2 position)
@@ -129,6 +157,16 @@ namespace TimeKiller.Maniac
                          : Awareness >= config.suspicionThreshold ? AwarenessLevel.Suspicious
                          : AwarenessLevel.Unaware;
 
+            // Split by whether he is still sensing (rate > 0 = closing in) or
+            // merely forgetting (rate == 0 = draining). Counted before the
+            // branch below so a rise straight through the band is not lost.
+            if (newLevel == AwarenessLevel.Suspicious)
+            {
+                if (rate > 0f) StalkSeconds += dt;
+                else FadeSeconds += dt;
+                if (Level == AwarenessLevel.Unaware) SuspicionEpisodes++;
+            }
+
             if (newLevel == AwarenessLevel.Detected)
             {
                 if (Level != AwarenessLevel.Detected)
@@ -149,7 +187,11 @@ namespace TimeKiller.Maniac
                 {
                     SetNoise(player.position);
                     if (Level == AwarenessLevel.Unaware) // first flicker of suspicion — a dark riser
-                        EventBus.Publish(new ManiacHeardNoiseEvent { NoisePosition = player.position });
+                        EventBus.Publish(new ManiacHeardNoiseEvent
+                        {
+                            NoisePosition = player.position,
+                            Cause = NoiseCause.Suspicion
+                        });
                 }
             }
             Level = newLevel;

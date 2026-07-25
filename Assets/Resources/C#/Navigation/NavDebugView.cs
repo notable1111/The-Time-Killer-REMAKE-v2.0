@@ -1,7 +1,9 @@
 // Shows, in the GAME view, exactly where an AI character believes it can walk.
 // Press F3 to cycle: off -> maniac -> bot -> ... -> off.
 //
-//   red    = blocked (wall, furniture, or the dropped outside-the-castle void)
+//   red    = a real collider is here — wall or furniture
+//   grey   = no collider at all, but cut off from the reachable region (the
+//            empty space outside the castle: ~88% of everything unwalkable)
 //   yellow = walkable, but too tight for THIS body — a shortcut across it would
 //            scrape, so the smoother refuses it (see GridPathfinder.ClearLine)
 //   green  = comfortably open
@@ -11,6 +13,12 @@
 // this wide" are different questions, and every wall-scraping bug we have had
 // lived in the gap between them. Each agent paints its OWN colours because each
 // has its own body — the maniac's yellow is far wider than the player's.
+//
+// WATCH THE LABEL. Painting the maniac's map while driving the player is
+// genuinely misleading: 4.9% of where the player can walk is red on the
+// maniac's map (his sample box is 0.85, the player capsule 0.55) — and every
+// one of those cells is yellow on the player's own map. Red always means "for
+// the body named in the legend", never "for anybody".
 //
 // Registration is push-based (agents call Register on themselves) so Navigation
 // never has to know which characters exist; a new AI shows up in the cycle for
@@ -72,16 +80,19 @@ namespace TimeKiller.Navigation
         LineRenderer route;
         Texture2D texture;
 
-        static readonly Color Blocked = new Color(0.85f, 0.15f, 0.15f, 0.38f);
+        static readonly Color Solid = new Color(0.85f, 0.15f, 0.15f, 0.42f);
+        static readonly Color CutOff = new Color(0.28f, 0.28f, 0.32f, 0.30f);
         static readonly Color Tight = new Color(0.95f, 0.80f, 0.15f, 0.34f);
         static readonly Color Open = new Color(0.20f, 0.85f, 0.35f, 0.16f);
 
         void Start()
         {
             CheatHotkeys.RegisterCheat(Key.F3, "Walkable map", Cycle);
+            // The label names WHOSE body the colours describe — the one thing a
+            // reader must not get wrong when several agents are registered.
             DebugOverlay.Watch("Nav view", () => shown < 0 || shown >= sources.Count
                 ? "off (F3)"
-                : $"{sources[shown].NavLabel} — red blocked / yellow tight / green open");
+                : $"{sources[shown].NavLabel}'s body — red wall / grey cut off / yellow tight / green open");
         }
 
         void OnDestroy()
@@ -148,7 +159,7 @@ namespace TimeKiller.Navigation
                 for (int x = 0; x < w; x++)
                 {
                     Color c;
-                    if (!grid.Walkable(x, y)) c = Blocked;
+                    if (!grid.Walkable(x, y)) c = grid.IsSolid(x, y) ? Solid : CutOff;
                     else if (grid.ClearanceCells(x, y) < need) c = Tight;
                     else c = Open;
                     pixels[y * w + x] = c;

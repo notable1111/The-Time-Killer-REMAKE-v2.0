@@ -32,6 +32,7 @@ namespace TimeKiller.Navigation
         readonly float sampleBox;  // the overlap box each node was tested with
         readonly int cols, rows;
         readonly bool[] walkable;
+        readonly bool[] solid;      // a real collider sits here, as opposed to merely unreachable
         readonly byte[] clearCells; // cells to the nearest blocked cell (0 = blocked itself)
 
         public int Cols => cols;
@@ -58,10 +59,15 @@ namespace TimeKiller.Navigation
             cols = Mathf.CeilToInt(worldBounds.size.x / cell) + 2;
             rows = Mathf.CeilToInt(worldBounds.size.y / cell) + 2;
             walkable = new bool[cols * rows];
+            solid = new bool[cols * rows];
             var box = new Vector2(clearance, clearance);
             for (int y = 0; y < rows; y++)
                 for (int x = 0; x < cols; x++)
-                    walkable[y * cols + x] = !Blocked(CellCenter(x, y), box);
+                {
+                    int i = y * cols + x;
+                    solid[i] = Blocked(CellCenter(x, y), box);
+                    walkable[i] = !solid[i];
+                }
 
             KeepReachableFrom(reachableSeed);
             clearCells = BuildClearanceField();
@@ -111,6 +117,13 @@ namespace TimeKiller.Navigation
         /// Distance in cells from (x,y) to the nearest blocked cell. 0 = blocked.
         /// Out of bounds reads as 0 so callers treat the world edge as solid.
         public int ClearanceCells(int x, int y) => InBounds(x, y) ? clearCells[y * cols + x] : 0;
+
+        /// True when a real collider sits here. The other reason a cell is not
+        /// walkable is that the flood-fill CUT IT OFF — the empty space outside
+        /// the castle has no colliders at all and is most of the blocked map.
+        /// Telling the two apart matters: "wall" and "nothing there, but you
+        /// can't get to it" are different facts about the level.
+        public bool IsSolid(int x, int y) => InBounds(x, y) && solid[y * cols + x];
 
         // Flood-fill (4-neighbour, which matches A*'s no-corner-cut connectivity)
         // from the seed; block every walkable cell it can't reach — the void.
