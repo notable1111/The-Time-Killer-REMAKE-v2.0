@@ -5,6 +5,12 @@ using UnityEngine;
 
 namespace TimeKiller.Player
 {
+    // Last on the physics step, after whoever decided the target velocity. The
+    // chain is BotPilot (-200) -> ScriptedInputSource (-150) -> PlayerController
+    // (0) -> this (50); a human's input arrives on the render frame, so only the
+    // scripted driver cares, and for it the whole decision now lands inside one
+    // fixed step at any timeScale.
+    [DefaultExecutionOrder(50)]
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerMotor : MonoBehaviour
     {

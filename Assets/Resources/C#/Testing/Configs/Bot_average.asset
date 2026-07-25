@@ -15,7 +15,7 @@ MonoBehaviour:
   profileName: average
   reactionTime: 0.22
   reactionJitter: 0.3
-  aimError: 0.06
+  aimError: 0.062
   pressCooldown: 0.18
   panicDistance: 5
   calmDistance: 11

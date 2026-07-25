@@ -21,10 +21,25 @@ using UnityEngine;
 
 namespace TimeKiller.Testing
 {
+    // First on the physics step, ahead of ScriptedInputSource (-150), the player's
+    // states (0) and PlayerMotor (50). The chain think -> steer -> state -> body
+    // therefore completes inside ONE fixed step, at every timeScale. It used to
+    // straddle whatever order Unity happened to pick, which cost one frame or two
+    // depending on the run — the kind of hidden variable that makes a batch
+    // unreproducible even at a fixed seed.
+    [DefaultExecutionOrder(-200)]
     public class BotPilot : MonoBehaviour, INavDebugSource
     {
         public BotProfileConfig Profile;
         public int Seed = 1;
+
+        /// Half the player capsule (0.55 x 0.4 — see PlayerSetup). The A/B knob
+        /// for the batch harness: 0 reproduces the old hairline string-pull that
+        /// GridPathfinder documents, so one batch can run both pathfindings over
+        /// matched seeds instead of comparing against uninstrumented history.
+        /// Nothing in normal play changes it.
+        public const float DefaultBodyRadius = 0.275f;
+        public float BodyRadius = DefaultBodyRadius;
 
         // ---- results the batch runner reads ----
         public int SkillChecksAttempted { get; private set; }
@@ -33,6 +48,26 @@ namespace TimeKiller.Testing
         public int ExploreTargets { get; private set; }
         public string CurrentGoal => machine.Current?.GetType().Name ?? "none";
         public BotMemory Memory => memory;
+
+        // nav is REBUILT mid-run when the gate opens, so reading the live
+        // instance would silently drop every stuck event before that moment —
+        // and the escape leg is the shortest, so almost all of them.
+        int stuckEventsCarry, stuckGiveUpsCarry;
+        float wedgedCarry, travelCarry;
+
+        public int StuckEvents => stuckEventsCarry + (nav != null ? nav.StuckEvents : 0);
+        public int StuckGiveUps => stuckGiveUpsCarry + (nav != null ? nav.StuckGiveUps : 0);
+        public float WedgedSeconds => wedgedCarry + (nav != null ? nav.WedgedSeconds : 0f);
+        public float TravelSeconds => travelCarry + (nav != null ? nav.TravelSeconds : 0f);
+
+        void RetireNav()
+        {
+            if (nav == null) return;
+            stuckEventsCarry += nav.StuckEvents;
+            stuckGiveUpsCarry += nav.StuckGiveUps;
+            wedgedCarry += nav.WedgedSeconds;
+            travelCarry += nav.TravelSeconds;
+        }
 
         PlayerController player;
         ScriptedInputSource input;
@@ -72,7 +107,10 @@ namespace TimeKiller.Testing
             maniac = Object.FindAnyObjectByType<ManiacController>();
             clockConfig = Resources.Load<ClockConfig>("C#/Objectives/Configs/ClockConfig");
 
-            nav = new BotPath(transform.position);
+            stuckEventsCarry = stuckGiveUpsCarry = 0;
+            wedgedCarry = travelCarry = 0f;   // a reused component must not carry the last run's wall
+
+            nav = new BotPath(transform.position, bodyRadius: BodyRadius);
             memory = new BotMemory(transform, nav, Profile.sightRange, Profile.knowsEverything);
             NavDebugView.Register(this);   // F3 in play mode paints what the bot sees
 
@@ -108,17 +146,31 @@ namespace TimeKiller.Testing
         void OnAllFixed(AllClocksFixedEvent e)
         {
             memory.HearExitOpen();
-            nav = new BotPath(transform.position);
+            RetireNav();
+            nav = new BotPath(transform.position, bodyRadius: BodyRadius);
             machine.ChangeState(new EscapeState(this));
         }
 
-        void Update()
+        // The think runs on the PHYSICS clock, not the render frame.
+        //
+        // FixedUpdate is a fixed cadence in GAME time (0.02 s) whatever timeScale
+        // is, so the bot senses, re-chooses and re-steers exactly as often per
+        // game-second at 6x as at 1x. On Update it did that 60 times a game-second
+        // at 1x and 15 at 4x, while every loop on the maniac's side — awareness
+        // integration, motor steering, all his Time.time timers — is already
+        // speed-invariant. Acceleration was not making him smarter; it was
+        // stripping the bot, and the win rate was reading the difference as
+        // difficulty.
+        //
+        // NOT the same as ticking this N times inside one Update: nothing moves
+        // between those slices, so N identical linecasts buy nothing.
+        void FixedUpdate()
         {
             if (!Ready || player == null) return;
             memory.Observe();
             SenseManiac();
             Choose();
-            machine.Tick(Time.deltaTime);
+            machine.Tick(Time.fixedDeltaTime);
         }
 
         // ---- threat perception ----------------------------------------------
@@ -203,7 +255,11 @@ namespace TimeKiller.Testing
         /// to Arrived / Failed without knowing anything about A*.
         BotPath.Result Drive(bool sprint)
         {
-            var result = nav.Tick(transform.position, out var waypoint);
+            // dt is passed, not read inside BotPath: the follower now ticks on the
+            // physics clock and Time.deltaTime there is the RENDER frame's, which
+            // would over-count travelSeconds by ~3.3x at 4x — inflating the
+            // denominator of every wall-stuck rate and hiding real wedging.
+            var result = nav.Tick(transform.position, Time.fixedDeltaTime, out var waypoint);
             if (result == BotPath.Result.Following)
             {
                 input.Target = waypoint;
@@ -289,6 +345,8 @@ namespace TimeKiller.Testing
             float giveUpAt;
             int dir = 1;
             float lastMarker;
+            bool aimed;              // a press is already planned — do not re-decide per frame
+            float aimedZone = -1f;   // the zone centre that plan was computed against
 
             public RepairState(BotPilot bot) => b = bot;
 
@@ -404,12 +462,40 @@ namespace TimeKiller.Testing
                 lastMarker = m;
             }
 
+            // Decide ONCE per press, not once per frame.
+            //
+            // The original re-rolled the noise every Update and fired on the FIRST
+            // roll that passed. The marker sweeps in game time, so the number of
+            // rolls taken while it sat inside the window was set by the frame rate:
+            // ~13 at 1x/60fps but only ~3 at 4x. More rolls means more chances to
+            // fire on an early false positive, so the bot got WORSE the more frames
+            // it had. Measured across the batches on disk: 21% hit rate at 1x, 43%
+            // at 4x, 50% at 6x — monotone in timeScale. That made every accelerated
+            // batch measure the accelerator instead of the game, and it also made
+            // the 1x bot spend ~60% of its run standing motionless at a clock,
+            // which is the strongest stealth state in the game (0.4x detection).
+            //
+            // Now: work out analytically WHEN the marker next reaches the zone
+            // centre, apply the profile's aim error once as the timing error it
+            // really is, and commit. Hit rate becomes a property of the profile —
+            // which is what aimError was always supposed to mean.
             void TryPress()
             {
+                // A zone re-roll invalidates a plan that has not fired yet. Observed
+                // off ZoneCenter rather than inferred from our own hit, so a zone
+                // moved by anything else is still handled.
+                if (!Mathf.Approximately(b.repair.ZoneCenter, aimedZone))
+                {
+                    if (pressDueAt > 0f) pressDueAt = -1f;
+                    aimed = false;
+                    aimedZone = b.repair.ZoneCenter;
+                }
+
                 if (pressDueAt > 0f)
                 {
                     if (Time.time < pressDueAt) return;
                     pressDueAt = -1f;
+                    aimed = false;              // plan spent — re-aim for the next press
                     progressAtPress = target.Progress;
                     awaitingResult = true;
                     resolveBy = Time.time + 0.5f;
@@ -418,26 +504,34 @@ namespace TimeKiller.Testing
                     nextPressAt = Time.time + b.Profile.pressCooldown;
                     return;
                 }
-                if (awaitingResult || Time.time < nextPressAt) return;
+                if (awaitingResult || aimed || Time.time < nextPressAt) return;
 
-                // Decide now, act later: predict where the marker will be after the
-                // reaction, from a NOISY read of where it is. The bot cannot see
-                // its own jitter, so the press lands slightly off — that gap is the
-                // whole difference between novice and expert.
-                float reaction = b.Profile.RollReaction(b.rng);
-                float perceived = Mathf.Clamp01(b.repair.Marker + b.Profile.RollAimError(b.rng));
-                float future = Advance(perceived, dir, b.MarkerSpeed * b.Profile.reactionTime);
-                if (Mathf.Abs(future - b.repair.ZoneCenter) <= b.repair.ZoneWidth * 0.45f)
-                    pressDueAt = Time.time + reaction;
+                float speed = Mathf.Max(0.0001f, b.MarkerSpeed);
+                float wait = TimeToCentre(b.repair.Marker, dir, b.repair.ZoneCenter, speed,
+                                          b.Profile.RollReaction(b.rng));
+                // Aim error is a POSITION error in marker units; divide by marker
+                // speed to land it as the timing error it actually is.
+                pressDueAt = Time.time + wait + b.Profile.RollAimError(b.rng) / speed;
+                aimed = true;
             }
 
-            // Marker = PingPong(t): fold the 0..1 bar into a 0..2 loop, walk it,
-            // fold back. Handles a bounce inside the reaction window correctly.
-            static float Advance(float m, int dir, float distance)
+            // Seconds until the marker next sits on `centre`, given the bot cannot
+            // act sooner than `minLead` (its reaction time).
+            //
+            // Marker = PingPong(t), so fold the 0..1 bar into a 0..2 loop where the
+            // sweep only ever moves forward. In that space the centre is crossed at
+            // TWO places — `centre` on the way up and `2 - centre` on the way back —
+            // and the bounce at either end needs no special case.
+            static float TimeToCentre(float marker, int dir, float centre, float speed, float minLead)
             {
-                float p = dir >= 0 ? m : 2f - m;
-                p = Mathf.Repeat(p + distance, 2f);
-                return p <= 1f ? p : 2f - p;
+                float p = dir >= 0 ? marker : 2f - marker;
+                float toUp = Mathf.Repeat(centre - p, 2f);
+                float toDown = Mathf.Repeat((2f - centre) - p, 2f);
+                float first = Mathf.Min(toUp, toDown), second = Mathf.Max(toUp, toDown);
+
+                if (first / speed >= minLead) return first / speed;
+                if (second / speed >= minLead) return second / speed;
+                return (first + 2f) / speed;   // both too close — take the next lap
             }
         }
 

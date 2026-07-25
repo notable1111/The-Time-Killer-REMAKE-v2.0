@@ -36,6 +36,7 @@ namespace TimeKiller.Testing.EditorTools
         int controlRuns = 15;
         string controlProfile = "Bot_average";   // "" = spread the control across every profile
         float maxRunSeconds = 480f;
+        bool abPathfinding;   // run every seed twice: old hairline vs body-width
 
         [MenuItem("TimeKiller/Setup/33 - Bot Playtest")]
         public static void Open()
@@ -72,10 +73,18 @@ namespace TimeKiller.Testing.EditorTools
             }
             maxRunSeconds = EditorGUILayout.Slider("Timeout (game seconds)", maxRunSeconds, 60f, 900f);
 
+            abPathfinding = EditorGUILayout.Toggle(
+                new GUIContent("A/B pathfinding",
+                    "Runs every seed twice: once with bodyRadius 0 (the old hairline string-pull) " +
+                    "and once at 0.275 (the real player body). Doubles the run count. Without it " +
+                    "the stuck counters have no baseline — no earlier batch recorded them."),
+                abPathfinding);
+
             bool control = alsoAtRealtime && speed > 1f;
+            int arms = abPathfinding ? 2 : 1;
             int controlCells = string.IsNullOrEmpty(controlProfile) ? selected.Count : 1;
-            int fast = selected.Count * runs;
-            int slow = control ? controlCells * Mathf.Min(runs, controlRuns) : 0;
+            int fast = selected.Count * runs * arms;
+            int slow = control ? controlCells * Mathf.Min(runs, controlRuns) * arms : 0;
             // Measured, not guessed: a full honest run on CastleWing takes ~400
             // in-game seconds, because the bot explores until it has seen every
             // clock. Deaths come in under that and timeouts sit at the cap, so
@@ -162,7 +171,8 @@ namespace TimeKiller.Testing.EditorTools
             string control = selected.Contains(controlProfile) ? controlProfile : "";
             SessionState.SetString(PendingKey,
                 $"{string.Join(",", list)}|{runs}|{baseSeed}|{speed.ToString(ci)}|" +
-                $"{(alsoAtRealtime ? 1 : 0)}|{maxRunSeconds.ToString(ci)}|{controlRuns}|{control}");
+                $"{(alsoAtRealtime ? 1 : 0)}|{maxRunSeconds.ToString(ci)}|{controlRuns}|{control}|" +
+                $"{(abPathfinding ? 1 : 0)}");
             EditorApplication.EnterPlaymode();
         }
 
@@ -190,6 +200,11 @@ namespace TimeKiller.Testing.EditorTools
                 RealtimeControlRuns = int.Parse(parts[6]),
                 ControlProfiles = parts.Length > 7 && !string.IsNullOrEmpty(parts[7])
                     ? new[] { parts[7] } : null,
+                // Old arm FIRST, so a batch killed halfway still leaves the
+                // baseline on disk — the arm that cannot be reconstructed from
+                // the shipping build later.
+                BodyRadii = parts.Length > 8 && parts[8] == "1"
+                    ? new[] { 0f, BotPilot.DefaultBodyRadius } : null,
             });
         }
 
@@ -199,12 +214,26 @@ namespace TimeKiller.Testing.EditorTools
         {
             Directory.CreateDirectory(ConfigDir);
 
+            // AIM ERROR IS CALIBRATED, NOT GUESSED (2026-07-25). It is the sigma of a
+            // gaussian in marker units (BotProfileConfig.RollAimError), so the hit
+            // rate is erf(halfZone / (sigma * sqrt 2)) with halfZone = zoneWidth/2 =
+            // 0.09. Solved for 70 / 85 / 95%:
+            //     novice 0.087 -> 0.70    average 0.062 -> 0.85    expert 0.045 -> 0.95
+            //
+            // The old values (0.12 / 0.06 / 0.02) were authored against the broken
+            // per-frame press loop, which returned ~21% for EVERY profile and hid the
+            // fact that they were never calibrated. With that fixed they would have
+            // given 55 / 86 / 100% — expert at 4.5 sigma literally could not miss.
+            // This matters beyond the bot's score: hit rate sets how long it stands
+            // still at a clock, and standing still is the 0.4x detection multiplier,
+            // so mis-calibrating it silently changes how findable the bot is.
+            //
             // reaction, jitter, aim, panic, calm, hideBias, route, sprint, cheat
-            Make("Bot_novice", "novice", 0.35f, 0.35f, 0.12f, 3.0f, 9f, 0.30f, 0.40f, 0.80f, false, force);
-            Make("Bot_average", "average", 0.22f, 0.30f, 0.06f, 5.0f, 11f, 0.60f, 0.75f, 0.50f, false, force);
-            Make("Bot_expert", "expert", 0.12f, 0.20f, 0.02f, 7.0f, 13f, 0.50f, 1.00f, 0.35f, false, force);
-            Make("Bot_oracle_average", "oracle_average", 0.22f, 0.30f, 0.06f, 5.0f, 11f, 0.60f, 0.90f, 0.50f, true, force);
-            Make("Bot_oracle_expert", "oracle_expert", 0.12f, 0.20f, 0.02f, 7.0f, 13f, 0.50f, 1.00f, 0.35f, true, force);
+            Make("Bot_novice", "novice", 0.35f, 0.35f, 0.087f, 3.0f, 9f, 0.30f, 0.40f, 0.80f, false, force);
+            Make("Bot_average", "average", 0.22f, 0.30f, 0.062f, 5.0f, 11f, 0.60f, 0.75f, 0.50f, false, force);
+            Make("Bot_expert", "expert", 0.12f, 0.20f, 0.045f, 7.0f, 13f, 0.50f, 1.00f, 0.35f, false, force);
+            Make("Bot_oracle_average", "oracle_average", 0.22f, 0.30f, 0.062f, 5.0f, 11f, 0.60f, 0.90f, 0.50f, true, force);
+            Make("Bot_oracle_expert", "oracle_expert", 0.12f, 0.20f, 0.045f, 7.0f, 13f, 0.50f, 1.00f, 0.35f, true, force);
 
             AssetDatabase.SaveAssets();
         }

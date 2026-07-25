@@ -15,7 +15,7 @@ MonoBehaviour:
   profileName: novice
   reactionTime: 0.35
   reactionJitter: 0.35
-  aimError: 0.12
+  aimError: 0.087
   pressCooldown: 0.18
   panicDistance: 3
   calmDistance: 9

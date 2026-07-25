@@ -8,6 +8,13 @@ using UnityEngine;
 
 namespace TimeKiller.Testing
 {
+    // Runs after BotPilot (-200) and before PlayerController (0), so the steering
+    // below is always computed from the Target the pilot set THIS physics step and
+    // is always read by the player's states in the same one. Script execution
+    // order used to decide whether a decision cost one frame or two — a hidden
+    // variable that changed with timeScale, which is exactly what this pass exists
+    // to remove.
+    [DefaultExecutionOrder(-150)]
     public class ScriptedInputSource : MonoBehaviour, IInputSource
     {
         public Vector2 MoveInput { get; private set; }
@@ -29,6 +36,14 @@ namespace TimeKiller.Testing
 
         public bool Arrived => Target == null;
 
+        // The two halves of a controller tick on different clocks on purpose.
+        //
+        // PULSES stay on the RENDER frame, because that is where their consumers
+        // live: ClockRepair and PlayerInteractor read InteractPressed /
+        // SkillCheckPressed in Update. Published from FixedUpdate they would be
+        // raised and cleared several times between two Updates at high timeScale
+        // (3.3 physics steps per frame at 4x) and every press but the last would
+        // vanish — the harness would then measure its own dropped inputs.
         void Update()
         {
             // One-frame interact pulse, exactly like a physical key tap.
@@ -36,7 +51,16 @@ namespace TimeKiller.Testing
             interactQueued = false;
             SkillCheckPressed = skillCheckQueued;
             skillCheckQueued = false;
+        }
 
+        // STEERING runs on the physics clock. FixedUpdate is a fixed cadence in
+        // GAME time, so the rate at which the bot corrects its course no longer
+        // falls with timeScale — an Update-driven steer recomputed at 60 Hz of
+        // game time at 1x but only 15 Hz at 4x, while ManiacMotor has always
+        // re-solved its own heading every physics step. That asymmetry, not the
+        // maniac's AI, is what an accelerated batch was measuring.
+        void FixedUpdate()
+        {
             RunHeld = Run;
 
             if (Target == null) { MoveInput = Vector2.zero; return; }

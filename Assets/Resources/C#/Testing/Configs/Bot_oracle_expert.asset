@@ -15,7 +15,7 @@ MonoBehaviour:
   profileName: oracle_expert
   reactionTime: 0.12
   reactionJitter: 0.2
-  aimError: 0.02
+  aimError: 0.045
   pressCooldown: 0.18
   panicDistance: 7
   calmDistance: 13
