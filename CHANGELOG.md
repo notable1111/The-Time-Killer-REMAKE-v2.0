@@ -2,6 +2,316 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-25 — The run cycle existed all along, and walking was secretly sprinting
+
+**The run animation was never missing — it was never exported.** The 8-direction,
+8-frame `running-8-frames` set had been sitting completed on PixelLab since
+2026-07-24. Locally there were only `Idle`, `Rotation` and `Walk` strips, so
+`SurvivorAnimationSetup`'s fallback (`runSource = HasSheets("Run") ? "Run" :
+idleSource`) quietly built every `Run_*` clip out of the **idle pose** and logged
+a warning nobody was reading. Sprinting played standing still. Downloading the
+64 frames and rebuilding cost nothing and fixed it outright.
+
+**Then the probe found the thing the eye would not have.** `Walk` and `Run` were
+both authored at 14 fps with contacts on frames `[2,6]` — identical. Same clip
+length, same contact frames, same rate: the legs turned over **3.5 times a
+second whether you crept or sprinted**, while the body moved 2.2 vs 4.5 u/s.
+
+Measuring the art instead of guessing gave the correction. The side-view strips
+depict a **0.41-unit walk stride and a 0.48-unit run stride**, so keeping the
+feet planted would need 5.4 and 9.3 steps/s. 9.3 is a blur, so the fix takes
+most of the correction and stops short of all of it:
+
+| | was | now | foot slide |
+|---|---|---|---|
+| walk | 14 fps (3.5 steps/s) | **18 fps** (4.5) | 35% → **17%** |
+| run | 14 fps (3.5 steps/s) | **24 fps** (6.0) | 62% → **35%** |
+
+Cadence is now a named constant per gait in `SurvivorAnimationSetup`
+(`fps = frames × steps ÷ 2`, because one cycle is two contacts) rather than one
+shared `frames × 1.75` that run was tuned for and walk inherited by accident.
+
+**The stealth scare was a false alarm, and that is worth recording.** The
+identical rate looked like a balance bug, but `ManiacPerception` gates a footstep
+on `hearingRadius × loudness` — 9×0.3 = **2.7u** walking against 9×0.85 =
+**7.65u** running. Detection was never carried by the rate; sneaking already
+worked. This was a *looks* bug wearing a gameplay bug's clothes. Contact frames
+`[2,6]` turned out to be right on the money for the clean side views, so the one
+part that was suspected of being wrong was the one part that was correct.
+
+**Clock repair now looks like clock repair.** New PixelLab `Repair` set (8
+directions × 6 frames, standing, hands working at chest height — the clock is
+~1.6u tall, so its mechanism sits at the survivor's chest, not at their feet)
+and a `RepairState` nested in `ClockRepair`, mirroring `PlayerHiding.HidingState`.
+Starting a repair turns the player to face the clock and **locks them there**
+(DbD-style commitment, user ruling): the state has no transitions of its own, so
+movement input is simply ignored, and that *is* the lock. The repair clips carry
+no `eventFrames`, so standing at a clock broadcasts no phantom footsteps.
+
+Two seams added to make that safe rather than ad hoc: `PlayerController`
+`.CurrentState` / `.IsFreeToInterrupt`. A feature takes the player only when free
+(so pressing E inside a wardrobe still belongs to hiding), and hands control back
+only if it still holds it (so two features cannot fight over returning to Idle).
+Facing is now driven by input only while free — otherwise WASD spins a locked
+player's pose on the spot. `PlayerAnimationDriver` matches `"RepairState"` **by
+string, not `nameof`**: the player must not hold a compile-time reference to a
+feature that is meant to be deletable.
+
+**New: `TimeKiller/Verify/Probe Player Animations`** — play-mode assertions for
+what screenshots cannot show. It reports all 16 octant×gait combinations, the
+measured contact frames and real step rate per gait, and the repair lock
+(drift under held run input, and release on E). Results: 16/16 correct,
+`busEvents == contacts` in both gaits, `drift = 0.000u`, `RELEASED OK`.
+
+Two Unity traps are baked into it, both hit for real on the way here: entering
+play mode reloads the domain and **silently drops** a `playModeStateChanged`
+subscription registered beforehand (the request now travels in `SessionState`),
+and the probe's `[DefaultExecutionOrder(-200)]` is load-bearing — a key pulse
+spanning two frames is read twice by `ClockRepair`, and its second read means
+"walk away", cancelling the repair it had just begun.
+
+Also worth knowing: **Setup/33 must be run out of play mode.** Its scene-attach
+step cannot mark the scene dirty while playing, so it half-completes — the
+ScriptableObject updates and the scene wiring does not.
+
+## 2026-07-25 — The player has a face again, by not having one
+
+The hero art pipeline was abandoned in July after ~58 generations: AI 8-direction
+rotation kept re-interpreting a detailed painting, and the Watchman shimmered
+between angles. The fix was not a better prompt — it was a **design that gives
+the tool nothing to be inconsistent about**. A deep hood with a black void
+instead of a face has no eyes, nose or mouth to drift. Every candidate came back
+stable across all 8 directions, varying by at most 1px in height.
+
+The player is now a **hooded, faceless survivor in a grey-green coat**, replacing
+the borrowed New_Leaf placeholder.
+
+Two measurements drove the whole build, and both contradicted an assumption:
+
+- **The world is 32 pixels per world unit and its characters are 29px tall.**
+  PixelLab's default 48 produces a 44px character that stands **52% taller than
+  the maniac** — the victim looming over the killer. Caught by measuring the
+  maniac's sprite rather than eyeballing a composite.
+- **The level averages 11/255 luminance.** A worry that a dark hooded figure
+  would vanish was simply wrong: the character sits at ~39, making it the
+  brightest thing on screen after the clock face. Hue contrast, not brightness,
+  is what separates the hero from the stone.
+
+New this pass:
+
+- `Tools/CharArt/build_sheets.py` — converts a PixelLab bundle (one PNG per frame
+  per direction) into the horizontal strips Unity slices. Direction names map 1:1
+  onto `FacingDirection`'s declaration order, so no lookup table is needed.
+- **Setup/33 — Generate Survivor Player Animations.** Slices, builds 24 clips
+  (idle + walk + run x 8), fills `PlayerAnimationSet` and attaches it.
+  **Must be run out of play mode** — asset reimport throws there, and the menu
+  item still reports success, so the failure is silent.
+- **Pivot is derived from pixels, not hardcoded.** PixelLab centres a small
+  character in a large padded canvas, so a plain centre pivot sinks it into the
+  floor. The importer finds the lowest opaque pixel across the *whole strip* and
+  places the pivot 17px above it — the placeholder's exact ground offset, which
+  is why the swap needed no collider, camera or nav-grid changes. Measuring
+  across the whole strip (not per-frame) is what keeps every frame on one ground
+  line instead of bobbing through the floor mid-cycle.
+- **Real walk cycles.** `PlayerAnimationSet` gained an optional `walk[8]`; at
+  walkSpeed 2.2 vs runSpeed 4.5 the old "play the run clip at half speed" trick
+  read as slow-motion arm pumping. `PlayerAnimationDriver` now normalises
+  playback against whichever clip is playing — dividing a walk cycle by runSpeed
+  would halve its rate and slide the feet. Packs with no walk art fall back to
+  the old behaviour, so Setup/5 and the New_Leaf placeholder still work.
+
+Verified in-engine, not assumed: all 24 state x direction combinations resolve to
+the correct clip at runtime, and all 8 directions face the right way on screen.
+
+**Still to tune:** walk and run currently share a 14fps cadence, so both step
+~3.5 times/sec and differ only in stride. Those `eventFrames` are what the maniac
+hears, so the cadence is gameplay — it wants a play-test, not a formula.
+
+## 2026-07-25 — The tension instrument was measuring its own thresholds
+
+First traced batch (`results/2026-07-25_025149.jsonl`, 7 runs, Bot_average, **1x**,
+sampler healthy at 96% of its 4 Hz). It reported a calm game: chase 4.2% of all
+play time, dread **1.3%**, `nearMissHidden` **0 in every run** against 25 hides,
+and **74% of every threat-curve bucket flat at zero**.
+
+None of that survived being read next to `ManiacConfig.asset`. The three
+thresholds had been typed in — 4 / 12 / 0.25 — beside a config that says
+`sightRange 7`, `hearingRadius 9`, `suspicionThreshold 0.4`. Two were wrong, and
+wrong in a direction no amount of batch data could have exposed:
+
+- **`FeltRadius` 12 sat three units beyond his maximum sensory reach.** Past 9 he
+  cannot perceive the player by any channel, so the 9–12 band counted as neither
+  "felt" nor "dead air" — a limbo that *undercounted* the one boredom metric this
+  instrument exists to expose. Correcting it makes the headline number worse: the
+  game is quieter than the old instrument admitted.
+- **`AwareThreshold` 0.25 sat below the game's own `suspicionThreshold` 0.4.**
+  Below 0.4 he does not investigate, does not turn, does nothing observable. So
+  "dread" spanned a band containing no behaviour.
+- **`NearMissRadius` 4 was the one that was fine** — it sits inside `sightRange`.
+
+All three are now **derived from `ManiacConfig` at run start**, which also ends
+the silent drift: a copied constant does not follow a retune, and nothing would
+have failed. Each row records the thresholds it was measured with, and
+`analyze.py` refuses to average two sets rather than quietly blending tunings.
+
+**Dread was measuring the drain rate, not the level.** `awarenessDrainRate 0.8`
+fixes the fall from spotted back to the threshold at `(1 − 0.4) / 0.8 = 0.75s`
+per lost contact, every time — so at ~4 spots per run, dread could never have
+been more than a few seconds regardless of level design. It was the forgetting
+tail wearing the name of the stalking beat. Suspicion is now accumulated **inside
+`ManiacPerception`, per frame** (at `awarenessFillRate 2.6` the band is often
+shorter than one 4 Hz sample, so a sampler misses most crossings outright) and
+split in two: `stalkSeconds` — still sensing, answers to level design — and
+`fadeSeconds` — forgetting, answers only to tuning. The report prints the
+structural ceiling beside it so the second can never be read as the first. The
+maniac's feel is untouched; only the instrument changed.
+
+**Three near-miss fixes**, all of which had been deleting real encounters:
+
+| was | now |
+|---|---|
+| any hit **voided** the episode | third bucket, `nearMissClipped` |
+| hidden if hidden ≥50% of samples | classified by how it **ended** |
+| `heardNoise` = one counter | `heardSound` / `heardSuspicion` |
+
+The hit filter alone ate most of the file — 13 hits against 4 surviving near
+misses. Being clipped and escaping is the classic horror beat, and discarding it
+made a violent run read as uneventful. The ≥50% rule scored a dive into a
+wardrobe as **open**, because the first half of the episode was spent in the
+open — which is exactly backwards, and the likeliest reason `nearMissHidden` was
+0 across all 7 runs.
+
+**Threat curve rebalanced** `0.6·awareness + 0.4·proximity` → `0.35·alarm +
+0.65·proximity`, where `alarm` is awareness normalised against the suspicion
+threshold. Awareness sits at ~0 outside chases, so the old weighting capped a
+non-chase sample at **0.40** and left the curve's entire top half unreachable —
+seeds 2003 and 2004 peak at 0.37 and 0.40, hitting that ceiling exactly.
+Proximity is the term that actually varies, so it gets the larger share.
+
+Backward compatible: pre-split files still parse and say what they cannot show,
+rather than guessing. **Not yet re-run** — the numbers above describe the old
+instrument, and the corrected one has never produced a batch.
+
+## 2026-07-25 — The wall-stuck claim gets an actual measurement (and the retry cap never worked)
+
+Body-width pathfinding was verified *offline*, by sweeping a collider over 3000
+candidate shortcuts. That proves the smoother refuses bad shortcuts; it does not
+prove a **live** bot stops scraping, where the maniac shoves, props sit off the
+grid, and the gate opens a wall the grid sampled as solid. Nothing measured that,
+so the harness now does.
+
+**The bug found on the way in.** `BotPath`'s stuck detector documents "one free
+repath, then give up on this destination — grinding a wall forever is the failure
+mode this whole class exists to avoid." It did not do that. The retry counter was
+incremented, then `SetDestination` reset it to zero on the very next line, so
+`++repathsAtThisSpot > 1` **could never be true**. A wedged bot repathed every
+1.2s indefinitely. Split the planning in two: `SetDestination` (new goal, fresh
+retry budget) and `Plan` (same goal, same spot — no refund).
+
+Left unfixed, this would have pinned the new metric's give-up count at zero and
+made both arms look equally healthy.
+
+**Four numbers per run**, written as `stuck` in every result row:
+
+| field | meaning |
+|---|---|
+| `events` | times the 1.2s no-movement threshold tripped |
+| `giveUps` | of those, ones that abandoned the destination |
+| `wedgedSeconds` | in-game seconds confirmed wedged |
+| `travelSeconds` | seconds with a path active — **the denominator** |
+
+`travelSeconds` matters as much as the count. A bot that wedges less also lives
+longer, so raw counts hand the *better* arm a bigger number and make it look
+worse. Rates only.
+
+Counters survive the mid-run `BotPath` rebuild that happens when the gate opens
+(`RetireNav`). Reading the live instance would have dropped everything before the
+escape leg — which is most of the run.
+
+**A/B, because there is no baseline.** No earlier batch recorded any of this, so
+comparing against history is impossible. `GridPathfinder` documents
+`bodyRadius: 0` as the old hairline behaviour, so the batch runner now takes
+**arms**: every seed runs twice, once per pathfinding, same maniac, same
+skill-check rolls. The old arm runs **first** — a batch killed halfway then still
+leaves the baseline on disk, which is the arm that cannot be reconstructed later.
+
+`analyze.py` keys cells on `bodyRadius` as well as profile and speed. Without
+that it would have averaged a baseline into the thing it is the baseline *for* —
+the mistake that makes a real change look like it did nothing. New sections:
+**WALL-STUCK** (pooled rates + matched-pair sign test) and **CLOCK TIMELINE**
+(first exercise of `clockFixTimes`: median time to each clock, and how many runs
+fixed everything and *still* lost — an escape problem, not a difficulty one).
+Pre-instrumentation files still read correctly; they say so instead of guessing.
+
+**Result** (`results/2026-07-25_022250.jsonl` — 25 seeds × 2 arms, Bot_average,
+4x, 0 harness faults, 0 timeouts, the first fully clean batch this harness has
+produced):
+
+| | old hairline | body-width |
+|---|---|---|
+| stuck events / 100s travel | 8.08 | **0.60** |
+| destinations abandoned | 73 | **2** |
+| time wedged | 9.8% | **0.7%** |
+| runs that never wedged | 12% | **80%** |
+
+**22 of 25 seeds improved, 0 worsened.** A 13.5× reduction on identical seeds.
+The offline sweep is confirmed in live play.
+
+**The win rate did not move** — 24% vs 24%, with 3 seeds flipping each way. That
+is noise, and at n=25 the win rate cannot resolve this. What *did* move: clocks
+fixed 2.00 → 2.52, and runs completing all three 11/25 → 16/25. Of those, six
+escaped in **both** arms — so the five extra runs the fix carried to "objective
+complete" all died on the way out.
+
+Which relocates the problem: **15 of 50 runs (30%) fixed every clock and still
+lost.** The gate is the bottleneck, not the walking; bots dying earlier used to
+hide that. Flagged for follow-up, not concluded: `spotted` rose 2.96 → 3.80 (14
+seeds up, 7 down) — the hug penalty buys the corridor's centre, which is also
+where the maniac's sight lines are.
+
+Not validated here: 4x speed on this scene (the batch meant to check it died at
+run 11). The A/B survives that — both arms ran at the same speed, so distortion
+cancels in the pairing — but the absolute 24% and the clock times do not.
+
+## 2026-07-25 — "Red isn't always impossible": the overlay was answering about the wrong body
+
+Playtest note from the F3 overlay: *green and yellow behave right, but ~5–10% of
+the **red** is walkable — dangerous, could collide.* Correct observation, and the
+cause was a missing feature, not a wrong model.
+
+`CastleWingLDtk` registered exactly one nav source: the **maniac**. So F3 painted
+*his* map — sample box **0.85** — while the player drives a **0.55** capsule.
+Measured:
+
+- **186 cells = 4.9% of the player's walkable world** are red on the maniac's map.
+  That is the reported 5%.
+- **All 186 are YELLOW on the player's own map. Zero are green.** The overlay
+  already encoded "walkable but dangerous" — it was just answering about the
+  wrong character.
+
+**Checked the scarier reading first:** 43 of those pockets fit the player and not
+the maniac. If any were deep enough, you could camp there forever. Against his
+real 0.60 collider and 0.9 attack range, the nearest he can physically stand to
+the four deepest is **0.0u / 0.1u / 0.3u / 0.4u** — all inside reach. **No
+safe-camp exploit.** His grid is conservative; his chase steers directly.
+
+Two fixes:
+
+1. **`PlayerNavDebug`** — F3 now cycles **Player → Maniac → off**. It reads the
+   player's actual `CapsuleCollider2D` rather than hard-coding 0.55, because a
+   debug view that quietly disagrees with the body it claims to describe is
+   worse than none. Grid builds **on first view** (~33k overlap queries), not at
+   startup. `PlayerController` attaches it at runtime, so no scene or prefab is
+   edited and none can drift out of sync.
+2. **Red split in two.** `WalkabilityGrid` now records *why* a cell is
+   unwalkable: **red = a real collider**, **grey = no collider at all, merely
+   cut off** from the reachable region. On the player map that is 9.8% red vs
+   **78.7% grey** — the outside-the-castle void was being painted exactly like a
+   wall, which is why so much of the screen looked solid.
+
+The legend now names whose body the colours describe. Red has always meant "for
+*this* body" and never "for anybody"; nothing said so.
+
 ## 2026-07-25 — You can now SEE where the AI can walk, and it stopped scraping walls
 
 The bot kept touching walls. The instinct was right and the cause was not in the
