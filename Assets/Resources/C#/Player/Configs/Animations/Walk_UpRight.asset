@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85738f08ff23ea640a9e0c32f69a7e87, type: 3}
+  m_Name: Walk_UpRight
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Core.SpriteAnimationClip
+  frames:
+  - {fileID: 3884487000919816082, guid: 224f2439b09f0264ab1ac411990eb9f2, type: 3}
+  - {fileID: -194123190129079250, guid: 224f2439b09f0264ab1ac411990eb9f2, type: 3}
+  - {fileID: -7809534815674460587, guid: 224f2439b09f0264ab1ac411990eb9f2, type: 3}
+  - {fileID: -5916281222970810662, guid: 224f2439b09f0264ab1ac411990eb9f2, type: 3}
+  - {fileID: 4711574922738693670, guid: 224f2439b09f0264ab1ac411990eb9f2, type: 3}
+  - {fileID: 2271559791053102575, guid: 224f2439b09f0264ab1ac411990eb9f2, type: 3}
+  - {fileID: 3958895971261270576, guid: 224f2439b09f0264ab1ac411990eb9f2, type: 3}
+  - {fileID: 7636374649118648135, guid: 224f2439b09f0264ab1ac411990eb9f2, type: 3}
+  framesPerSecond: 18
+  loop: 1
+  eventFrames: 0200000006000000

@@ -19,9 +19,14 @@ namespace TimeKiller.Player
         string currentState = nameof(IdleState);
         FacingDirection facing = FacingDirection.Down;
 
-        // Explicit list — unknown states (Hiding, future Stunned…) must count as
-        // NOT moving, or their run-clip frame events would publish phantom
-        // footstep noise for the maniac to hear.
+        // Matched by name, not nameof: the repair state belongs to the Objectives
+        // feature, and the player must not take a hard reference to something
+        // designed to be deleted with its clocks.
+        const string RepairStateName = "RepairState";
+
+        // Explicit list — unknown states (Hiding, Repair, future Stunned…) must
+        // count as NOT moving, or their run-clip frame events would publish
+        // phantom footstep noise for the maniac to hear.
         public bool IsMovingState => currentState == nameof(WalkState) || currentState == nameof(RunState);
         public bool IsRunningState => currentState == nameof(RunState);
 
@@ -48,10 +53,18 @@ namespace TimeKiller.Player
         void Update()
         {
             // Velocity-matched playback: leg cycle speed follows real ground speed.
+            // Each clip's fps is authored for the speed it depicts, so normalise
+            // against THAT speed — dividing a walk cycle by runSpeed would play it
+            // at half rate and slide the feet.
             if (!IsMovingState || animations == null || player.Config == null) return;
-            float normalized = player.Motor.CurrentVelocity.magnitude / player.Config.runSpeed;
+            float reference = UsingWalkClip ? player.Config.walkSpeed : player.Config.runSpeed;
+            float normalized = player.Motor.CurrentVelocity.magnitude / reference;
             animator.SetSpeed(Mathf.Max(normalized, animations.minAnimationSpeed));
         }
+
+        // Walking only uses a distinct clip when the pack actually ships one;
+        // otherwise the run clip is reused and must stay normalised to runSpeed.
+        bool UsingWalkClip => currentState == nameof(WalkState) && animations.HasWalkClips;
 
         void OnStateChanged(PlayerStateChangedEvent evt)
         {
@@ -71,7 +84,15 @@ namespace TimeKiller.Player
         void Apply(bool preservePhase)
         {
             if (animations == null) return;
-            animator.Play(IsMovingState ? animations.GetRun(facing) : animations.GetIdle(facing), 1f, preservePhase);
+            animator.Play(ClipForCurrentState(), 1f, preservePhase);
+        }
+
+        SpriteAnimationClip ClipForCurrentState()
+        {
+            if (currentState == nameof(RunState)) return animations.GetRun(facing);
+            if (currentState == nameof(WalkState)) return animations.GetWalk(facing);
+            if (currentState == RepairStateName) return animations.GetRepair(facing);
+            return animations.GetIdle(facing);
         }
     }
 }

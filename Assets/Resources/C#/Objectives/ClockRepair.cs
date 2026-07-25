@@ -18,6 +18,7 @@ namespace TimeKiller.Objectives
         PlayerController player;
         TimeKiller.Maniac.ManiacController maniac;
         ClockObjective active;
+        RepairState repairState;
         float sweepT;
 
         public bool Repairing => active != null;
@@ -28,7 +29,11 @@ namespace TimeKiller.Objectives
 
         public void Init(ClockConfig cfg) => config = cfg;
 
-        void Awake() => player = GetComponent<PlayerController>();
+        void Awake()
+        {
+            player = GetComponent<PlayerController>();
+            repairState = new RepairState(player);
+        }
 
         void Update()
         {
@@ -44,11 +49,20 @@ namespace TimeKiller.Objectives
 
         void TryStart()
         {
+            // Never yank the player out of someone else's state — pressing E
+            // inside a wardrobe belongs to hiding, not to a clock behind it.
+            if (!player.IsFreeToInterrupt) return;
+
             var clock = NearestBrokenClock();
             if (clock == null) return;
             active = clock;
             sweepT = 0f;
             NewZone();
+
+            // Face the clock so the work pose points at it, then lock: repairing
+            // is a commitment you have to deliberately break off.
+            player.Facing.UpdateFromInput((Vector2)(clock.transform.position - transform.position));
+            player.ChangeState(repairState);
         }
 
         void Repair()
@@ -82,7 +96,14 @@ namespace TimeKiller.Objectives
             }
         }
 
-        void Stop() => active = null;
+        void Stop()
+        {
+            active = null;
+            // Only hand control back if we still hold it. If something with a
+            // stronger claim (a grab, hiding) already moved the player on, this
+            // must not drag them back to Idle behind its back.
+            if (player.CurrentState == repairState) player.ChangeState(player.Idle);
+        }
 
         void NewZone() => ZoneCenter = Random.Range(0.15f, 0.85f);
 
@@ -104,6 +125,35 @@ namespace TimeKiller.Objectives
             if (maniac == null) maniac = Object.FindAnyObjectByType<TimeKiller.Maniac.ManiacController>();
             return maniac != null &&
                 Vector2.Distance(transform.position, maniac.transform.position) <= config.interruptRange;
+        }
+
+        // ---- the state ----
+
+        /// Holds the player still at the clock. Deliberately has no transitions
+        /// of its own: every way out of a repair (E, the maniac, the clock being
+        /// finished, walking out of range) is decided in ClockRepair.Repair,
+        /// which then calls Stop. Movement input is simply ignored while here,
+        /// and that IS the lock.
+        ///
+        /// The class name is the animation key — PlayerAnimationDriver matches
+        /// "RepairState" and plays PlayerAnimationSet.GetRepair. Renaming this
+        /// class silently falls back to the idle pose.
+        public class RepairState : IState
+        {
+            readonly PlayerController player;
+
+            public RepairState(PlayerController player) => this.player = player;
+
+            public void Enter() => player.Motor.SetTargetVelocity(Vector2.zero);
+
+            public void Tick(float deltaTime) { }
+
+            // Re-issued every physics step rather than once on Enter, so a shove
+            // from the maniac's body or a lingering velocity cannot slide the
+            // player off the clock while the pose says they are standing still.
+            public void FixedTick(float fixedDelta) => player.Motor.SetTargetVelocity(Vector2.zero);
+
+            public void Exit() { }
         }
     }
 }

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85738f08ff23ea640a9e0c32f69a7e87, type: 3}
+  m_Name: Repair_Right
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Core.SpriteAnimationClip
+  frames:
+  - {fileID: -1702432060748781810, guid: 1993877af914d854b9209c89dc7ead60, type: 3}
+  - {fileID: -5170493341897919913, guid: 1993877af914d854b9209c89dc7ead60, type: 3}
+  - {fileID: 3848608702529401613, guid: 1993877af914d854b9209c89dc7ead60, type: 3}
+  - {fileID: 1518777733963463978, guid: 1993877af914d854b9209c89dc7ead60, type: 3}
+  - {fileID: 7015350218168452286, guid: 1993877af914d854b9209c89dc7ead60, type: 3}
+  - {fileID: 1630125092884450850, guid: 1993877af914d854b9209c89dc7ead60, type: 3}
+  framesPerSecond: 6
+  loop: 1
+  eventFrames: 

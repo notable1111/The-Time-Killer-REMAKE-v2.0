@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Idle_Left
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Core.SpriteAnimationClip
   frames:
-  - {fileID: 26244217641285957, guid: b213298c66640d941a35a236fcb7b031, type: 3}
-  - {fileID: -3546609638814664784, guid: b213298c66640d941a35a236fcb7b031, type: 3}
-  - {fileID: -5401197829702184301, guid: b213298c66640d941a35a236fcb7b031, type: 3}
-  - {fileID: 7961510364197062328, guid: b213298c66640d941a35a236fcb7b031, type: 3}
-  framesPerSecond: 5
+  - {fileID: 502363876534660705, guid: f61c1cc057175094fa612953f3ad9e48, type: 3}
+  - {fileID: 8371597543428211330, guid: f61c1cc057175094fa612953f3ad9e48, type: 3}
+  - {fileID: -2506136286365620613, guid: f61c1cc057175094fa612953f3ad9e48, type: 3}
+  - {fileID: -6902398135632537639, guid: f61c1cc057175094fa612953f3ad9e48, type: 3}
+  framesPerSecond: 6
   loop: 1
   eventFrames: 

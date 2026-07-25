@@ -18282,7 +18282,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -3179086527763344619, guid: 864602965b37f4843b26f52ec4da39c6, type: 3}
+  m_Sprite: {fileID: 1310268032764119549, guid: aadedfffa8171504a8b8d907f8b13d82, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -18852,6 +18852,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Navigation.ManiacNavigator
   clearance: 0.85
+  bodyRadius: 0.45
   repathDistance: 1
   repathInterval: 0.4
   waypointTolerance: 0.35

@@ -52,6 +52,24 @@ namespace TimeKiller.Player
 
             Motor.Init(config);
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // Puts "Player" in the F3 walkability cycle, so the overlay can be
+            // asked about THIS body instead of only the maniac's much wider one.
+            // Attached here rather than in PlayerSetup so existing scenes and
+            // prefabs need no edit and cannot drift out of sync. It builds
+            // nothing until the first time you actually select it.
+            //
+            // DontSave, and not optional: this is the only structural change any
+            // runtime script makes to a scene object, and an un-flagged
+            // AddComponent asks the editor to dirty the scene — which throws
+            // "cannot be used during play mode" and, worse, leaves the hall
+            // showing unsaved changes it never actually received. The hall is
+            // hand-fixed and protected; a debug component must not be able to
+            // creep into it.
+            if (GetComponent<PlayerNavDebug>() == null)
+                gameObject.AddComponent<PlayerNavDebug>().hideFlags = HideFlags.DontSave;
+#endif
+
             Idle = new IdleState(this);
             Walk = new WalkState(this);
             Run = new RunState(this);
@@ -69,10 +87,27 @@ namespace TimeKiller.Player
 
         public void ChangeState(IState next) => stateMachine.ChangeState(next);
 
+        /// Who is driving right now. Features that push the player into a state
+        /// of their own (hiding, clock repair) read this so they only ever hand
+        /// control back if they still hold it — two features must never fight
+        /// over returning the player to Idle.
+        public IState CurrentState => stateMachine.Current;
+
+        /// True when the player is in one of the three normal movement states,
+        /// i.e. free for a feature to take over.
+        public bool IsFreeToInterrupt =>
+            stateMachine.Current == Idle || stateMachine.Current == Walk || stateMachine.Current == Run;
+
         void Update()
         {
             stateMachine.Tick(Time.deltaTime);
-            Facing.UpdateFromInput(Input.MoveInput);
+
+            // Only the movement states steer the body. A feature state (repair,
+            // hiding) has aimed the character deliberately, and letting WASD keep
+            // writing facing underneath it would let you spin a locked player's
+            // pose on the spot. No behaviour change for Idle/Walk/Run: idle input
+            // is near-zero, which UpdateFromInput already ignores.
+            if (IsFreeToInterrupt) Facing.UpdateFromInput(Input.MoveInput);
         }
 
         void FixedUpdate() => stateMachine.FixedTick(Time.fixedDeltaTime);
