@@ -2,6 +2,187 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-28 — The blood was invisible, then it was gumballs, and the castle now keeps the evidence
+
+**One heart, and the dead wiring that outlived it.** `PlayerHeartbeat` had already
+taken over the lub-dub, but `HidingConfig` still carried `heartbeatRange/farBpm/
+nearBpm/heartbeatMaxVolume`, `HealthVfxDirector` still carried `heartAudio/
+heartbeatClip/heartVolume`, and the scene still held two idle AudioSources nothing
+played. All removed. `Setup/22` and `Setup/25` stopped creating them — and stopped
+**destroying and rebuilding their whole rig on every run**, which had been quietly
+deleting a `DamageSfx` object nobody put back. New `Setup/37` clears the orphans
+from existing scenes, refusing to touch anything that is not a childless Transform
++ idle AudioSource.
+
+**`EffectRecipe` grew a second visual path.** `sheetClip` plays a hand-drawn sprite
+sheet through the `SpriteAnimator` we already had; `particlePrefab` stays for
+dispersal work. A one-shot sheet dies exactly when its last frame has played, so a
+mistuned lifetime cannot truncate it. `Setup/38` slices strips into clips and
+**preserves any fps/loop tuned by eye** on re-run.
+
+**The hit effect was measured, and it was invisible.** Rendered in the real scene
+against the real floor (luminance 10/255), the burst covered **0.26% of the screen
+and was gone in 0.75s**. It had been tuned against an isolated neutral backdrop and
+then *darkened* for "palette match" — fine in a test harness, invisible in the
+game. `Setup/23` had also been preferring CFXR's cartoon prefabs over our own art.
+New `TimeKiller/Verify/VFX Visibility` measures coverage in-scene so this is never
+guessed again: **0.26% → 1.52% → 3.53%, still visible past t=1.1s.**
+
+**Then the droplets were gumballs.** The first redraw was supersampled metaballs at
+saturation 0.93 and value 165, with a radial specular — against game art that
+measures **median value 52, median saturation 0.07, hard pixel edges**. Rejected,
+correctly. Redrawn as pixel-art spatter: **no antialiasing** (alpha is only 0 or
+255), **four quantised colours**, irregular torn silhouettes with tendrils and
+satellite specks. Authored at **32px cells** so a particle at size 1.0 draws 1:1
+against the 32 px/unit world, Point-filtered. Count is the knob that decides wound
+vs paint bomb — 46 spatters buried the player; 24 + 5 gouts reads as a hit.
+
+**Blood now flies away from the blow.** `PlayerHitEvent` has carried
+`SourcePosition` since the shove was added and the effects side never read it, so
+every wound sprayed as a symmetric ring. `EffectPlayer.Play` takes an optional
+direction and rotates the emission wedge, reading the wedge width off the prefab's
+own shape module so the two cannot drift apart. Droplets also orient along their
+flight path now — stretch kept tiny on purpose, because it distorts the quad and
+smears pixel art.
+
+**New feature: `C#/Blood` — the castle keeps the evidence.** You bleed at or below
+2 HP, faster as you near death, and the floor remembers for the whole run. Every
+stain is **one mesh**: a fixed ring buffer, one draw call and zero per-spill
+allocation whether there are 3 stains or 220, oldest recycled so a long run cannot
+degrade. Rotation is quantised to quarter turns (arbitrary angles resample off the
+pixel grid); drying refreshes at 5Hz and **only while something is still wet**.
+`BloodTrail` publishes, `BloodStainField` draws, neither references the other —
+either is deletable alone. Sorting order −6, measured against the scene rather than
+guessed. **Maniac tracking is approved but deliberately not wired yet**, so the
+look can be judged before the difficulty changes.
+
+## 2026-07-28 — The maniac makes a sound now, and relief has to be earned
+
+**The relief breath was firing mid-chase.** It played the instant
+`Perception.Level` left `Detected` — but `Detected` drops every time line of
+sight breaks, which behind a pillar happens constantly while he is still
+actively hunting you. So the "I got away" exhale was going off repeatedly during
+the chase it was supposed to end. The chase ending now only **arms** it; he must
+stay off you for `recoveryDelaySeconds` (**8.5s**, user ruling) or re-acquiring
+you cancels it.
+
+**Delaying it alone would have broken it.** Measured against the shipped config,
+exertion decaying at the normal rate sits at **0.229** after 8.5s against a
+`silenceBelow` of **0.22** — a margin of 0.009, so the exhale would have landed
+out of dead silence. `settleDecayScale` 0.35 holds panting up through the wait
+and it lands at **0.730** instead. The `recoveryNeedsExertion` gate also moved to
+*arm* time, so the waiting cannot cancel a breath that was earned: a 2s scare
+reaches 0.331 and correctly arms nothing, a 5s chase reaches 0.831 and does.
+
+**The maniac had no AudioSource at all.** Not one, anywhere under `C#/Maniac/`.
+The first information the game ever gave you about him was seeing him — which is
+why hiding measured as inert in the bot playtests. `ManiacVoice` gives him a 3D
+breathing bed whose volume reads as distance, plus state-driven growls, boots,
+and rare idle mutters. Non-verbal only: he never speaks.
+
+| distance | 14u | 9u | 6u | 4u | 2u | 1u |
+|---|---|---|---|---|---|---|
+| breath volume | 0.0000 | 0.0735 | 0.1840 | 0.2578 | 0.3315 | 0.3500 |
+
+**Unity's 3D rolloff could not have delivered that.** The `AudioListener` rides
+the Main Camera and `CameraFollow` preserves its authored Z — measured at
+**−10** — so Unity scores the distance to him as `sqrt(d² + 100)`. Standing on
+top of him reads as **10.0u**, leaving one usable unit inside an 11u hearing
+radius. All three sources now use a flat custom curve and the component does its
+own 2D attenuation.
+
+**`PlayerVoice`** covers pain, the spotted gasp, repair effort and the death cry.
+Pain keys off `PlayerHealthChangedEvent` falling, **not** `PlayerHitEvent` —
+that one fires even inside the invulnerability window where it does nothing, so
+it would have the player cry out for damage they never took.
+
+**Footsteps had to be cut by hand.** Every "steps" file in the PSX pack is a
+walking *sequence* (tunnel 8.1s, mud 31.6s) and the system triggers one clip per
+stride. `Tools/AudioPipeline/slice_footsteps.py` cuts eight single steps out of
+`tunnel steps.wav`. Its first pass silently merged steps — a share-of-peak
+threshold tuned for the loud ones dropped the quiet ones (amplitudes span
+4640–18337), leaving 0.96s and 1.46s gaps against a ~0.48s stride. An
+80th-percentile threshold plus a 350ms refractory fixed it: **17 onsets, median
+gap 0.486s, range 0.451–0.527s, zero missed.**
+
+**The voice set is generated and wired — 27 clips, and fal.ai was never needed.**
+Unity's built-in audio backend is unconfigured, but Higgsfield was already on a
+paid plan, and growls and grunts are *voice*, which its speech models cover.
+Cost: **~5.4 credits of 20.27**. Maniac at `pitch_rate -12`, player at −4..+3, so
+the two are unmistakably different throats.
+
+**Raw generator output spanned −12.4 to −52.2 dB RMS** — a 40 dB spread that
+would have left `maniac_mutter_3` inaudible beside `maniac_attack_2`.
+`Tools/AudioPipeline/process_voice.py` trims, mono-folds and **loudness**-matches
+to −12 dBFS with a tanh soft limiter; 24 of 27 now land within 1 dB. Peak
+normalising was tried first and rejected by measurement — it left the first batch
+7 dB under the heartbeat, because a clip with one sharp transient peaks the same
+as a sustained one.
+
+## 2026-07-28 — Two rejections by ear, and the mix owed the player's lungs an apology
+
+**The mix had been trimming the player's own body like background.** `PlayerBreath`
+sat at level 0.75 / duckDepth 0.45, which put the recovery breath — the entire
+reward for surviving a chase, and a sound already approved — at **0.638** normally
+and **0.287** while anything else spoke, i.e. 36% and 71% quieter than the version
+that was signed off. Now level 1.00 / duck 0.90: **0.850**, which is 1.4 dB off
+instead of 3.9 dB, and the rest is the global headroom trim that everything shares.
+
+**⚠️ `seed_audio` defaults to a FEMALE voice when no `voice_id` is passed.** The
+whole first maniac set was generated without one, so `pitch_rate -12` was simply a
+pitched-down woman — rejected by ear as "normal girl's voice going haaa". All 13
+of his vocals regenerated with **Roman** (male preset, user's pick from a
+three-way comparison).
+
+**A deep male voice was not enough on its own** — a pitched-down man still reads
+as a man. `Tools/AudioPipeline/monsterize.py` adds the three things no TTS
+parameter offers: a **formant-shifting** pitch drop by resampling (−3.9 semitones,
+moving throat and skull resonances down *with* the pitch, so it reads as a bigger
+body and not a slowed tape), a **sub-octave** for weight, and a **detuned double**
+whose beating is the strongest wrongness cue available — a real throat cannot
+produce two pitches at once, so the ear refuses to hear one person. Player voices
+are untouched: they were approved as they were.
+
+## 2026-07-28 — Nine sounds wanted the same instant, so the mix got a priority
+
+**Measured before building anything:** during a chase the linear amplitudes of
+nine simultaneous sources summed to **6.72× full scale**, and Unity hard-clips
+above 1.0. Three of them — heartbeat 1.00, maniac breath 0.85, growl 0.90 —
+stacked to **2.75 below ~300Hz**, masking each other into mud. Volumes lived in
+**eight separate config assets**, so the balance could not be seen, let alone
+set, and **6 of ~12 sources ignored `AudioDucking` entirely**.
+
+**`AudioMix` adds the missing idea: priority.** Tier 0 Sting → 1 vocals → 2
+maniac breath / heartbeat → 3 footsteps-his / breath / effects → 4 your footsteps
+→ 5 music / ambience. A channel ducks only for **strictly** lower tiers — equal
+tiers never duck each other, or the mix would flip-flop on whichever arrived
+last. Duck length comes from the clip via `Announce(channel, clip.length)`, called
+*before* `PlayOneShot`: a fixed window is either too short for a death cry or too
+long for a footstep, and announcing afterwards ducks for a sound already buried.
+
+It returns a **multiplier**, never an absolute level, so every hand-tuned volume
+survives (`chaseVolume` 0.42 and `stingVolume` 0.70 were set by ear and are kept).
+No config → every call returns 1.0 and nothing changes. Unity exposes no public
+API to build AudioMixer groups from script, so a mixer would have had to be
+hand-built in the editor; a code bus stays scriptable, which is why the numbers
+below exist at all.
+
+| | before | after |
+|---|---|---|
+| peak-sum | 6.72 | **3.01** |
+| power-sum (uncorrelated sources add as power) | 2.21 | **1.20** |
+| low band <300Hz | 2.75 | **1.28** |
+
+Runtime-verified: a sting pulls music 0.680→0.516 and falling while **footsteps
+hold flat at 0.723** — they are trimmed by the mix but never ducked, because
+muting the feedback you steer by reads as a bug rather than as tension. The heart
+falls 0.519→0.173 as his breath rises, then clamps: they cannot both own the low
+band, and information beats emotion — his breath says *where he is*, and the
+heart's **rate** still carries proximity at any volume.
+
+`Setup/40` creates the config and **never overwrites an existing one**; it is
+meant to be tuned by ear in Play Mode. F1 line `Mix`.
+
 ## 2026-07-28 — Four defects in the maniac's arithmetic, and the body that hears him
 
 **The maniac's problems were never in the pathfinding.** All four were in the
