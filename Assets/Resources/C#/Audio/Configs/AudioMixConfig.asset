@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92fe24ce9848e8f48b96185ab387db3f, type: 3}
+  m_Name: AudioMixConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Audio.AudioMixConfig
+  channels:
+  - channel: 2
+    level: 0.9
+    tier: 0
+    duckDepth: 1
+  - channel: 8
+    level: 1
+    tier: 1
+    duckDepth: 0.85
+  - channel: 4
+    level: 0.95
+    tier: 1
+    duckDepth: 0.85
+  - channel: 3
+    level: 0.9
+    tier: 2
+    duckDepth: 0.75
+  - channel: 6
+    level: 0.85
+    tier: 2
+    duckDepth: 0.6
+  - channel: 5
+    level: 0.8
+    tier: 3
+    duckDepth: 0.6
+  - channel: 7
+    level: 1
+    tier: 3
+    duckDepth: 0.9
+  - channel: 10
+    level: 0.85
+    tier: 3
+    duckDepth: 0.7
+  - channel: 9
+    level: 0.85
+    tier: 4
+    duckDepth: 1
+  - channel: 0
+    level: 0.8
+    tier: 5
+    duckDepth: 0.35
+  - channel: 1
+    level: 0.7
+    tier: 5
+    duckDepth: 0.4
+  duckAttackSeconds: 0.08
+  duckReleaseSeconds: 0.55
+  heartUnderManiacBreath: 0.4
+  heartDuckAtBreath: 0.5
+  masterLevel: 0.85
+  enabled: 1

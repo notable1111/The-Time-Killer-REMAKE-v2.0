@@ -45,6 +45,13 @@ namespace TimeKiller.Audio
             EventBus.Subscribe<AllClocksFixedEvent>(OnGateOpened);
             EventBus.Subscribe<GameWonEvent>(OnEscaped);
             DebugOverlay.Watch("Music", () => $"{currentLayer} ({(active != null && active.clip != null ? active.clip.name : "-")})");
+            // The mix has to be visible to be tuned by ear — otherwise a duck
+            // that is firing and a duck that is broken sound the same as "quiet".
+            DebugOverlay.Watch("Mix", () => !AudioMix.Active ? "off" :
+                $"mus {AudioMix.Describe(MixChannel.Music)} " +
+                $"hrt {AudioMix.Describe(MixChannel.Heartbeat)} " +
+                $"mBr {AudioMix.Describe(MixChannel.ManiacBreath)} " +
+                $"sting {AudioMix.Describe(MixChannel.Sting)}");
         }
 
         void OnDestroy()
@@ -56,6 +63,7 @@ namespace TimeKiller.Audio
             EventBus.Unsubscribe<AllClocksFixedEvent>(OnGateOpened);
             EventBus.Unsubscribe<GameWonEvent>(OnEscaped);
             DebugOverlay.Unwatch("Music");
+            DebugOverlay.Unwatch("Mix");
         }
 
         void OnManiacState(ManiacStateChangedEvent evt) => maniacState = evt.StateName;
@@ -64,7 +72,7 @@ namespace TimeKiller.Audio
         {
             if (Time.time < nextSpottedSting) return;
             if (config.spottedStings != null && config.spottedStings.Length > 0)
-                stings.PlayOneShot(config.spottedStings[Random.Range(0, config.spottedStings.Length)], config.stingVolume);
+                PlaySting(config.spottedStings[Random.Range(0, config.spottedStings.Length)]);
             nextSpottedSting = Time.time + config.spottedStingCooldown;
         }
 
@@ -74,15 +82,13 @@ namespace TimeKiller.Audio
             // constant re-triggers while already alert would wear it out.
             bool unaware = currentLayer == Layer.Dread || currentLayer == Layer.Mystery;
             if (!unaware || Time.time < nextRiser) return;
-            if (config.heardRiser != null)
-                stings.PlayOneShot(config.heardRiser, config.stingVolume);
+            if (config.heardRiser != null) PlaySting(config.heardRiser);
             nextRiser = Time.time + config.riserCooldown;
         }
 
         void OnDied(PlayerDiedEvent evt)
         {
-            if (config.deathSting != null)
-                stings.PlayOneShot(config.deathSting, config.stingVolume);
+            if (config.deathSting != null) PlaySting(config.deathSting);
         }
 
         // The last clock lands. This sting is deliberately NOT positional — the
@@ -90,14 +96,12 @@ namespace TimeKiller.Audio
         void OnGateOpened(AllClocksFixedEvent evt)
         {
             endgame = true;
-            if (config.gateUnlockSting != null)
-                stings.PlayOneShot(config.gateUnlockSting, config.stingVolume);
+            if (config.gateUnlockSting != null) PlaySting(config.gateUnlockSting);
         }
 
         void OnEscaped(GameWonEvent evt)
         {
-            if (config.escapeSting != null)
-                stings.PlayOneShot(config.escapeSting, config.stingVolume);
+            if (config.escapeSting != null) PlaySting(config.escapeSting);
         }
 
         void Update()
@@ -114,7 +118,8 @@ namespace TimeKiller.Audio
             if (fade < 1f)
             {
                 fade = Mathf.MoveTowards(fade, 1f, Time.deltaTime / Mathf.Max(0.05f, config.crossfadeSeconds));
-                standby.volume = standbyStartVolume * (1f - fade) * AudioDucking.World;
+                standby.volume = standbyStartVolume * (1f - fade) * AudioDucking.World
+                               * AudioMix.GainFor(MixChannel.Music);
                 if (fade >= 1f && standby.isPlaying) standby.Stop();
             }
 
@@ -122,7 +127,8 @@ namespace TimeKiller.Audio
             // maniac has you, leaving only your own heart. Applied here every
             // frame rather than folded into targetVolume so it survives the
             // crossfade above and so nothing breaks if the dial never moves.
-            if (active != null) active.volume = targetVolume * fade * AudioDucking.World;
+            if (active != null)
+                active.volume = targetVolume * fade * AudioDucking.World * AudioMix.GainFor(MixChannel.Music);
         }
 
         float targetVolume;
@@ -183,6 +189,16 @@ namespace TimeKiller.Audio
             Layer.Endgame => config.endgameVolume,
             _ => config.dreadVolume,
         };
+
+        /// Every sting goes through here. A sting is tier 0 — the punctuation the
+        /// whole mix makes room for — so it announces itself for exactly its own
+        /// length before it plays, and everything below it steps back.
+        void PlaySting(AudioClip clip)
+        {
+            if (clip == null || stings == null) return;
+            AudioMix.Announce(MixChannel.Sting, clip.length);
+            stings.PlayOneShot(clip, config.stingVolume * AudioMix.GainFor(MixChannel.Sting));
+        }
 
         void BeginCrossfade(AudioClip next, float volume)
         {
