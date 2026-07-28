@@ -10,9 +10,14 @@
 //     constantly and it turned breathing into a permanent bed nobody heard.
 //   HIM LOSING YOU recovers you, slower than it took to get winded — catching
 //     your breath always takes longer than losing it.
-//   LOSING HIM triggers one long recovery breath: the moment you realise you got
-//     away. That single sound is the whole reward for surviving a chase, and it
-//     lands in the silence right after the music has ducked back.
+//   STAYING LOST earns one long recovery breath, ~8.5s AFTER the chase ends
+//     (user ruling 2026-07-28). It used to fire the instant `Detected` dropped,
+//     which was wrong twice over: relief is not instant, and `Detected` drops
+//     every time line of sight breaks behind a pillar — so the "I got away"
+//     breath was going off mid-chase, repeatedly, while he was still hunting.
+//     Now the chase end only ARMS it; he must stay off you for the whole delay
+//     or the wait resets. Panting is held up through that window on purpose, so
+//     the exhale lands on top of audible breathing instead of out of silence.
 //
 // It reads the maniac and the player's own speed directly. It deliberately does
 // NOT read the heartbeat's fear level — that coupling is exactly what made it
@@ -44,6 +49,8 @@ namespace TimeKiller.Heartbeat
         float voiced;        // smoothed value actually driving the audio
         bool hidden;
         bool wasChased;
+        bool recoveryPending;                              // chase over, relief breath owed but not yet due
+        float recoveryArmedAt = float.NegativeInfinity;    // when the chase ended
 
         /// 0..1 how out of breath the player is. Public for debug and tuning.
         public float Exertion => exertion;
@@ -52,6 +59,12 @@ namespace TimeKiller.Heartbeat
         /// evidence this — it decays to zero on its own, so a low reading is
         /// equally consistent with "the breath fired" and "nothing happened".
         public int RecoveryBreathCount { get; private set; }
+        /// Seconds until the relief breath is due, or -1 when none is owed.
+        /// Exposed because a timer nobody can see is a timer nobody can test —
+        /// this is what the overlay and the bot read to prove the delay ran.
+        public float RecoveryDueIn => recoveryPending && config != null
+            ? Mathf.Max(0f, config.recoveryDelaySeconds - (Time.time - recoveryArmedAt))
+            : -1f;
 
         public void Init(BreathingConfig breathingConfig, AudioClip loop, AudioClip recovery)
         {
@@ -76,11 +89,15 @@ namespace TimeKiller.Heartbeat
         {
             EventBus.Subscribe<TimeKiller.Hiding.PlayerHidEvent>(OnHid);
             EventBus.Subscribe<TimeKiller.Hiding.PlayerUnhidEvent>(OnUnhid);
-            DebugOverlay.Watch("Breath", () => config == null
-                ? "NO CONFIG"
-                : Holding ? $"HELD (winded {exertion:0.00}) recoveries {RecoveryBreathCount}"
-                          : voiced < config.silenceBelow ? $"calm (winded {exertion:0.00}) recoveries {RecoveryBreathCount}"
-                          : $"winded {exertion:0.00} vol {loopSource.volume:0.00} pitch {loopSource.pitch:0.00} recoveries {RecoveryBreathCount}");
+            DebugOverlay.Watch("Breath", () =>
+            {
+                if (config == null) return "NO CONFIG";
+                string relief = recoveryPending ? $" relief in {RecoveryDueIn:0.0}s" : "";
+                string tail = $" recoveries {RecoveryBreathCount}{relief}";
+                if (Holding) return $"HELD (winded {exertion:0.00}){tail}";
+                if (voiced < config.silenceBelow) return $"calm (winded {exertion:0.00}){tail}";
+                return $"winded {exertion:0.00} vol {loopSource.volume:0.00} pitch {loopSource.pitch:0.00}{tail}";
+            });
 
             if (loopSource != null && breathLoop != null)
             {
@@ -111,18 +128,33 @@ namespace TimeKiller.Heartbeat
             bool chased = maniac != null && maniac.Perception != null
                           && maniac.Perception.Level == ManiacPerception.AwarenessLevel.Detected;
 
+            // The chase ending only ARMS the relief breath — it does not play it.
+            // Re-acquiring you takes it away again: that chase never ended, so no
+            // relief is owed. Ordered ahead of the exertion update below because
+            // the pending flag is what slows the decay.
+            if (wasChased && !chased) ArmRecoveryBreath();
+            else if (chased && recoveryPending) recoveryPending = false;
+            wasChased = chased;
+
             // ONLY being chased winds you. Ordinary running used to count too,
             // and since the player runs almost constantly that made breathing a
             // permanent bed you stopped hearing. Now it is silent until he is
             // actually after you, which is the only time it means anything.
-            float rate = chased
-                ? 1f / Mathf.Max(0.1f, config.secondsToWinded)
-                : -1f / Mathf.Max(0.1f, config.secondsToRecover);
+            float rate;
+            if (chased) rate = 1f / Mathf.Max(0.1f, config.secondsToWinded);
+            else
+            {
+                rate = -1f / Mathf.Max(0.1f, config.secondsToRecover);
+                // Adrenaline does not stop the moment he turns away. At the full
+                // rate you would be under silenceBelow by the time the exhale is
+                // due, and it would land out of silence instead of out of panting.
+                if (recoveryPending) rate *= config.settleDecayScale;
+            }
             exertion = Mathf.Clamp01(exertion + rate * dt);
 
-            // He had you and now he does not: the one long breath of relief.
-            if (wasChased && !chased) TryRecoveryBreath();
-            wasChased = chased;
+            // He has stayed off you long enough. Now you let it out.
+            if (recoveryPending && Time.time - recoveryArmedAt >= config.recoveryDelaySeconds)
+                FireRecoveryBreath();
 
             Holding = config.holdWhileHiding && hidden && chased;
 
@@ -135,18 +167,40 @@ namespace TimeKiller.Heartbeat
                                      Mathf.InverseLerp(config.silenceBelow, 1f, voiced));
 
             loopSource.pitch = Mathf.Lerp(config.easyPitch, config.windedPitch, voiced);
-            loopSource.volume = Mathf.MoveTowards(loopSource.volume, target, dt * 1.5f);
+            loopSource.volume = Mathf.MoveTowards(loopSource.volume,
+                target * TimeKiller.Audio.AudioMix.GainFor(TimeKiller.Audio.MixChannel.PlayerBreath),
+                dt * 1.5f);
         }
 
-        /// The long exhale when you realise he has lost you. Gated on having
-        /// actually been worked — otherwise a two-second scare would end in a
-        /// dramatic recovery breath the player did not earn.
-        void TryRecoveryBreath()
+        /// The chase just ended — start counting, do not breathe yet. Gated on
+        /// having actually been worked, otherwise a two-second scare would end in
+        /// a dramatic recovery breath the player did not earn. That test lives
+        /// HERE rather than at fire time on purpose: exertion keeps decaying
+        /// through the wait, so testing it late would let the waiting itself
+        /// cancel a breath that was earned when the chase ended.
+        void ArmRecoveryBreath()
         {
             if (gaspClip == null || oneShotSource == null) return;
             if (exertion < config.recoveryNeedsExertion) return;
+            recoveryPending = true;
+            recoveryArmedAt = Time.time;
+        }
+
+        /// The long exhale, once he has genuinely stayed lost. This is the whole
+        /// reward for surviving a chase, and it only means anything because it
+        /// waited: you spend the delay still panting, not yet sure he is gone.
+        void FireRecoveryBreath()
+        {
+            recoveryPending = false;
+            if (gaspClip == null || oneShotSource == null) return;
             oneShotSource.pitch = 1f;
-            oneShotSource.PlayOneShot(gaspClip, config.recoveryVolume);
+            // This is the whole reward for surviving a chase, so it gets the room:
+            // announcing it steps the score and the ambience back underneath it.
+            // The Soften() call below was doing this by hand for the heartbeat
+            // alone, before there was a bus that could do it for everything.
+            TimeKiller.Audio.AudioMix.Announce(TimeKiller.Audio.MixChannel.PlayerBreath, gaspClip.length);
+            oneShotSource.PlayOneShot(gaspClip, config.recoveryVolume
+                * TimeKiller.Audio.AudioMix.GainFor(TimeKiller.Audio.MixChannel.PlayerBreath));
             RecoveryBreathCount++;
 
             // Ask the heart to step back while the exhale plays. Without this the

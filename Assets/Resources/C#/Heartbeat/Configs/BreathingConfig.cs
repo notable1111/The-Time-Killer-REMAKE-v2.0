@@ -36,7 +36,11 @@ namespace TimeKiller.Heartbeat
         [Range(0.5f, 2f)] public float windedPitch = 1.4f;
 
         [Header("The recovery breath")]
-        [Tooltip("One long breath when the chase ends — the moment you realise he has lost you. Only fires if you were actually winded above this much, so it cannot trigger after a two-second scare.")]
+        [Tooltip("Seconds he must stay OFF you before the relief breath fires (user ruling 2026-07-28: 8-9s). Relief is not instant — and 'Detected' drops every time line of sight breaks behind a pillar, so firing immediately meant the breath went off mid-chase. Re-acquiring you cancels it and the wait starts over.")]
+        public float recoveryDelaySeconds = 8.5f;
+        [Tooltip("How fast you stop panting DURING that wait, as a share of the normal recovery rate. Well below 1 because adrenaline does not stop the moment he turns away — and because at full rate you would be near silent by the time the exhale lands, which makes it come out of nowhere.")]
+        [Range(0f, 1f)] public float settleDecayScale = 0.35f;
+        [Tooltip("One long breath when the chase ends — the moment you realise he has lost you. Only fires if you were actually winded above this much, so it cannot trigger after a two-second scare. Judged when the chase ENDS, not when the breath fires, so the wait itself cannot cancel a breath you earned.")]
         [Range(0f, 1f)] public float recoveryNeedsExertion = 0.45f;
         [Range(0f, 1f)] public float recoveryVolume = 0.8f;
         [Tooltip("Exertion is dropped to this immediately after the recovery breath, so the long exhale IS the recovery rather than playing over continued panting.")]

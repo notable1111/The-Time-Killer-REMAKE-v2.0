@@ -159,7 +159,12 @@ namespace TimeKiller.Heartbeat
             // 2026-07-28 and rejected by ear: it read as three different sounds
             // rather than one heart changing, and the single dry beat with the
             // pitch rise above is what actually sounds like a body.
-            audioSource.PlayOneShot(beatClip, volume);
+            // The mix trims this, and specifically pulls it down when the maniac's
+            // breath is loud — they are both sub-300Hz and measured 2.75 stacked.
+            // Nothing is lost: the heart's RATE is what carries proximity, and the
+            // rate keeps saying it at any volume.
+            audioSource.PlayOneShot(beatClip, volume
+                * TimeKiller.Audio.AudioMix.GainFor(TimeKiller.Audio.MixChannel.Heartbeat));
         }
 
         /// Distance sets the rate; state sets a floor it cannot fall below.
