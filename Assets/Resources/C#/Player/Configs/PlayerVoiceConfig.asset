@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcf270fd6c0cfbb4a881e7f59f3f6148, type: 3}
+  m_Name: PlayerVoiceConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Player.PlayerVoiceConfig
+  painGrunts:
+  - {fileID: 8300000, guid: b8c817023eb92a049a7d4fa9bdcb3b22, type: 3}
+  - {fileID: 8300000, guid: 454f73554457752498c9b2db4352200b, type: 3}
+  - {fileID: 8300000, guid: 43ccef3023226bc47b4aa4164d263245, type: 3}
+  painGruntsCritical:
+  - {fileID: 8300000, guid: 92b76f3c0c762b54b9dcd7512c8fbba8, type: 3}
+  - {fileID: 8300000, guid: fbef4e8cc330a5441a3d17be2cda1d90, type: 3}
+  - {fileID: 8300000, guid: 73c0d6360d13a024c8e93c9dcffe8b1f, type: 3}
+  criticalAtOrBelow: 0.34
+  painVolume: 0.85
+  deathCries:
+  - {fileID: 8300000, guid: 2d36c64a6843e7944a09c339913f5fa5, type: 3}
+  - {fileID: 8300000, guid: 370998b70c6e9a543bd940ed74ff66ad, type: 3}
+  deathVolume: 0.95
+  spottedGasps:
+  - {fileID: 8300000, guid: 222c14efad9fe0a4b9a13fd1f03e55e1, type: 3}
+  - {fileID: 8300000, guid: 3b6f80dbf6bcc89498ef632ef6fd5121, type: 3}
+  - {fileID: 8300000, guid: eebdd6a5b494adf439e1a14d7945022b, type: 3}
+  gaspVolume: 0.6
+  gaspCooldown: 9
+  repairEfforts:
+  - {fileID: 8300000, guid: 70f87c07db6048e40a361bfcbfe4ba3a, type: 3}
+  - {fileID: 8300000, guid: 19bb6add0b5d3954d9423e03c5f12ce3, type: 3}
+  - {fileID: 8300000, guid: 7b4836553ab45534fba8694993786758, type: 3}
+  repairVolume: 0.45
+  repairMinInterval: 3.5
+  repairMaxInterval: 7
+  pitchJitter: 0.06
+  enabled: 1

@@ -1,8 +1,22 @@
-// Player-facing HUD (IMGUI v1 — swap to UGUI later): the clocks-fixed counter
-// and the repair skill-check bar while repairing. The end-of-run screen is
-// Core's RunEndScreen, not this. Reads ObjectiveManager + ClockRepair. Removable.
+// Player-facing HUD: the clocks-fixed counter and the repair skill-check gauge.
+// The end-of-run screen is Core's RunEndScreen, not this.
+//
+// uGUI now, not IMGUI (2026-07-28). The old version drew everything with
+// GUI.DrawTexture in OnGUI — fine as a prototype, but it could not use the
+// "carved stone and brass" art set, and OnGUI runs several times per frame so
+// every string and style had to be hand-cached to avoid churning garbage. This
+// version owns no drawing at all: it moves RectTransforms and sets text on
+// objects that Setup/38 builds, so the art is swappable without touching code.
+//
+// The gauge's inner channel is expressed as ANCHORS on a Channel rect, so the
+// fill, the hit zone and the needle track the frame automatically at any screen
+// size. The channel rectangle came from measuring Gauge.png — see
+// Tools/UIArt/README.md, which is the only place that number is written down.
+//
+// Removable: delete the ObjectiveHUD object and the game runs unchanged.
 using TimeKiller.Core;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TimeKiller.Objectives
 {
@@ -10,89 +24,91 @@ namespace TimeKiller.Objectives
     {
         [SerializeField] ClockRepair repair;
 
-        // OnGUI runs at least twice a frame (Layout + Repaint) and again for every
-        // input event, so ANYTHING allocated in here is allocated several times per
-        // frame. Styles and the counter string are therefore built once and reused;
-        // they can only be created inside OnGUI because GUI.skin is null outside it.
-        GUIStyle counterStyle;
-        GUIStyle repairLabelStyle;
-        string counterText;
-        int counterFixed = -1, counterTotal = -1;
-        bool counterAllFixed;
+        [Header("Counter (built by Setup/38)")]
+        [SerializeField] GameObject counterRoot;
+        [SerializeField] Text counterText;
 
-        static readonly Color CounterDone = new Color(0.5f, 1f, 0.5f);
+        [Header("Skill-check gauge (built by Setup/38)")]
+        [SerializeField] GameObject gaugeRoot;
+        [SerializeField] Image progressFill;
+        [SerializeField] RectTransform fillEdge;
+        [SerializeField] RectTransform zone;
+        [SerializeField] RectTransform needle;
 
-        void EnsureStyles()
-        {
-            if (counterStyle != null) return;
-            counterStyle = new GUIStyle(GUI.skin.label)
-            {
-                fontSize = 22,
-                alignment = TextAnchor.UpperCenter,
-                fontStyle = FontStyle.Bold,
-            };
-            repairLabelStyle = new GUIStyle(GUI.skin.label)
-            {
-                fontSize = 13,
-                alignment = TextAnchor.MiddleCenter,
-            };
-            repairLabelStyle.normal.textColor = Color.white;
-        }
+        int shownFixed = -1, shownTotal = -1;
+        bool shownAllFixed;
 
-        void OnGUI()
+        static readonly Color CounterDone = new Color(0.62f, 1f, 0.60f);
+        static readonly Color CounterNormal = new Color(0.90f, 0.88f, 0.82f);
+
+        void Update()
         {
             // The run is over — get out of the end screen's way.
             var flow = GameFlow.Instance;
-            if (flow != null && flow.Phase != RunPhase.Playing) return;
+            bool playing = flow == null || flow.Phase == RunPhase.Playing;
 
-            EnsureStyles();
-
-            var mgr = ObjectiveManager.Instance;
-            if (mgr != null)
-            {
-                // Rebuild the string only when the count actually changes — a few
-                // times a run, instead of a few times a frame.
-                if (mgr.FixedCount != counterFixed || mgr.Total != counterTotal || mgr.AllFixed != counterAllFixed)
-                {
-                    counterFixed = mgr.FixedCount;
-                    counterTotal = mgr.Total;
-                    counterAllFixed = mgr.AllFixed;
-                    counterText = counterAllFixed
-                        ? $"CLOCKS {counterFixed}/{counterTotal} — RUN TO THE EXIT"
-                        : $"CLOCKS  {counterFixed} / {counterTotal}";
-                }
-                counterStyle.normal.textColor = counterAllFixed ? CounterDone : Color.white;
-                GUI.Label(new Rect(0, 12, Screen.width, 34), counterText, counterStyle);
-            }
-
-            if (repair != null && repair.Repairing && repair.Active != null)
-                DrawRepairBar(repair);
+            if (counterRoot != null) counterRoot.SetActive(playing);
+            UpdateCounter(playing);
+            UpdateGauge(playing);
         }
 
-        void DrawRepairBar(ClockRepair r)
+        void UpdateCounter(bool playing)
         {
-            float w = 360f, h = 26f;
-            float x = (Screen.width - w) / 2f, y = Screen.height - 120f;
+            if (!playing || counterText == null) return;
+            var mgr = ObjectiveManager.Instance;
+            if (mgr == null) return;
 
-            GUI.color = new Color(0f, 0f, 0f, 0.7f);
-            GUI.DrawTexture(new Rect(x - 3, y - 3, w + 6, h + 6), Texture2D.whiteTexture);
-            GUI.color = new Color(0.15f, 0.15f, 0.18f, 1f);
-            GUI.DrawTexture(new Rect(x, y, w, h), Texture2D.whiteTexture);
+            // Only touch the Text when the count actually changes: assigning
+            // Text.text rebuilds the mesh even when the string is identical.
+            if (mgr.FixedCount == shownFixed && mgr.Total == shownTotal && mgr.AllFixed == shownAllFixed) return;
+            shownFixed = mgr.FixedCount;
+            shownTotal = mgr.Total;
+            shownAllFixed = mgr.AllFixed;
 
-            // clock's overall progress (dim fill behind)
-            GUI.color = new Color(0.25f, 0.6f, 0.3f, 0.5f);
-            GUI.DrawTexture(new Rect(x, y, w * r.Active.Progress, h), Texture2D.whiteTexture);
+            counterText.text = shownAllFixed ? "RUN" : $"{shownFixed} / {shownTotal}";
+            counterText.color = shownAllFixed ? CounterDone : CounterNormal;
+        }
 
-            // target zone
-            float zc = r.ZoneCenter, zw = r.ZoneWidth;
-            GUI.color = new Color(0.4f, 1f, 0.4f, 0.9f);
-            GUI.DrawTexture(new Rect(x + (zc - zw * 0.5f) * w, y, zw * w, h), Texture2D.whiteTexture);
+        void UpdateGauge(bool playing)
+        {
+            bool active = playing && repair != null && repair.Repairing && repair.Active != null;
+            if (gaugeRoot != null && gaugeRoot.activeSelf != active) gaugeRoot.SetActive(active);
+            if (!active) return;
 
-            // sweeping marker
-            GUI.color = Color.white;
-            GUI.DrawTexture(new Rect(x + r.Marker * w - 1.5f, y - 4, 3, h + 8), Texture2D.whiteTexture);
+            float progress = repair.Active.Progress;
+            if (progressFill != null) progressFill.fillAmount = progress;
 
-            GUI.Label(new Rect(x, y + h + 2, w, 20), "SPACE when the marker hits green", repairLabelStyle);
+            // The hot line rides the fill's boundary. A Filled image cannot do
+            // this itself — its gradient is fixed to the texture, not to the cut,
+            // so the brightest part would sit still while the fill moved past it.
+            if (fillEdge != null)
+            {
+                fillEdge.anchorMin = new Vector2(progress, 0f);
+                fillEdge.anchorMax = new Vector2(progress, 1f);
+                fillEdge.anchoredPosition = Vector2.zero;
+                // Nothing to lead when the bar is empty or already full.
+                bool show = progress > 0.001f && progress < 0.999f;
+                if (fillEdge.gameObject.activeSelf != show) fillEdge.gameObject.SetActive(show);
+            }
+
+            // Zone and needle live in normalised channel space, so the maths is
+            // the same one the old bar used and stays correct at any resolution.
+            if (zone != null)
+            {
+                float half = repair.ZoneWidth * 0.5f;
+                zone.anchorMin = new Vector2(Mathf.Clamp01(repair.ZoneCenter - half), 0f);
+                zone.anchorMax = new Vector2(Mathf.Clamp01(repair.ZoneCenter + half), 1f);
+                zone.offsetMin = Vector2.zero;
+                zone.offsetMax = Vector2.zero;
+            }
+
+            if (needle != null)
+            {
+                float t = Mathf.Clamp01(repair.Marker);
+                needle.anchorMin = new Vector2(t, 0.5f);
+                needle.anchorMax = new Vector2(t, 0.5f);
+                needle.anchoredPosition = Vector2.zero;
+            }
         }
     }
 }

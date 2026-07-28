@@ -40,7 +40,10 @@ namespace TimeKiller.Player
             {
                 var clip = config.stepClips[Random.Range(0, config.stepClips.Length)];
                 source.pitch = 1f + Random.Range(-config.pitchJitter, config.pitchJitter);
-                source.PlayOneShot(clip, loudness);
+                // Trimmed by the mix but never DUCKED by it (duckDepth 1.0):
+                // muting the feedback you steer by reads as a bug, not as tension.
+                source.PlayOneShot(clip, loudness
+                    * TimeKiller.Audio.AudioMix.GainFor(TimeKiller.Audio.MixChannel.PlayerFootsteps));
             }
 
             EventBus.Publish(new PlayerFootstepEvent

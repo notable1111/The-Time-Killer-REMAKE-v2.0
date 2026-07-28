@@ -29,6 +29,13 @@ namespace TimeKiller.Objectives
 
         public void Init(ClockConfig cfg) => config = cfg;
 
+        /// The clock E would start right now, or null. Exposed for the interact
+        /// prompt: it must offer exactly what pressing E would actually do, so it
+        /// asks the same question TryStart asks rather than re-deriving it and
+        /// drifting out of sync. Cheap — a distance check over the 3-clock list.
+        public ClockObjective NearbyClock =>
+            config != null && player != null && player.IsFreeToInterrupt ? NearestBrokenClock() : null;
+
         void Awake()
         {
             player = GetComponent<PlayerController>();
