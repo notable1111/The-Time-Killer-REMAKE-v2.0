@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5334b51ce9b49d4bb1ae7372c3f7a05, type: 3}
   m_Name: WardrobeSearchConfig
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Maniac.WardrobeSearchConfig
+  checkChance: 0.12
   considerRadius: 4
   recheckCooldown: 25
   beliefSampleRadius: 1.5
-  openBeliefThreshold: 0.05
+  openBeliefShare: 0.75
+  minAbsoluteMass: 0.02
+  maxDistanceFromLastSeen: 3.5
   dreadPauseSeconds: 1.2

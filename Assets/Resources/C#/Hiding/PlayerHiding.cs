@@ -26,6 +26,12 @@ namespace TimeKiller.Hiding
 
         public void Init(HidingConfig hidingConfig) => config = hidingConfig;
 
+        /// The wardrobe E would enter right now, or null. Same reasoning as
+        /// ClockRepair.NearbyClock: the prompt must ask the question the input
+        /// actually asks, not a copy of it that can drift.
+        public HidingSpot NearbySpot =>
+            config != null && spots != null && !IsHidden ? NearestFreeSpot() : null;
+
         void Awake()
         {
             controller = GetComponent<PlayerController>();

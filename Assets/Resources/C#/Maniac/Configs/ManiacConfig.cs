@@ -75,6 +75,10 @@ namespace TimeKiller.Maniac
         [Header("Search (the lost-sight hunt — replaces the abrupt give-up)")]
         [Tooltip("Speed while sweeping for you after losing sight — alert, between patrol and investigate.")]
         public float searchSpeed = 2.6f;
+        [Tooltip("Speed for the RUSH that opens every hunt. He does not know you stopped — his working theory is that you are still running — so he keeps driving at chase pace toward where you would be if you had. Set at chaseSpeed by default; the moment he slows to searchSpeed is the moment he stops believing that.")]
+        public float searchRushSpeed = 5.2f;
+        [Tooltip("Longest the opening rush lasts. It also ends early the instant he arrives at his first guess and starts looking — the rush is over when the theory has been tested, whichever comes first.")]
+        public float searchRushSeconds = 3.5f;
         [Tooltip("How many spots he checks before giving up. First is your last-seen position; the rest are the nearest patrol waypoints (known-reachable).")]
         public int searchPoints = 3;
         [Tooltip("Seconds he stops to scan his sight cone at each search spot.")]
@@ -103,6 +107,8 @@ namespace TimeKiller.Maniac
         [Header("Hiding (the Outlast rule)")]
         [Tooltip("If he had eyes on the player within this many seconds before they hid, the spot is compromised — he walks up and drags a hit out of it.")]
         public float seenEnterWindow = 1.25f;
+        [Tooltip("Only compromise the spot if he was actually ON SCREEN when you hid. Measured 2026-07-28: the camera shows 3.4u vertically but he sees 7u, so there is a 3.6u band above and below where he watches you and you cannot see him — hiding there was punished on information the game never showed the player. This does NOT weaken his sight; he still detects and chases from the full range. It only stops the hiding penalty firing from a blind spot.")]
+        public bool compromiseOnlyWhenOnScreen = true;
 
         [Header("Body")]
         [Tooltip("Rigidbody mass. Heavy on purpose: the player must NOT be able to push him around.")]

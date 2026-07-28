@@ -179,12 +179,32 @@ namespace TimeKiller.Maniac
 
         void OnPlayerHid(TimeKiller.Hiding.PlayerHidEvent evt)
         {
-            // Saw them within the window? Then hiding fools nobody.
-            if (Perception.TimeSinceSeen <= config.seenEnterWindow)
-            {
-                CompromisedSpot = evt.SpotPosition;
-                ChangeState(Chase);
-            }
+            // Saw them within the window? Then hiding fools nobody — but only if
+            // the player could have KNOWN he was watching. See IsOnScreen.
+            if (Perception.TimeSinceSeen > config.seenEnterWindow) return;
+            if (config.compromiseOnlyWhenOnScreen && !IsOnScreen()) return;
+
+            CompromisedSpot = evt.SpotPosition;
+            ChangeState(Chase);
+        }
+
+        /// Was he actually visible to the player at this moment?
+        ///
+        /// The camera is wide and short — measured 7.5u horizontally but only
+        /// 3.4u vertically — while his sightRange is 7u. That leaves a 3.6u band
+        /// directly above and below the player where he has clear line of sight
+        /// and is completely off screen. Punishing a hide decided in that band
+        /// means punishing the player for information the game refused to show
+        /// them, which reads as the hiding system being broken.
+        ///
+        /// Deliberately narrow in scope: this gates the HIDING penalty only. His
+        /// detection, chasing and searching all still use the full sight range.
+        bool IsOnScreen()
+        {
+            var cam = Camera.main;
+            if (cam == null) return true;   // can't tell — keep the original rule
+            var vp = cam.WorldToViewportPoint(Motor.Position);
+            return vp.z > 0f && vp.x >= 0f && vp.x <= 1f && vp.y >= 0f && vp.y <= 1f;
         }
 
         void OnPlayerUnhid(TimeKiller.Hiding.PlayerUnhidEvent evt) => CompromisedSpot = null;

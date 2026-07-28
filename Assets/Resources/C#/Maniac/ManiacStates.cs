@@ -242,6 +242,18 @@ namespace TimeKiller.Maniac
         TimeKiller.Hiding.HidingSpot checkingSpot;
         bool atDoor;
 
+        // The opening rush: he does not know you stopped. His working theory is
+        // that you are still running, so he drives at chase pace toward where you
+        // would be if you had — and only once that theory has been tested does it
+        // occur to him that you might have gone to ground.
+        bool rushing;
+        float rushUntil;
+
+        // Rolled ONCE per hunt. When false he will not open a single wardrobe for
+        // the whole hunt, which is what makes hiding a read on his behaviour
+        // rather than a coin flip at every door.
+        bool considersWardrobes;
+
         public SearchState(ManiacController maniac) : base(maniac) { }
 
         public override void Enter()
@@ -253,6 +265,12 @@ namespace TimeKiller.Maniac
             nextStep = 0f;
             checkingSpot = null;
             atDoor = false;
+
+            rushing = true;
+            rushUntil = Time.time + maniac.Config.searchRushSeconds;
+            considersWardrobes = search != null && search.Ready
+                                 && Random.value < search.Config.checkChance;
+
             PickTarget();
         }
 
@@ -283,7 +301,11 @@ namespace TimeKiller.Maniac
                 // on the way. He walks to the DOOR rather than the belief cell —
                 // which is what finally gives the hidden player's heartbeat
                 // something to climb toward.
-                if (search != null && search.Ready && search.TryPickSpot(t, out var spot))
+                //
+                // Never during the rush: while he still believes you are running,
+                // stopping at a door would contradict the whole theory. And only
+                // if this hunt rolled for it at all.
+                if (!rushing && considersWardrobes && search.TryPickSpot(t, out var spot))
                 {
                     checkingSpot = spot;
                     target = spot.transform.position;
@@ -304,6 +326,9 @@ namespace TimeKiller.Maniac
         {
             looking = true;
             lookUntil = until;
+            // Stopping to look IS him abandoning the "you kept running" theory,
+            // so the rush ends here even if its timer had seconds left.
+            rushing = false;
             maniac.Nav.Stop();
             scanBase = CurrentFacing();
         }
@@ -333,7 +358,8 @@ namespace TimeKiller.Maniac
                 return;
             }
 
-            maniac.Nav.MoveTo(target, maniac.Config.searchSpeed);
+            if (rushing && Time.time >= rushUntil) rushing = false;
+            maniac.Nav.MoveTo(target, rushing ? maniac.Config.searchRushSpeed : maniac.Config.searchSpeed);
             if (maniac.Nav.ReachedDestination(maniac.Config.waypointTolerance) || Time.time >= pointDeadline)
             {
                 // Arrived at a wardrobe he meant to check: hold at the door for
@@ -357,7 +383,7 @@ namespace TimeKiller.Maniac
             if (spot == null || search == null) { PickTarget(); return; }
             search.MarkChecked(spot);
 
-            if (search.ShouldOpen(spot, belief) && spot.Occupied)
+            if (search.ShouldOpen(spot, belief, maniac.Perception.LastSeenPosition) && spot.Occupied)
             {
                 // Caught. Same drag-out path as being watched climbing in.
                 maniac.CompromiseSpot(spot.transform.position);

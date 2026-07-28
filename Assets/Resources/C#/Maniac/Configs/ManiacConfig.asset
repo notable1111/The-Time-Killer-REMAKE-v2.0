@@ -39,7 +39,12 @@ MonoBehaviour:
   runSpeedThreshold: 3.5
   exposureFloor: 0.2
   ambientExposure: 0.12
+  suspicionGuessError: 3
+  suspicionHoldSeconds: 1
+  suspiciousApproachSpeed: 1.4
   searchSpeed: 2.6
+  searchRushSpeed: 5.2
+  searchRushSeconds: 3.5
   searchPoints: 3
   searchLookSeconds: 1.7
   searchTravelTimeout: 4
@@ -52,6 +57,7 @@ MonoBehaviour:
   attackCooldown: 1.6
   attackRecoverySeconds: 0.35
   seenEnterWindow: 1.25
+  compromiseOnlyWhenOnScreen: 1
   bodyMass: 400
   phaseThroughSeconds: 2.5
   brainPatrolBaseline: 0.15

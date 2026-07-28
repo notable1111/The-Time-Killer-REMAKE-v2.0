@@ -56,7 +56,8 @@ namespace TimeKiller.EditorTools
             int spots = Object.FindObjectsByType<TimeKiller.Hiding.HidingSpot>(
                 FindObjectsInactive.Include, FindObjectsSortMode.None).Length;
             Debug.Log($"[TimeKiller Setup] Wardrobe search wired: {spots} hiding spots are now checkable "
-                      + $"(openBeliefThreshold {config.openBeliefThreshold:0.000}, dread pause {config.dreadPauseSeconds:0.0}s).");
+                      + $"(opens at {config.openBeliefShare:0.00} of his best guess, floor {config.minAbsoluteMass:0.000}, "
+                      + $"dread pause {config.dreadPauseSeconds:0.0}s).");
         }
     }
 }

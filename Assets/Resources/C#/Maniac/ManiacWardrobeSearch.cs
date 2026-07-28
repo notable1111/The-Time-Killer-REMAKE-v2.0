@@ -28,9 +28,10 @@ namespace TimeKiller.Maniac
         // a spot that is destroyed (level reload) simply falls out of the map.
         readonly Dictionary<HidingSpot, float> checkedUntil = new Dictionary<HidingSpot, float>();
 
-        // Live readout for tuning openBeliefThreshold against a real hunt
-        // rather than a guess — see the config's comment.
+        // Live readout for tuning against a real hunt rather than a guess.
         float lastMass;
+        float lastShare;
+        float lastDistance;
         string lastSpotName = "-";
 
         public void Init(WardrobeSearchConfig searchConfig) => config = searchConfig;
@@ -40,7 +41,8 @@ namespace TimeKiller.Maniac
             spots = Object.FindObjectsByType<HidingSpot>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             DebugOverlay.Watch("Wardrobe", () => config == null
                 ? "NO CONFIG"
-                : $"{lastSpotName} mass {lastMass:0.000}/{config.openBeliefThreshold:0.000} ({spots?.Length ?? 0} spots)");
+                : $"{lastSpotName} dist {lastDistance:0.0}/{config.maxDistanceFromLastSeen:0.0} " +
+                  $"share {lastShare:0.00}/{config.openBeliefShare:0.00} ({spots?.Length ?? 0} spots)");
         }
 
         void OnDestroy() => DebugOverlay.Unwatch("Wardrobe");
@@ -78,12 +80,34 @@ namespace TimeKiller.Maniac
         /// into this room — so hiding EARLY and AWAY from his last contact stays
         /// reliably safe, and hiding in the first box he is already walking toward
         /// does not. A player who is never sensed is never found.
-        public bool ShouldOpen(HidingSpot spot, PlayerBeliefMap belief)
+        public bool ShouldOpen(HidingSpot spot, PlayerBeliefMap belief, Vector2 lastSeen)
         {
             if (spot == null || belief == null || config == null) return false;
             lastSpotName = spot.name;
             lastMass = belief.MassNear(spot.transform.position, config.beliefSampleRadius);
-            return lastMass >= config.openBeliefThreshold;
+            lastShare = 0f;
+
+            // THE rule that decides whether hiding is safe. Hiding out of the
+            // area he last had you in must reliably work, or wardrobes stop being
+            // a plan and become a coin flip — which is exactly how this shipped.
+            lastDistance = Vector2.Distance(spot.transform.position, lastSeen);
+            if (lastDistance > config.maxDistanceFromLastSeen) return false;
+
+            // RELATIVE, not absolute. Measured 2026-07-28: an absolute threshold
+            // of 0.05 let him open any wardrobe within 9.5u of where he last saw
+            // you, because a freshly seeded map concentrates its whole mass (it
+            // sums to 1) into a short trail worth 0.13-0.44 per sample. Worse, the
+            // same number meant 6.5u in one flee direction and 9.5u in another.
+            // Comparing against the best guess he currently has removes all of
+            // that: the question is "is this among the likeliest places?", which
+            // does not care how big the map is or how long he has been looking.
+            if (!belief.BestTarget(out var peakPosition)) return false;
+            float peak = belief.MassNear(peakPosition, config.beliefSampleRadius);
+            if (peak <= 0.0001f) return false;
+
+            lastShare = lastMass / peak;
+            return lastShare >= config.openBeliefShare
+                && lastMass >= config.minAbsoluteMass;
         }
     }
 }
