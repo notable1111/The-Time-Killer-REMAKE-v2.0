@@ -12,7 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41026f5ebbd43e444964728dfb13b486, type: 3}
   m_Name: PlayerHit
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Effects.EffectRecipe
-  particlePrefab: {fileID: 6823200998282874702, guid: 8f8fe12323625f5499b2853dd2ad3e58, type: 3}
+  sheetClip: {fileID: 0}
+  sheetScale: 1
+  sheetMaterial: {fileID: 0}
+  sheetSortingLayer: Default
+  sheetSortingOrder: 5
+  randomFlip: 1
+  randomRotation: 0
+  particlePrefab: {fileID: 3276772947071831509, guid: cbe5c180ea56f4f46a622731f838666c, type: 3}
   particleScale: 1
   clips:
   - {fileID: 8300000, guid: d657a88db1f94684491199873047c0c9, type: 3}

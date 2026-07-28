@@ -38,7 +38,16 @@ namespace TimeKiller.Effects
             return player != null ? (Vector2)player.position : Vector2.zero;
         }
 
-        void OnHit(PlayerHitEvent evt) => EffectPlayer.Play(hitRecipe, PlayerPosition());
+        void OnHit(PlayerHitEvent evt)
+        {
+            // Blood flies AWAY from whatever hit you. The event has carried
+            // SourcePosition since the shove was added; the effects side simply
+            // never read it, so every wound sprayed as a symmetric ring.
+            Vector2 at = PlayerPosition();
+            Vector2 away = at - evt.SourcePosition;
+            EffectPlayer.Play(hitRecipe, at, away.sqrMagnitude > 0.0001f ? away.normalized : Vector2.zero);
+        }
+
         void OnDied(PlayerDiedEvent evt) => EffectPlayer.Play(deathRecipe, evt.Position);
     }
 }

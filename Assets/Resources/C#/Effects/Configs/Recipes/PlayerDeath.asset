@@ -12,8 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41026f5ebbd43e444964728dfb13b486, type: 3}
   m_Name: PlayerDeath
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Effects.EffectRecipe
-  particlePrefab: {fileID: 4553287630450876385, guid: 15483e51212e3d74886ea57291f4639a, type: 3}
-  particleScale: 1.6
+  sheetClip: {fileID: 0}
+  sheetScale: 1
+  sheetMaterial: {fileID: 0}
+  sheetSortingLayer: Default
+  sheetSortingOrder: 5
+  randomFlip: 1
+  randomRotation: 0
+  particlePrefab: {fileID: 3276772947071831509, guid: cbe5c180ea56f4f46a622731f838666c, type: 3}
+  particleScale: 1.9
   clips:
   - {fileID: 8300000, guid: 66d9098c71e15f6449ce754ebe11e9b5, type: 3}
   volume: 0.9
