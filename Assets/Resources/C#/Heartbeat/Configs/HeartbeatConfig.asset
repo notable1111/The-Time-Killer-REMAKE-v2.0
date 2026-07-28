@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75a1427b0cf4dea4792cb84be3b75de2, type: 3}
+  m_Name: HeartbeatConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Heartbeat.HeartbeatConfig
+  calmBpm: 56
+  nearBpm: 160
+  heartRange: 14
+  distanceCurve: 2.2
+  suspiciousFloorBpm: 108
+  detectedFloorBpm: 150
+  injuredFloorBpm: 95
+  riseSpeed: 6
+  fallSpeed: 0.7
+  maxVolume: 1
+  quietVolume: 0.72
+  silenceBelow: 0.05
+  hiddenBoost: 1.3
+  pitchAtMax: 1.12
+  duckedWorldVolume: 0.05
+  duckByIntensity: 0.9
+  duckInSeconds: 0.35
+  duckOutSeconds: 2.5
+  irregularity: 0.06
+  lurchOnDetected: 1

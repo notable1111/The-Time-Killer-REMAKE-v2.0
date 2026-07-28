@@ -6,6 +6,9 @@
 //      subtle scale-breath — the blood feels alive, not pasted
 //   3. Hit: splatter flash that slams in at scale + Cinemachine camera shake
 //   4. Heavy breathing loop at critical HP
+// The pulse clock below is VISUAL ONLY. The audible heartbeat belongs to
+// PlayerHeartbeat, which folds injury into one intensity alongside the maniac's
+// awareness and distance — see C#/Heartbeat/PlayerHeartbeat.cs.
 // Fully removable: delete the HealthVfx object and the game runs unchanged.
 using TimeKiller.Core;
 using TimeKiller.Player;
@@ -28,8 +31,6 @@ namespace TimeKiller.HealthVfx
         [SerializeField] Image flashImage;
         [SerializeField] CanvasGroup flashGroup;
         [SerializeField] AudioSource breathing;
-        [SerializeField] AudioSource heartAudio;   // PlayOneShot lub-dub, synced to the visual systole
-        [SerializeField] AudioClip heartbeatClip;
         // Impact juice (world blood burst, splash SFX, camera shake, death
         // sting) moved to C#/Effects recipes — this director is screen-state only.
         [SerializeField] Sprite subtleSprite;
@@ -45,9 +46,7 @@ namespace TimeKiller.HealthVfx
         float bandStrength, targetStrength;
         float targetVignette, targetOverlay, targetChromatic, targetGrain, targetDesat;
         float bpm, pulseDepth, pulsePhase;
-        float heartVolume;
         float breathingTarget;
-        int lastBeatIndex = -1;
 
         public void Init(HealthVfxConfig vfxConfig) => config = vfxConfig;
 
@@ -87,7 +86,6 @@ namespace TimeKiller.HealthVfx
                 SetBand(criticalSprite, criticalSpriteB, config.criticalVignette, config.criticalOverlayAlpha,
                     config.criticalBpm, config.criticalPulseDepth, config.criticalChromatic,
                     config.criticalGrain, config.criticalDesaturation);
-                heartVolume = config.criticalHeartVolume;
                 breathingTarget = config.breathingVolume;
             }
             else if (evt.Current <= config.subtleAtHp)
@@ -95,7 +93,6 @@ namespace TimeKiller.HealthVfx
                 SetBand(subtleSprite, subtleSpriteB, config.subtleVignette, config.subtleOverlayAlpha,
                     config.subtleBpm, config.subtlePulseDepth, config.subtleChromatic,
                     config.subtleGrain, 0f);
-                heartVolume = config.subtleHeartVolume;
                 breathingTarget = 0f;
             }
             else
@@ -140,16 +137,6 @@ namespace TimeKiller.HealthVfx
             float pulseA = 1f - pulseDepth * (1f - beatA);
             float pulseB = 1f - pulseDepth * (1f - beatB);
 
-            // The SOUND fires on the same systole the SCREEN throbs on: the
-            // visual peak sits at phase x.5, so trigger on floor(phase + 0.5).
-            int beatIndex = Mathf.FloorToInt(pulsePhase + 0.5f);
-            if (beatIndex != lastBeatIndex)
-            {
-                if (lastBeatIndex >= 0 && bandStrength > 0.05f && heartAudio != null && heartbeatClip != null)
-                    heartAudio.PlayOneShot(heartbeatClip, heartVolume * bandStrength);
-                lastBeatIndex = beatIndex;
-            }
-
             if (vignette != null) vignette.intensity.value = targetVignette * s * pulseA;
             if (chromatic != null) { chromatic.intensity.overrideState = true; chromatic.intensity.value = targetChromatic * s * pulseA; }
             if (grain != null) { grain.intensity.overrideState = true; grain.intensity.value = targetGrain * s; }
@@ -171,12 +158,15 @@ namespace TimeKiller.HealthVfx
                         flashImage.rectTransform.localScale, Vector3.one, 1f - Mathf.Exp(-10f * dt));
             }
 
-            if (breathing != null)
+            // Breathing now belongs to PlayerBreathing, which drives it from fear
+            // rather than only from injury and can hold it while you hide. Two
+            // breath loops running at different rates was the same mistake the
+            // heartbeat made before it was consolidated, so this one stands down
+            // and simply makes sure its old source is not left audible.
+            if (breathing != null && breathing.isPlaying)
             {
-                float step = dt * (config.breathingVolume / Mathf.Max(0.01f, config.breathingFade));
-                breathing.volume = Mathf.MoveTowards(breathing.volume, breathingTarget, step);
-                if (breathing.volume > 0.001f && !breathing.isPlaying) breathing.Play();
-                else if (breathing.volume <= 0.001f && breathing.isPlaying) breathing.Pause();
+                breathing.volume = Mathf.MoveTowards(breathing.volume, 0f, dt);
+                if (breathing.volume <= 0.001f) breathing.Stop();
             }
         }
 

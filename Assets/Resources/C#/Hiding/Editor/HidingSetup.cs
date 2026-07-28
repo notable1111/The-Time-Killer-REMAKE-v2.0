@@ -1,7 +1,9 @@
 // Menu: TimeKiller/Setup/25 - Setup Hiding Spots (wardrobes).
 // Imports the AI-generated wardrobe sprites (approved 2026-07-23: both looks,
 // room-matched), places six wardrobes along north walls across the wing,
-// adds PlayerHiding to the Player and the hidden-view overlay + heartbeat.
+// adds PlayerHiding to the Player and the hidden-view overlay.
+// Safe to re-run: wardrobe placement is preserved once it exists, and the VFX
+// rig is found-or-created in place rather than rebuilt.
 using System.IO;
 using TimeKiller.Player;
 using UnityEditor;
@@ -15,7 +17,6 @@ namespace TimeKiller.Hiding.EditorTools
         const string ConfigPath = "Assets/Resources/C#/Hiding/Configs/HidingConfig.asset";
         const string SpriteFolder = "Assets/Resources/Assets/Hiding";
         const string SlatsPath = "Assets/Resources/Assets/Hiding/hidden_slats.png";
-        const string HeartbeatClipPath = "Assets/Resources/Assets/HealthVfx/heartbeat.wav";
         const string LitMatPath = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Lit-Default.mat";
 
         // (position, style) — style A = flat-top (hall/guard/kitchen),
@@ -114,49 +115,66 @@ namespace TimeKiller.Hiding.EditorTools
             hso.FindProperty("config").objectReferenceValue = config;
             hso.ApplyModifiedPropertiesWithoutUndo();
 
-            // Hidden view overlay + proximity heartbeat.
-            var vfxOld = GameObject.Find("HidingVfx");
-            if (vfxOld != null) Undo.DestroyObjectImmediate(vfxOld);
-            var vfxRoot = new GameObject("HidingVfx");
-            Undo.RegisterCreatedObjectUndo(vfxRoot, "Hiding Vfx");
+            // Hidden view overlay only. The heartbeat you hear in a wardrobe is
+            // PlayerHeartbeat's (Setup/36) — it listens to the same hide events
+            // and boosts itself while hidden, so there is no second AudioSource
+            // here to beat out of phase with it. Setup/37 clears the stale
+            // HiddenHeartbeat child out of scenes built before that split.
+            //
+            // Found-or-created, never destroyed and rebuilt: this method runs on
+            // EVERY re-run of Setup/25, including the placement-preserving path
+            // above, so a rebuild here would quietly discard hand-tuning.
+            var vfxRoot = GameObject.Find("HidingVfx");
+            if (vfxRoot == null)
+            {
+                vfxRoot = new GameObject("HidingVfx");
+                Undo.RegisterCreatedObjectUndo(vfxRoot, "Hiding Vfx");
+            }
 
-            var canvasGo = new GameObject("SlatsCanvas");
-            canvasGo.transform.SetParent(vfxRoot.transform, false);
-            var canvas = canvasGo.AddComponent<Canvas>();
+            var canvasGo = Child(vfxRoot.transform, "SlatsCanvas");
+            var canvas = Ensure<Canvas>(canvasGo);
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 600; // above the blood canvas (500)
-            canvasGo.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            Ensure<CanvasScaler>(canvasGo).uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
 
-            var imageGo = new GameObject("Slats");
-            imageGo.transform.SetParent(canvasGo.transform, false);
-            var rect = imageGo.AddComponent<RectTransform>();
+            var imageGo = Child(canvasGo.transform, "Slats");
+            var rect = imageGo.GetComponent<RectTransform>();
+            if (rect == null) rect = imageGo.AddComponent<RectTransform>();
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
             rect.offsetMin = rect.offsetMax = Vector2.zero;
-            var group = imageGo.AddComponent<CanvasGroup>();
+            var group = Ensure<CanvasGroup>(imageGo);
             group.alpha = 0f;
             group.interactable = false;
             group.blocksRaycasts = false;
-            var image = imageGo.AddComponent<Image>();
+            var image = Ensure<Image>(imageGo);
             image.sprite = ImportSprite(SlatsPath);
             image.raycastTarget = false;
 
-            var audioGo = new GameObject("HiddenHeartbeat");
-            audioGo.transform.SetParent(vfxRoot.transform, false);
-            var heart = audioGo.AddComponent<AudioSource>();
-            heart.playOnAwake = false;
-            heart.spatialBlend = 0f;
-
-            var vfx = vfxRoot.AddComponent<HidingVfx>();
+            var vfx = Ensure<HidingVfx>(vfxRoot);
             var vso = new SerializedObject(vfx);
             vso.FindProperty("config").objectReferenceValue = config;
             vso.FindProperty("overlay").objectReferenceValue = group;
-            vso.FindProperty("heartAudio").objectReferenceValue = heart;
-            vso.FindProperty("heartbeatClip").objectReferenceValue =
-                AssetDatabase.LoadAssetAtPath<AudioClip>(HeartbeatClipPath);
             vso.ApplyModifiedPropertiesWithoutUndo();
 
             UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(vfxRoot.scene);
+        }
+
+        /// Find a direct child by name, or create it. Never destroys.
+        static GameObject Child(Transform parent, string name)
+        {
+            var existing = parent.Find(name);
+            if (existing != null) return existing.gameObject;
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            Undo.RegisterCreatedObjectUndo(go, "Hiding Vfx");
+            return go;
+        }
+
+        static T Ensure<T>(GameObject go) where T : Component
+        {
+            var component = go.GetComponent<T>();
+            return component != null ? component : go.AddComponent<T>();
         }
 
         static Sprite ImportSprite(string path)

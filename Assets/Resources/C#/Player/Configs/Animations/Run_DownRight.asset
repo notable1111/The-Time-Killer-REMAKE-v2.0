@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Run_DownRight
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Core.SpriteAnimationClip
   frames:
-  - {fileID: -2834224170145230926, guid: 49dc850ff2825a04a9a843da4a12eddb, type: 3}
-  - {fileID: 6106190201318187345, guid: 49dc850ff2825a04a9a843da4a12eddb, type: 3}
-  - {fileID: -5558617534224280046, guid: 49dc850ff2825a04a9a843da4a12eddb, type: 3}
-  - {fileID: -410444103488495033, guid: 49dc850ff2825a04a9a843da4a12eddb, type: 3}
-  - {fileID: 5592510779682050489, guid: 49dc850ff2825a04a9a843da4a12eddb, type: 3}
-  - {fileID: 4449449439452633090, guid: 49dc850ff2825a04a9a843da4a12eddb, type: 3}
-  - {fileID: -4747556412948419276, guid: 49dc850ff2825a04a9a843da4a12eddb, type: 3}
-  - {fileID: 2830399519817521637, guid: 49dc850ff2825a04a9a843da4a12eddb, type: 3}
-  framesPerSecond: 24
+  - {fileID: 1391661484976798395, guid: 7ac5cf6f97a60e04c861c0756caf9775, type: 3}
+  - {fileID: -644457405443625197, guid: 7ac5cf6f97a60e04c861c0756caf9775, type: 3}
+  - {fileID: -8507967909617154935, guid: 7ac5cf6f97a60e04c861c0756caf9775, type: 3}
+  - {fileID: -7807337087254605450, guid: 7ac5cf6f97a60e04c861c0756caf9775, type: 3}
+  - {fileID: -6644414368233417650, guid: 7ac5cf6f97a60e04c861c0756caf9775, type: 3}
+  - {fileID: 6132562778344572842, guid: 7ac5cf6f97a60e04c861c0756caf9775, type: 3}
+  - {fileID: 727143188356842230, guid: 7ac5cf6f97a60e04c861c0756caf9775, type: 3}
+  - {fileID: -7073681443947708795, guid: 7ac5cf6f97a60e04c861c0756caf9775, type: 3}
+  framesPerSecond: 14
   loop: 1
-  eventFrames: 0200000006000000
+  eventFrames: 0100000005000000

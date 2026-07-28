@@ -24,7 +24,7 @@ namespace TimeKiller.HealthVfx
         [Range(0f, 1f)] public float subtleOverlayAlpha = 0.35f;
         [Range(0f, 1f)] public float criticalOverlayAlpha = 0.85f;
 
-        [Header("Heartbeat (one clock drives screen AND sound)")]
+        [Header("Screen pulse (visual throb only — the SOUND lives in HeartbeatConfig)")]
         [Tooltip("Beats per minute at 2 HP — an elevated but steady heart.")]
         public float subtleBpm = 74f;
         [Tooltip("BPM at 1 HP — tachycardia, a panicking heart.")]
@@ -32,10 +32,6 @@ namespace TimeKiller.HealthVfx
         [Range(0f, 1f), Tooltip("How much of the effect strength the pulse modulates.")]
         public float subtlePulseDepth = 0.18f;
         [Range(0f, 1f)] public float criticalPulseDepth = 0.35f;
-        [Range(0f, 1f), Tooltip("Lub-dub volume at 2 HP.")]
-        public float subtleHeartVolume = 0.35f;
-        [Range(0f, 1f), Tooltip("Lub-dub volume at 1 HP.")]
-        public float criticalHeartVolume = 0.8f;
 
         [Header("Damage sounds")]
         [Range(0f, 1f)] public float hitSoundVolume = 0.85f;

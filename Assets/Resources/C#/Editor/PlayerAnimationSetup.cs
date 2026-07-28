@@ -63,6 +63,15 @@ namespace TimeKiller.EditorTools
             var directions = System.Enum.GetNames(typeof(FacingDirection));
             set.idle = new SpriteAnimationClip[8];
             set.run = new SpriteAnimationClip[8];
+            // New_Leaf ships no walk or repair art, and these MUST be cleared
+            // rather than left alone. After Setup/33 they hold Survivor clips, and
+            // the set is shared — GetWalk/GetRepair would keep serving those, so
+            // the player would turn into the other character the moment they moved
+            // (walking being the default gait) and again at every clock. Empty
+            // arrays restore the fallback this pack was always built against:
+            // GetWalk borrows the run clip slowed, GetRepair borrows idle.
+            set.walk = new SpriteAnimationClip[8];
+            set.repair = new SpriteAnimationClip[8];
             for (int i = 0; i < 8; i++)
             {
                 set.idle[i] = BuildClip(IdleSheets[i], $"Idle_{directions[i]}", fpsForIdle: true);

@@ -2,6 +2,77 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-07-28 — Four defects in the maniac's arithmetic, and the body that hears him
+
+**The maniac's problems were never in the pathfinding.** All four were in the
+utility weights and in the "he has stopped moving" case, and all four were found
+by replaying the shipped config's own maths rather than by watching him.
+
+| defect | measured | fix |
+|---|---|---|
+| Heard to 9u, only *reacted* within 6.2u (2.0u for a 3s-old noise) | `investigate = 0.8 × recency × (1 − d/9)` could not beat Patrol 0.15 + stickiness 0.10 | `noiseFarWeight` 0.55 — distance biases, never vetoes |
+| Blind past ~4u, and forgot 4× faster than he learned | 6u in shadow needed 9.1s of unbroken exposure; a full meter drained in 1.25s | `sightFalloffPower` 2, drain 0.8→0.35, new `awarenessHoldSeconds` 1.2 |
+| Ignored a footstep 1u away for the first ~5s of a hunt | Search 0.98 vs a point-blank footstep 0.71 | `brainFreshNoiseBoost` 1.6, gated to the hunting window |
+| "Pausing to look around" never moved his eyes | `FacingDirection` is only written from velocity | `SweepCone` on `ManiacStateBase`; Patrol and Investigate now scan |
+
+**`CanSeePlayer` now requires LIVE contact, not a full meter.** The new awareness
+hold would otherwise keep it true through a wall and send `ChaseState` beelining
+into geometry — silently undoing the chase-pathfinding fix from 2026-07-24.
+
+**Suspicion was not suspicion.** At `Awareness >= 0.4` perception called
+`SetNoise(player.position)` *every frame*, handing the AI the player's exact live
+coordinates, and `investigateSpeed` 3.0 outruns the player's walk of 2.2. Being
+half-noticed was identical to being seen, and it could not be escaped. Now he
+commits to a **guess** — offset by `suspicionGuessError`, direction rolled once
+per episode and held, error shrinking to zero as he grows certain — then **stops
+and stares for 1s** before closing at 1.4, below the player's walk. Verified
+error: 2.73/2.75, 1.98/2.00, 0.98/1.00, 0.23/0.25.
+
+**The stare had to stop being latched.** Component update order is undefined, so
+reading `LastNoiseCause` in `Enter()` could see the previous frame and skip the
+hesitation entirely (measured 0.03s against a configured 1.00s). Perception now
+exposes `SuspicionStartedTime` and the state recomputes every frame.
+
+**HealthVfx post-processing had never once run.** `volume.profile` writes a
+runtime-only field — `sharedProfile` is the serialised one — so the assignment
+died on every scene reload, and `VolumeProfile.Add<T>()` without
+`AddObjectToAsset` never wrote the overrides to disk either. Vignette, chromatic
+aberration, grain and desaturation all resolved to null. Both halves fixed, and
+Setup/22 now round-trips the profile through disk and logs an error if it
+reloads empty.
+
+**The player now has a body.** One heartbeat clock and one voice, replacing two
+unsynchronised ones (`HidingVfx` and `HealthVfxDirector` each ran their own).
+Distance drives the rate continuously on a curve; Suspicious and Detected raise
+floors under it; detection ducks the score to 5% via `AudioDucking`, a voluntary
+dial the music respects. It climbs in 0.5s and falls in 4.2s — being safe and
+feeling safe are deliberately different things. Breathing is **exertion, not
+fear**: only an active chase winds you, and when he loses you one normalised
+recovery breath plays while the heart steps back to let it through.
+
+**The heartbeat sounds were synthesised in-house** (free, no licence to track).
+Three measurement-driven revisions: v1 put 97.2% of its energy below 100Hz and
+was inaudible on normal speakers; raising the fundamentals fixed that; a soft
+limiter took it from RMS 0.125 to 0.402 (+10.1 dB perceived). The PSX pack's
+"Deep breath" was 31 dB below the heartbeat and was really five breath cycles,
+so one breath was cut from it and normalised (+19.6 dB).
+
+**First tests in the project.** 20 EditMode tests over `ManiacBrain.Score` and
+the new pure statics on `ManiacPerception` (`RateFor` / `StepAwareness` /
+`GuessErrorFor`), running in 0.65s with no scene, no frames and no physics. Two
+were checked against the pre-fix config and provably fail on it, so they are
+real regression detectors. Also new: **F4 vision-cone overlay** (central,
+peripheral, point-blank ring, and his suspicion guess), `TimeKiller/Verify/Probe
+Maniac Senses`, and `Setup/35` to serialise the 15 detection fields that had
+never been written to `ManiacConfig.asset`.
+
+**Also landed, and NOT yet playtested by the user:** wardrobe search — the maniac
+can open a hiding spot mid-hunt when his belief map is concentrated there
+(`ManiacWardrobeSearch`, `WardrobeSearchConfig`, `Setup/37`), routed through the
+same compromised-spot path as being watched climbing in. This is the other half
+of making hiding matter; it compiles and the suite passes, but it has not been
+played.
+
 ## 2026-07-25 — The run cycle existed all along, and walking was secretly sprinting
 
 **The run animation was never missing — it was never exported.** The 8-direction,

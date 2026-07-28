@@ -1,7 +1,7 @@
-// The inside of the wardrobe: a dark slat overlay closes in (world stays
-// visible through the door crack) and your heartbeat gives away how close he
-// is — BPM and volume scale with the maniac's distance. Presentation only,
-// fully removable.
+// The inside of the wardrobe: a dark slat overlay closes in and the world stays
+// visible through the door crack. The heartbeat you hear in here belongs to
+// PlayerHeartbeat, not to this script — it listens to the same hide events and
+// boosts itself while you are hidden. Presentation only, fully removable.
 using TimeKiller.Core;
 using TimeKiller.Maniac;
 using UnityEngine;
@@ -13,15 +13,11 @@ namespace TimeKiller.Hiding
     {
         [SerializeField] HidingConfig config;
         [SerializeField] CanvasGroup overlay;
-        [SerializeField] AudioSource heartAudio;
-        [SerializeField] AudioClip heartbeatClip;
 
         bool hidden;
         Vector2 spotPosition;
-        float pulsePhase;
-        int lastBeatIndex = -1;
         ManiacController maniac;
-        float liveBpm, liveVolume, liveDistance; // F1 readout for live tuning
+        float liveDistance; // F1 readout for live tuning
 
         public void Init(HidingConfig hidingConfig) => config = hidingConfig;
 
@@ -31,7 +27,7 @@ namespace TimeKiller.Hiding
             EventBus.Subscribe<PlayerHidEvent>(OnHid);
             EventBus.Subscribe<PlayerUnhidEvent>(OnUnhid);
             DebugOverlay.Watch("HideVfx", () => hidden
-                ? $"dist {liveDistance:0.0}/{(config != null ? config.heartbeatRange : 0f):0.0} bpm {liveBpm:0} vol {liveVolume:0.00} slat {overlay.alpha:0.00}"
+                ? $"hidden — maniac {liveDistance:0.0}u, slat {overlay.alpha:0.00} (heart: see Heart)"
                 : "not hidden");
         }
 
@@ -51,28 +47,16 @@ namespace TimeKiller.Hiding
             float step = Time.deltaTime / Mathf.Max(0.05f, config.overlayFade);
             overlay.alpha = Mathf.MoveTowards(overlay.alpha, hidden ? config.overlayAlpha : 0f, step * config.overlayAlpha);
 
-            if (!hidden || heartAudio == null || heartbeatClip == null) return;
-
-            if (maniac == null)
+            // The heartbeat used to live here, on its own clock and its own
+            // AudioSource. PlayerHeartbeat owns it now — it hears the same hide
+            // events and already boosts volume while hidden — so this keeps only
+            // the slat overlay. Two hearts beating out of phase was the bug.
+            if (!hidden || maniac == null)
             {
-                maniac = Object.FindAnyObjectByType<ManiacController>();
-                if (maniac == null) return;
+                if (maniac == null) maniac = Object.FindAnyObjectByType<ManiacController>();
+                return;
             }
-
-            // Closer maniac -> faster, louder heart. One clock, thumps on the beat.
-            float distance = Vector2.Distance(spotPosition, maniac.Motor.Position);
-            float closeness = 1f - Mathf.Clamp01(distance / Mathf.Max(0.1f, config.heartbeatRange));
-            float bpm = Mathf.Lerp(config.farBpm, config.nearBpm, closeness);
-            float volume = config.heartbeatMaxVolume * Mathf.Max(0.15f, closeness);
-            liveBpm = bpm; liveVolume = volume; liveDistance = distance;
-
-            pulsePhase += (bpm / 60f) * Time.deltaTime;
-            int beatIndex = Mathf.FloorToInt(pulsePhase + 0.5f);
-            if (beatIndex != lastBeatIndex)
-            {
-                if (lastBeatIndex >= 0) heartAudio.PlayOneShot(heartbeatClip, volume);
-                lastBeatIndex = beatIndex;
-            }
+            liveDistance = Vector2.Distance(spotPosition, maniac.Motor.Position);
         }
     }
 }

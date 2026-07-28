@@ -188,5 +188,18 @@ namespace TimeKiller.Maniac
         }
 
         void OnPlayerUnhid(TimeKiller.Hiding.PlayerUnhidEvent evt) => CompromisedSpot = null;
+
+        /// He has FOUND the player by opening a wardrobe mid-hunt (SearchState +
+        /// ManiacWardrobeSearch), rather than by watching them climb in.
+        ///
+        /// Deliberately routed through the same compromised-spot path as
+        /// OnPlayerHid: there is one way to be caught in a wardrobe, not two that
+        /// can drift apart in tuning. ChaseState already knows how to march on a
+        /// known spot and swing regardless of sight.
+        public void CompromiseSpot(Vector2 spotPosition)
+        {
+            CompromisedSpot = spotPosition;
+            ChangeState(Chase);
+        }
     }
 }

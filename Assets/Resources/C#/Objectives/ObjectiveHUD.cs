@@ -10,26 +10,59 @@ namespace TimeKiller.Objectives
     {
         [SerializeField] ClockRepair repair;
 
+        // OnGUI runs at least twice a frame (Layout + Repaint) and again for every
+        // input event, so ANYTHING allocated in here is allocated several times per
+        // frame. Styles and the counter string are therefore built once and reused;
+        // they can only be created inside OnGUI because GUI.skin is null outside it.
+        GUIStyle counterStyle;
+        GUIStyle repairLabelStyle;
+        string counterText;
+        int counterFixed = -1, counterTotal = -1;
+        bool counterAllFixed;
+
+        static readonly Color CounterDone = new Color(0.5f, 1f, 0.5f);
+
+        void EnsureStyles()
+        {
+            if (counterStyle != null) return;
+            counterStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 22,
+                alignment = TextAnchor.UpperCenter,
+                fontStyle = FontStyle.Bold,
+            };
+            repairLabelStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 13,
+                alignment = TextAnchor.MiddleCenter,
+            };
+            repairLabelStyle.normal.textColor = Color.white;
+        }
+
         void OnGUI()
         {
             // The run is over — get out of the end screen's way.
             var flow = GameFlow.Instance;
             if (flow != null && flow.Phase != RunPhase.Playing) return;
 
+            EnsureStyles();
+
             var mgr = ObjectiveManager.Instance;
             if (mgr != null)
             {
-                var style = new GUIStyle(GUI.skin.label)
+                // Rebuild the string only when the count actually changes — a few
+                // times a run, instead of a few times a frame.
+                if (mgr.FixedCount != counterFixed || mgr.Total != counterTotal || mgr.AllFixed != counterAllFixed)
                 {
-                    fontSize = 22,
-                    alignment = TextAnchor.UpperCenter,
-                    fontStyle = FontStyle.Bold,
-                };
-                style.normal.textColor = mgr.AllFixed ? new Color(0.5f, 1f, 0.5f) : Color.white;
-                string txt = mgr.AllFixed
-                    ? $"CLOCKS {mgr.FixedCount}/{mgr.Total} — RUN TO THE EXIT"
-                    : $"CLOCKS  {mgr.FixedCount} / {mgr.Total}";
-                GUI.Label(new Rect(0, 12, Screen.width, 34), txt, style);
+                    counterFixed = mgr.FixedCount;
+                    counterTotal = mgr.Total;
+                    counterAllFixed = mgr.AllFixed;
+                    counterText = counterAllFixed
+                        ? $"CLOCKS {counterFixed}/{counterTotal} — RUN TO THE EXIT"
+                        : $"CLOCKS  {counterFixed} / {counterTotal}";
+                }
+                counterStyle.normal.textColor = counterAllFixed ? CounterDone : Color.white;
+                GUI.Label(new Rect(0, 12, Screen.width, 34), counterText, counterStyle);
             }
 
             if (repair != null && repair.Repairing && repair.Active != null)
@@ -59,9 +92,7 @@ namespace TimeKiller.Objectives
             GUI.color = Color.white;
             GUI.DrawTexture(new Rect(x + r.Marker * w - 1.5f, y - 4, 3, h + 8), Texture2D.whiteTexture);
 
-            var lab = new GUIStyle(GUI.skin.label) { fontSize = 13, alignment = TextAnchor.MiddleCenter };
-            lab.normal.textColor = Color.white;
-            GUI.Label(new Rect(x, y + h + 2, w, 20), "SPACE when the marker hits green", lab);
+            GUI.Label(new Rect(x, y + h + 2, w, 20), "SPACE when the marker hits green", repairLabelStyle);
         }
     }
 }

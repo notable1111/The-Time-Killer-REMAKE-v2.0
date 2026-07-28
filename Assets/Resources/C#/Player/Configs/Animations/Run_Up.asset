@@ -13,14 +13,10 @@ MonoBehaviour:
   m_Name: Run_Up
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Core.SpriteAnimationClip
   frames:
-  - {fileID: -1804420430984713983, guid: 5dacd91ff3d694f43b5e3743d7cb00a9, type: 3}
-  - {fileID: 8300423291277962566, guid: 5dacd91ff3d694f43b5e3743d7cb00a9, type: 3}
-  - {fileID: -4112690532553999560, guid: 5dacd91ff3d694f43b5e3743d7cb00a9, type: 3}
-  - {fileID: -4474121566659370341, guid: 5dacd91ff3d694f43b5e3743d7cb00a9, type: 3}
-  - {fileID: 8368437426027892590, guid: 5dacd91ff3d694f43b5e3743d7cb00a9, type: 3}
-  - {fileID: 2897885913479808278, guid: 5dacd91ff3d694f43b5e3743d7cb00a9, type: 3}
-  - {fileID: -4413255026004462502, guid: 5dacd91ff3d694f43b5e3743d7cb00a9, type: 3}
-  - {fileID: 1076074126761369879, guid: 5dacd91ff3d694f43b5e3743d7cb00a9, type: 3}
-  framesPerSecond: 24
+  - {fileID: -751568226057386589, guid: 47658a75e9963f24da2de30f6e8178f2, type: 3}
+  - {fileID: -4103686907187281045, guid: 47658a75e9963f24da2de30f6e8178f2, type: 3}
+  - {fileID: 3233855083779840962, guid: 47658a75e9963f24da2de30f6e8178f2, type: 3}
+  - {fileID: -5819087191749161283, guid: 47658a75e9963f24da2de30f6e8178f2, type: 3}
+  framesPerSecond: 7
   loop: 1
-  eventFrames: 0200000006000000
+  eventFrames: 0100000003000000

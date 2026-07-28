@@ -31,14 +31,18 @@ namespace TimeKiller.Maniac
         public float proximityRange = 1.9f;
         [Tooltip("Layers that block line of sight (walls).")]
         public LayerMask sightBlockers = ~0;
+        [Tooltip("How sharply detection weakens with distance. 1 = linear to zero at sightRange, which left everything past ~4u effectively invisible. 2 = strong through the mid range, falling off only near the edge of his vision.")]
+        public float sightFalloffPower = 2f;
 
         [Header("Detection — awareness stealth model (hard but fair)")]
         [Tooltip("Seeing is NOT instant: an awareness meter (0..1) fills while you're exposed and drains when he loses you. Crossing 'suspicion' makes him investigate; reaching 1 = fully spotted -> Chase.")]
         [Range(0f, 1f)] public float suspicionThreshold = 0.4f;
         [Tooltip("Base awareness gained per second under IDEAL exposure (central vision, close, lit, moving). Higher = spotted faster.")]
         public float awarenessFillRate = 2.6f;
-        [Tooltip("Awareness lost per second when he can't sense you (out of range / behind cover / hidden). Higher = forgets faster.")]
-        public float awarenessDrainRate = 0.8f;
+        [Tooltip("Awareness lost per second when he can't sense you (out of range / behind cover / hidden). Must stay BELOW the effective fill rate, or ducking behind one pillar erases everything he'd built up.")]
+        public float awarenessDrainRate = 0.35f;
+        [Tooltip("Grace period: after losing you he HOLDS his current awareness this long before it starts draining. This is the 'he's onto you' beat — stepping behind cover for a moment no longer resets him to oblivious.")]
+        public float awarenessHoldSeconds = 1.2f;
         [Tooltip("Central vision cone (deg): full-strength detection inside this.")]
         public float centralConeAngle = 100f;
         [Tooltip("Peripheral vision cone (deg): 'corner of his eye' — only up close (peripheralRange) and at reduced strength (peripheralWeight). Motion here makes him turn and check.")]
@@ -59,6 +63,14 @@ namespace TimeKiller.Maniac
         public float exposureFloor = 0.2f;
         [Tooltip("Ambient light everywhere (before torches). Keeps open areas a bit exposed even away from a torch.")]
         [Range(0f, 1f)] public float ambientExposure = 0.12f;
+
+        [Header("Suspicion — the \"did he see me?\" beat")]
+        [Tooltip("How far off his GUESS is when suspicion first crosses the threshold. Suspicion used to hand him the player's exact live position every frame, which made being half-noticed identical to being seen. The error shrinks to zero as awareness climbs toward 1, so his estimate converges as he grows certain.")]
+        public float suspicionGuessError = 3f;
+        [Tooltip("Seconds he STOPS and stares at his guess before moving on it. This is the tell — footsteps stopping dead — and the window the player uses to back away.")]
+        public float suspicionHoldSeconds = 1f;
+        [Tooltip("Speed of the suspicious approach. Deliberately BELOW the player's walk (2.2) so retreating is a real option; a plain heard noise still uses the faster investigateSpeed.")]
+        public float suspiciousApproachSpeed = 1.4f;
 
         [Header("Search (the lost-sight hunt — replaces the abrupt give-up)")]
         [Tooltip("Speed while sweeping for you after losing sight — alert, between patrol and investigate.")]
@@ -109,6 +121,10 @@ namespace TimeKiller.Maniac
         public float brainNoiseWeight = 0.8f;
         [Tooltip("Seconds over which a heard noise loses its pull.")]
         public float brainNoiseMemory = 5f;
+        [Tooltip("Pull of a noise heard at the very EDGE of hearingRadius, relative to one at his feet. A sound only reaches him at all if it was in range, so distance must bias his interest, not veto it — at 0 the far two-thirds of his hearing did nothing at all.")]
+        [Range(0f, 1f)] public float noiseFarWeight = 0.55f;
+        [Tooltip("Multiplier on Investigate when a noise arrives that is NEWER than his last sighting, while he's mid-hunt. New information should outrank a belief map that's pointing at where you WERE — without this he ignores footsteps a metre away for the first 5s of a search.")]
+        public float brainFreshNoiseBoost = 1.6f;
         [Tooltip("Bonus added to whatever he's currently doing — stops rapid flip-flopping between behaviors.")]
         public float brainStickiness = 0.1f;
 
@@ -117,6 +133,10 @@ namespace TimeKiller.Maniac
         public float waypointTolerance = 0.4f;
         [Tooltip("Idle pause at each waypoint (looking around).")]
         public float waypointPauseSeconds = 1.2f;
+        [Tooltip("Degrees he sweeps his sight cone during that pause. A stopped maniac keeps whatever facing his last step gave him, so without this the 'look around' pause pointed his eyes at a wall the whole time.")]
+        public float patrolScanAngle = 100f;
+        [Tooltip("How fast the patrol pause sweeps — slower than the search sweep; he's calm, not hunting.")]
+        public float patrolScanSpeed = 1.1f;
         [Tooltip("Anti-stuck: if he can't reach a waypoint within this many seconds (wedged on a pillar/corner), he gives up and moves to the next. Patrol must never hang.")]
         public float patrolWaypointTimeout = 5f;
     }

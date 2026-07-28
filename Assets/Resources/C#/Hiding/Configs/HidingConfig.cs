@@ -1,6 +1,9 @@
 // Tunables for the hiding system (interview 2026-07-23): E to enter/exit,
 // the Outlast rule (seen entering = the spot is compromised), darkened view
-// + proximity heartbeat while hidden.
+// while hidden.
+// The heartbeat knobs that used to live here moved to HeartbeatConfig when the
+// audio got a single owner — hiding no longer has a heart of its own, it just
+// raises the one PlayerHeartbeat already runs.
 // Asset: C#/Hiding/Configs/HidingConfig.asset.
 using UnityEngine;
 
@@ -24,14 +27,5 @@ namespace TimeKiller.Hiding
         public float overlayAlpha = 0.82f;
         [Range(0.05f, 1.5f), Tooltip("Seconds for the hide/unhide overlay fade.")]
         public float overlayFade = 0.35f;
-
-        [Header("Proximity heartbeat (hidden only)")]
-        [Range(3f, 25f), Tooltip("Distance at which the hidden heartbeat starts being audible.")]
-        public float heartbeatRange = 10f;
-        [Range(40f, 100f), Tooltip("BPM when he's at the edge of range.")]
-        public float farBpm = 60f;
-        [Range(80f, 200f), Tooltip("BPM when he's on top of the wardrobe.")]
-        public float nearBpm = 140f;
-        [Range(0f, 1f)] public float heartbeatMaxVolume = 0.85f;
     }
 }

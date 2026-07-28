@@ -16,6 +16,7 @@ How the systems of The Time Killer Remake connect. Update this file whenever a s
 ### Core (`C#/Core/`, namespace `TimeKiller.Core`)
 - **GameBootstrap** — runs before the first scene loads (`RuntimeInitializeOnLoadMethod`), clears static state, spawns the persistent `[TimeKillerCore]` object. No scene setup needed — the game boots itself.
 - **EventBus** — static typed publish/subscribe (`EventBus.Publish(new SomeEvent{...})`). The only sanctioned way for systems to talk across features.
+- **AudioDucking** — a single shared dial (`World`, 0..1) that the *atmospheric* audio voluntarily multiplies into its own volume. There is no mixer to pull down, and `AudioListener.volume` is useless here because it would take the heartbeat with it. `PlayerHeartbeat` writes it; `AudioDirector` reads it. Voluntary on purpose: footsteps deliberately opt out, because muting the feedback you steer by reads as a bug rather than as tension, and if the writer is deleted the dial simply stays at 1.
 - **ServiceLocator** — registry for long-lived services (`Register<T>` / `Get<T>`).
 - **StateMachine + IState** — reusable state machine driven by `Tick`/`FixedTick`.
 - **GameFlow** — the shape of one run: `RunPhase{Playing,Won,Lost}`, the run timer, the `Time.timeScale` freeze on the ending beat, **R** to restart (full scene reload — the only reset that can't leak stale state) and **Esc** to quit. Knows nothing about clocks or maniacs: features end a run by publishing `RunEndedEvent{Won, Headline}`, and an optional `GameFlow.ProvideSummary(Func<string>)` hook lends the end screen a one-line objective summary. Scene object built by `Setup/29`, which also registers the scene in Build Settings (restart is a `LoadScene`).
@@ -101,11 +102,20 @@ Obstacle-aware movement so the maniac routes around walls/pillars instead of gri
 
 ### Health VFX (`C#/HealthVfx/`, namespace `TimeKiller.HealthVfx`)
 Diegetic health — no HP bar, the screen is the health bar (design 2026-07-22). Bands on 3 HP: **3 = clean · 2 = subtle red heartbeat vignette · 1 = heavy blood + panicked breathing = "next hit kills"**, plus a splatter flash on every hit.
-- **HealthVfxDirector** — subscribes `PlayerHealthChangedEvent`/`PlayerHitEvent`/`PlayerDiedEvent` only (knows nothing about player/maniac; delete the object and the game runs unchanged). One BPM phase clock (74 at 2 HP, 118 at 1 HP) drives EVERYTHING in sync: URP Vignette + Chromatic Aberration (|sin|³ systole modulation), dual counter-pulsing blood layers with scale-breath, film grain + desaturation ramps, and the lub-dub SFX fired on the exact visual systole frame. Hits: splatter flash (scale punch) + Cinemachine impulse shake + pitch-jittered blood-splash SFX; death: impact sting; critical: breathing loop fade.
-- **HealthVfxConfig** (SO) — band thresholds, per-band vignette/overlay/chromatic/grain/desat, BPM + pulse depths + heart volumes, hit/death SFX levels, shake/punch, fades. Asset: `C#/HealthVfx/Configs/`.
+- **HealthVfxDirector** — subscribes `PlayerHealthChangedEvent`/`PlayerHitEvent`/`PlayerDiedEvent` only (knows nothing about player/maniac; delete the object and the game runs unchanged). One BPM phase clock (74 at 2 HP, 118 at 1 HP) drives every VISUAL in sync: URP Vignette + Chromatic Aberration (|sin|³ systole modulation), dual counter-pulsing blood layers with scale-breath, film grain + desaturation ramps. The audible lub-dub is **not** here — `PlayerHeartbeat` owns it and folds injury into one intensity (see Heartbeat). Hits: splatter flash (scale punch) + Cinemachine impulse shake + pitch-jittered blood-splash SFX; death: impact sting; critical: breathing loop fade.
+- **HealthVfxConfig** (SO) — band thresholds, per-band vignette/overlay/chromatic/grain/desat, screen-pulse BPM + pulse depths, hit/death SFX levels, shake/punch, fades. Asset: `C#/HealthVfx/Configs/`. (Heart *volumes* live in `HeartbeatConfig` now.)
 - Assets: OpenGameArt CC0 blood overlays reprocessed by `Tools/VfxPipeline/process_blood.py` (radial edge mask, two-tone crimson); heartbeat synthesized by `Tools/VfxPipeline/gen_heartbeat.py` (S1/S2 physiological model, license-free); breathing/splash/impact from the PSX SFX pack.
-- Setup: menu `TimeKiller/Setup/22` (also run by Setup/18). Dev cheat: **F7 = take 1 hit** (respects i-frames).
+- Setup: menu `TimeKiller/Setup/22` (also run by Setup/18) — **re-runnable**: every object is found-or-created and re-wired in place, never destroyed and rebuilt, so it cannot discard hand-tuning. Dev cheat: **F7 = take 1 hit** (respects i-frames).
 - Camera note: `CameraConfig.lookAheadDistance` set to **0** (user decision 2026-07-22) — player stays dead-center; the look-ahead system remains available via the slider.
+
+### Heartbeat (`C#/Heartbeat/`, namespace `TimeKiller.Heartbeat`) — one clock, one voice
+The audible heartbeat has a **single owner**. It used to have two: HidingVfx ran a distance-driven heart inside wardrobes and HealthVfxDirector ran a separate one at low health, each with its own AudioSource and its own phase — so being hurt *inside* a wardrobe played two unsynchronised hearts at once.
+- **PlayerHeartbeat** — a `PlayerHeartbeat` child of the Player with its own 2D AudioSource. **The heart answers exactly one question: how close is he?** Distance drives the rate continuously on a curve (`distanceCurve` 2.2 — the panic is in the *change* of rate, which a straight line never delivers); Suspicious and Detected raise **floors** under that, never additions, because two things stacking would run off the top and make the loud end meaningless. Sprinting and injury floors were tried and **removed** (2026-07-28): both made the heart pound with the maniac nowhere near, which is precisely what turns it into background noise — exertion is the lungs' job. Rises in 0.5s, falls in 4.2s, because being safe and *feeling* safe are different things. Silent below `silenceBelow`. Pitch rises to `pitchAtMax` as it races; `irregularity` keeps it off the grid; `hiddenBoost` while hidden. One immediate **lurch** beat fires the instant he detects you. `Soften()` lets the recovery breath through. Exposes `Intensity`/`Bpm`/`BeatThisFrame`/`BeatCount`. Removable. F1 line `Heart`.
+- **PlayerBreathing** — the other half of the body, and deliberately **decoupled from fear**: only an **active chase** winds you, over `secondsToWinded`, recovering over the longer `secondsToRecover`. Ordinary running was tried as a trigger and rejected — the player runs almost constantly, which made breathing a permanent bed nobody heard. When he loses you, one **recovery breath** plays and the heart softens underneath it so the exhale is audible; gated on `recoveryNeedsExertion` so a two-second scare cannot earn it. Holds your breath while hidden and hunted. Exposes `Exertion`/`Holding`/`RecoveryBreathCount`. F1 line `Breath`.
+- **HeartbeatConfig / BreathingConfig** (SO) — assets in `C#/Heartbeat/Configs/`. Heart: rate curve + state floors, rise/fall, volume + silence floor + quiet floor, pitch, ducking. Breath: winding/recovery seconds, volumes, pitches, recovery-breath gate and heart-soften.
+- **Audio assets** are synthesised in-house (`Assets/Assets/Heartbeat/`) and measured, not eyeballed: the beat must decay inside the fastest beat interval (265ms clip vs a 375ms interval at `nearBpm`), and must carry real energy **above 100Hz** or it is inaudible on laptop speakers regardless of volume — v1 sat 97% below 100Hz and could not be heard at all.
+- The other two systems keep only their **visuals**: HealthVfxDirector still runs a screen-pulse clock, HidingVfx still runs the slat overlay. Neither has an AudioSource field any more.
+- Setup: menu `TimeKiller/Setup/36`. **`TimeKiller/Setup/37`** is the one-off janitor that removes the now-orphaned `HealthVfx/Heartbeat` and `HidingVfx/HiddenHeartbeat` objects from scenes built before the split — it only deletes a childless object carrying nothing but a Transform + idle AudioSource, and re-running it after a clean run is a no-op.
 
 ### Effects (`C#/Effects/`, namespace `TimeKiller.Effects`) — the "Feel-lite" juice system
 One juice moment = ONE asset. `EffectPlayer.Play(recipe, worldPos)` fires a full impact package; adding a new effect to the game = creating a recipe asset, zero new code.
@@ -122,15 +132,15 @@ The music IS the threat detector (interview 2026-07-23). One layer at a time, cr
 - Tracks: PSX Horror Music pack (royalty-free, credited). Setup: menu `TimeKiller/Setup/24` (also run by Setup/18).
 
 ### Hiding (`C#/Hiding/`, namespace `TimeKiller.Hiding`) — the last verb of hide & run
-Design (interview 2026-07-23): **E** to enter/exit a wardrobe; **the Outlast rule** — hiding only works if he didn't see you enter; darkened slat view + proximity heartbeat while hidden.
+Design (interview 2026-07-23): **E** to enter/exit a wardrobe; **the Outlast rule** — hiding only works if he didn't see you enter; darkened slat view while hidden (the heartbeat you hear in there belongs to `PlayerHeartbeat`, which boosts itself while you are hidden).
 - **HidingSpot** — one wardrobe: occupied flag + closed/ajar sprite swap (ajar while empty — an invitation; shut while you're inside).
 - **PlayerHiding** (+ its `HidingState` for the player state machine) — E near a free spot parks the player at it: invisible, intangible, motionless; E again (or a landed hit — the drag-out) exits at the entry position. Publishes `PlayerHidEvent` / `PlayerUnhidEvent`.
 - **Maniac side:** `ManiacPerception.PlayerHidden` blinds sight while hidden; `ManiacController.CompromisedSpot` — if he had eyes on the player within `seenEnterWindow` (ManiacConfig, 1.25s) before they hid, he marches to the spot and drags a hit out (ChaseState/AttackState ignore sight rules for a compromised spot).
-- **HidingVfx** — screen-space slat overlay (self-made texture, door-crack slit in the middle) + proximity heartbeat: BPM 60→140 and volume scale with the maniac's distance to the wardrobe. Presentation only. F1 overlay line `HideVfx` shows live dist/BPM/volume/slat for tuning.
-- **HidingConfig** (SO) — interact range, overlay alpha/fade, heartbeat range/BPM/volume. All fields are `[Range]` sliders read live every frame — tune in Play Mode (SO edits persist). interactRange raised to 2.2 (2026-07-23): it measures to the sprite CENTER, and 1.8 was borderline at the wardrobe's foot.
+- **HidingVfx** — screen-space slat overlay only (self-made texture, door-crack slit in the middle). Presentation only. F1 overlay line `HideVfx` shows the maniac's live distance + slat alpha; the heart it used to own is now `PlayerHeartbeat`'s (F1 line `Heart`).
+- **HidingConfig** (SO) — interact range, overlay alpha/fade. All fields are `[Range]` sliders read live every frame — tune in Play Mode (SO edits persist). interactRange raised to 2.2 (2026-07-23): it measures to the sprite CENTER, and 1.8 was borderline at the wardrobe's foot. The heartbeat knobs moved to `HeartbeatConfig` when the audio got a single owner.
 - Art: AI-generated wardrobes (approved 2026-07-23) — style A flat-top (hall/guardroom/kitchen), style B gothic crown (chapel/great chamber/library), closed+ajar states each, in `Assets/Resources/Assets/Hiding/`. Seven spots: six original + armory (Setup/27, additive — refuses to run if the armory already has one).
 - Fix that rode along: `PlayerAnimationDriver.IsMovingState` is now an explicit Walk/Run list — unknown states (Hiding) no longer play run-clip frame events that would publish phantom footstep noise.
-- Setup: menu `TimeKiller/Setup/25` (also run by Setup/18).
+- Setup: menu `TimeKiller/Setup/25` (also run by Setup/18) — **re-runnable**: wardrobe placement is preserved once `HidingSpots` exists, and the VFX rig is found-or-created in place rather than rebuilt (it used to be destroyed and remade on every run, including the placement-preserving path).
 
 ### Objectives (`C#/Objectives/`, namespace `TimeKiller.Objectives`) — the win condition
 The core loop (design 2026-07-24, DbD-inspired): **fix 3 clocks → the exit gate unlocks → escape**. Removable — delete the `Clocks` object and the game still runs.
@@ -192,6 +202,35 @@ The generator writes three things and refuses to write any of them if BFS from t
 
 **Verification:** `Setup/32` audits the open scene. Note that the Collision layer's `CompositeCollider2D` uses `geometryType = Outlines`, i.e. EDGE colliders with no fill — asking "is this rock cell solid?" with a point query always returns nothing, and is the wrong question. The audit instead replicates `WalkabilityGrid` (0.5 spacing, integer-aligned nodes, 0.9 clearance, blocked = non-trigger hit on a null/Static body), floods from the spawn, and asserts the reachable set is exactly the walkable region: no leak out, nothing unreachable. It runs map integrity with props ignored (a solid clock legitimately makes its own cell unwalkable) and then separately checks no room is walled off by props.
 
+
+### Tests (`C#/Testing/Editor/`, namespace `TimeKiller.Tests`)
+EditMode tests via Unity Test Framework. No asmdef — they live in the predefined
+editor assembly, which already references NUnit, so they are discovered with zero
+setup. `Window > General > Test Runner > EditMode`. 20 tests, 0.65s.
+
+**The rule that makes them trustworthy: only pure functions.** No scene, no
+frames, no physics, no lighting, no MCP round-trip — so the failure modes that
+plagued the play-mode probe (a teleport read as "running" and applying the wrong
+detection multiplier; the level's torches confounding a distance measurement; a
+death freezing `timeScale` and hanging the run) are structurally impossible here.
+Exposure and speed are *arguments*.
+
+- `ManiacBrainTests` — over `ManiacBrain.Score`. Split deliberately into
+  **invariants** (fresh config: nothing may ever outrank a live chase; the
+  breadcrumb grace window is protected; patrol is the floor when nothing is
+  happening) and **shipped-config** guards that read `ManiacConfig.asset` and are
+  *meant* to fail if someone detunes the game.
+- `ManiacPerceptionTests` — over the pure statics `RateFor` / `StepAwareness` /
+  `GuessErrorFor`. Pins the falloff curve as monotonic *and* usable, the blind
+  spot behind him, point-blank ignoring facing, the awareness hold, the guess
+  sharpening with certainty, and that he cannot outrun the player at a walk
+  (this one reads `PlayerMovementConfig` too, so it breaks if either side moves).
+- Two guards were checked against the pre-fix config and provably fail on it —
+  a suite that only ever passes is decoration.
+- **Not covered here:** the 1s stare, the cone sweep, state transitions. Those
+  need real frames, and that is where the one real bug of the pass actually lived
+  (`Enter()` latching perception state). Until a PlayMode suite exists they are
+  covered only by `TimeKiller/Verify/Probe Maniac Senses`.
 
 ## Planned
 

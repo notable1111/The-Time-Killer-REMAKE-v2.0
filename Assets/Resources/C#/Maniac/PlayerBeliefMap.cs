@@ -141,6 +141,31 @@ namespace TimeKiller.Maniac
             return BestTarget(out world, minMass); // nothing far enough — take the global best
         }
 
+        /// Belief sitting within `radius` of a world point.
+        ///
+        /// Used to ask "does he think the player came THIS way?" about a specific
+        /// place — a wardrobe. Deliberately samples the area AROUND the point
+        /// rather than the point itself: a wardrobe has a collider, so its own
+        /// cell is never walkable and can never carry belief. What decides whether
+        /// he opens the door is how much probability has flowed into the floor
+        /// around it. Returned unnormalised against the map's own total, which is
+        /// 1 — so callers can treat it as a plain fraction.
+        public float MassNear(Vector2 world, float radius)
+        {
+            var c = WorldToCell(world);
+            int r = Mathf.Max(1, Mathf.CeilToInt(radius / cell));
+            float radiusSq = radius * radius;
+            float sum = 0f;
+            for (int y = c.y - r; y <= c.y + r; y++)
+                for (int x = c.x - r; x <= c.x + r; x++)
+                {
+                    if (!In(x, y)) continue;
+                    if ((CellCenter(x, y) - world).sqrMagnitude > radiusSq) continue;
+                    sum += prob[y * cols + x];
+                }
+            return sum;
+        }
+
         public float TotalMass()
         {
             float m = 0f;

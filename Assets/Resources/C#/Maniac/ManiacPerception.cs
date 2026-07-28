@@ -5,15 +5,24 @@
 // distance, how centered they are in his vision (central cone strong, peripheral
 // weak and close-only), how LIT they are (torchlight exposes, shadow hides), and
 // whether they're MOVING (running spots fast, standing still is a real hiding
-// tool). That rate fills an Awareness meter (0..1); it drains when he loses you.
-//   Awareness >= suspicionThreshold -> he INVESTIGATES your rough position (turns,
-//     comes to check — the "did he see me?" beat).
-//   Awareness >= 1                    -> fully SPOTTED: CanSeePlayer -> Chase.
+// tool). That rate fills an Awareness meter (0..1). When contact breaks the meter
+// HOLDS for awarenessHoldSeconds before draining, so he stays onto you across a
+// pillar instead of forgetting far faster than he could ever learn.
+//   Awareness >= suspicionThreshold -> he INVESTIGATES a GUESS at your position.
+//     Deliberately not your real one: the guess is offset by suspicionGuessError
+//     in a direction drawn once per episode, and that error shrinks to nothing as
+//     awareness climbs. Handing him your exact live coordinates (as this used to)
+//     made being half-noticed identical to being seen, so nothing was ever at
+//     stake in the doubt — he could not check the wrong side of a pillar.
+//   Awareness >= 1 AND sensing NOW    -> fully SPOTTED: CanSeePlayer -> Chase.
+//     CanSeePlayer requires LIVE contact, not merely a full meter: ChaseState
+//     reads it as "line of sight is clear" and beelines while it is true.
 // Walls block sight (linecast); a wardrobe hides you outright.
 //
 // HEARING is unchanged: footstep/world noises within loudness*hearingRadius set
 // the noise fields that drive Investigate. States read the flags; this component
 // never drives movement itself.
+using System.Collections.Generic;
 using TimeKiller.Core;
 using TimeKiller.Hiding;
 using TimeKiller.Player;
@@ -32,6 +41,15 @@ namespace TimeKiller.Maniac
         Vector2 prevPlayerPos;
         float playerSpeed;
         bool havePrev;
+        float senseLostTime = float.NegativeInfinity;  // when contact broke, for the awareness hold
+        Vector2 guessDirection = Vector2.right;        // this episode's error direction
+        TimeKiller.Navigation.ManiacNavigator nav;     // optional — only to keep guesses standable
+
+        // Sight is tested every frame for the whole run, so the hit buffer and the
+        // filter are built once. Physics2D.LinecastAll would hand back a freshly
+        // allocated array on each of those calls.
+        readonly List<RaycastHit2D> sightHits = new List<RaycastHit2D>(8);
+        ContactFilter2D sightFilter;
 
         /// True while the player is inside a hiding spot — sight can't find them.
         public bool PlayerHidden { get; private set; }
@@ -71,11 +89,26 @@ namespace TimeKiller.Maniac
         public bool HasUnhandledNoise { get; private set; }
         public Vector2 LastNoisePosition { get; private set; }
         public float LastNoiseTime { get; private set; } = float.NegativeInfinity;
+        /// Why the current noise exists. InvestigateState reads this to tell a
+        /// heard footstep (walk straight over) from a suspicion (stop, stare,
+        /// then close slowly on a spot he is not sure about).
+        public NoiseCause LastNoiseCause { get; private set; } = NoiseCause.Sound;
+
+        /// When the current suspicion episode began. The stare belongs to the
+        /// EPISODE, not to a state entry: component update order is undefined, so
+        /// a state that latched "is this a suspicion?" in Enter could read the
+        /// previous frame's cause and skip the hesitation entirely.
+        public float SuspicionStartedTime { get; private set; } = float.NegativeInfinity;
         public Vector2 FacingDirection { get; set; } = Vector2.down; // set by controller from velocity
 
         public void Init(ManiacConfig maniacConfig)
         {
             config = maniacConfig;
+            // useTriggers false does what the old per-hit isTrigger skip did, in the
+            // physics query itself; SetLayerMask also turns useLayerMask on.
+            sightFilter = new ContactFilter2D { useTriggers = false };
+            sightFilter.SetLayerMask(config.sightBlockers);
+            nav = GetComponent<TimeKiller.Navigation.ManiacNavigator>();
             lights = Object.FindObjectsByType<Light2D>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             EventBus.Subscribe<PlayerFootstepEvent>(OnFootstep);
             EventBus.Subscribe<PlayerHidEvent>(OnPlayerHid);
@@ -119,7 +152,7 @@ namespace TimeKiller.Maniac
         // A discrete noise (footstep, gate) — sets the noise fields AND announces it.
         void HearNoise(Vector2 position)
         {
-            SetNoise(position);
+            SetNoise(position, NoiseCause.Sound);
             EventBus.Publish(new ManiacHeardNoiseEvent
             {
                 NoisePosition = position,
@@ -127,11 +160,38 @@ namespace TimeKiller.Maniac
             });
         }
 
-        void SetNoise(Vector2 position)
+        void SetNoise(Vector2 position, NoiseCause cause)
         {
             LastNoisePosition = position;
             LastNoiseTime = Time.time;
+            LastNoiseCause = cause;
             HasUnhandledNoise = true;
+        }
+
+        /// Where he THINKS the movement was — never exactly where it was.
+        ///
+        /// The offset direction is drawn once per suspicion episode and then held,
+        /// so his estimate slides smoothly toward the truth as awareness climbs
+        /// instead of jittering around it. Re-rolling every frame would average
+        /// out to the player's exact position, which is the bug this replaces.
+        Vector2 GuessedPosition()
+        {
+            float error = GuessErrorFor(config, Awareness);
+            return ToStandableSpot((Vector2)player.position + guessDirection * error, player.position);
+        }
+
+        // A guess inside a wall is worse than no guess: the navigator would find no
+        // route, so he would press against the geometry and never "arrive" to look
+        // around. Walk the guess back toward the truth until he can stand on it.
+        Vector2 ToStandableSpot(Vector2 guess, Vector2 truth)
+        {
+            if (nav == null || !nav.Ready) return guess;
+            for (int i = 0; i < 5; i++)
+            {
+                if (nav.IsWalkable(guess)) return guess;
+                guess = Vector2.Lerp(guess, truth, 0.4f);
+            }
+            return truth;
         }
 
         void Update()
@@ -149,9 +209,15 @@ namespace TimeKiller.Maniac
 
             float dt = Time.deltaTime;
             float rate = DetectionRate();
-            Awareness = Mathf.Clamp01(Awareness + (rate > 0f
-                ? rate * config.awarenessFillRate * dt
-                : -config.awarenessDrainRate * dt));
+            bool sensing = rate > 0f;
+
+            // He HOLDS what he'd built up for a moment before it decays — see
+            // StepAwareness. Draining from the instant cover breaks made him forget
+            // several times faster than he could ever learn.
+            if (sensing) senseLostTime = float.NegativeInfinity;
+            else if (float.IsNegativeInfinity(senseLostTime)) senseLostTime = Time.time;
+            float sinceLost = float.IsNegativeInfinity(senseLostTime) ? 0f : Time.time - senseLostTime;
+            Awareness = StepAwareness(config, Awareness, rate, dt, sinceLost);
 
             var newLevel = Awareness >= 1f ? AwarenessLevel.Detected
                          : Awareness >= config.suspicionThreshold ? AwarenessLevel.Suspicious
@@ -167,7 +233,12 @@ namespace TimeKiller.Maniac
                 if (Level == AwarenessLevel.Unaware) SuspicionEpisodes++;
             }
 
-            if (newLevel == AwarenessLevel.Detected)
+            // EYES ON RIGHT NOW, not merely "the meter is full": the hold above
+            // deliberately keeps Level at Detected through a sight break, and
+            // ChaseState depends on CanSeePlayer meaning line of sight is clear
+            // (true -> beeline, false -> A* around the wall). Letting the held
+            // meter report sight would send him charging into geometry again.
+            if (newLevel == AwarenessLevel.Detected && sensing)
             {
                 if (Level != AwarenessLevel.Detected)
                     EventBus.Publish(new ManiacSpottedPlayerEvent { PlayerPosition = player.position });
@@ -185,11 +256,19 @@ namespace TimeKiller.Maniac
                 // your rough spot (drives Investigate; his movement turns him to look).
                 if (newLevel == AwarenessLevel.Suspicious && rate > 0f)
                 {
-                    SetNoise(player.position);
+                    // One direction per episode, held while the episode lasts.
+                    if (Level == AwarenessLevel.Unaware)
+                    {
+                        var roll = Random.insideUnitCircle;
+                        guessDirection = roll.sqrMagnitude > 0.0001f ? roll.normalized : Vector2.right;
+                        SuspicionStartedTime = Time.time;
+                    }
+                    var guess = GuessedPosition();
+                    SetNoise(guess, NoiseCause.Suspicion);
                     if (Level == AwarenessLevel.Unaware) // first flicker of suspicion — a dark riser
                         EventBus.Publish(new ManiacHeardNoiseEvent
                         {
-                            NoisePosition = player.position,
+                            NoisePosition = guess,
                             Cause = NoiseCause.Suspicion
                         });
                 }
@@ -211,6 +290,10 @@ namespace TimeKiller.Maniac
         }
 
         // 0 (undetectable this frame) .. 1 (ideal exposure). Drives the meter.
+        // Only the scene-dependent parts live here — the wall check, how lit the
+        // spot is, how fast the player is going. The arithmetic that decides how
+        // hard the game is sits in the pure statics below, where it can be tested
+        // without a scene (same reasoning as ManiacBrain.Score).
         float DetectionRate()
         {
             if (PlayerHidden) return 0f;
@@ -218,31 +301,61 @@ namespace TimeKiller.Maniac
             float dist = toPlayer.magnitude;
             if (dist > config.sightRange) return 0f;
             if (!HasLineOfSight()) return 0f;               // a wall/prop is in the way
-            if (dist <= config.proximityRange) return 1f;   // point-blank — he feels you
+            return RateFor(config, dist, Vector2.Angle(FacingDirection, toPlayer),
+                           Exposure(player.position), playerSpeed);
+        }
 
-            float angle = Vector2.Angle(FacingDirection, toPlayer);
+        /// Pure detection rate. `angleFromFacing` in degrees, `exposure` 0..1.
+        public static float RateFor(ManiacConfig cfg, float distance, float angleFromFacing,
+                                    float exposure, float playerSpeed)
+        {
+            if (distance > cfg.sightRange) return 0f;
+            if (distance <= cfg.proximityRange) return 1f;   // point-blank — he feels you
+
             float coneWeight;
-            if (angle <= config.centralConeAngle * 0.5f)
+            if (angleFromFacing <= cfg.centralConeAngle * 0.5f)
                 coneWeight = 1f;                             // central vision
-            else if (angle <= config.peripheralConeAngle * 0.5f && dist <= config.peripheralRange)
-                coneWeight = config.peripheralWeight;        // corner of the eye
+            else if (angleFromFacing <= cfg.peripheralConeAngle * 0.5f && distance <= cfg.peripheralRange)
+                coneWeight = cfg.peripheralWeight;           // corner of the eye
             else
                 return 0f;                                   // behind him
 
-            float distFactor = 1f - dist / config.sightRange;                 // closer = stronger
-            float lightFactor = Mathf.Lerp(config.exposureFloor, 1f, Exposure(player.position)); // shadow hides
-            float moveFactor = playerSpeed < 0.1f ? config.stillDetectionMultiplier
-                             : playerSpeed >= config.runSpeedThreshold ? config.runningDetectionMultiplier
+            // Closer = stronger, but NOT linearly to zero: at power 1 the mid range
+            // was a dead zone (5u in shadow needed 4.5s of unbroken exposure, 6u
+            // needed 9.1s), which is what made him feel blind past arm's reach.
+            float distFactor = 1f - Mathf.Pow(distance / cfg.sightRange, cfg.sightFalloffPower);
+            float lightFactor = Mathf.Lerp(cfg.exposureFloor, 1f, exposure);   // shadow hides
+            float moveFactor = playerSpeed < 0.1f ? cfg.stillDetectionMultiplier
+                             : playerSpeed >= cfg.runSpeedThreshold ? cfg.runningDetectionMultiplier
                              : 1f;
             return coneWeight * distFactor * lightFactor * moveFactor;
         }
 
+        /// Pure awareness integration for one frame. `secondsSinceContactLost` is
+        /// ignored while `rate > 0`. The HOLD is the whole point: draining from the
+        /// instant cover breaks made him forget faster than he could ever learn.
+        public static float StepAwareness(ManiacConfig cfg, float awareness, float rate,
+                                          float deltaTime, float secondsSinceContactLost)
+        {
+            if (rate > 0f) return Mathf.Clamp01(awareness + rate * cfg.awarenessFillRate * deltaTime);
+            if (secondsSinceContactLost < cfg.awarenessHoldSeconds) return awareness;
+            return Mathf.Clamp01(awareness - cfg.awarenessDrainRate * deltaTime);
+        }
+
+        /// Pure: how far off his guess is at a given awareness. Shrinks to nothing
+        /// as he grows certain.
+        public static float GuessErrorFor(ManiacConfig cfg, float awareness) =>
+            Mathf.Lerp(cfg.suspicionGuessError, 0f,
+                       Mathf.InverseLerp(cfg.suspicionThreshold, 1f, awareness));
+
         bool HasLineOfSight()
         {
-            foreach (var hit in Physics2D.LinecastAll(transform.position, player.position, config.sightBlockers))
+            int count = Physics2D.Linecast(transform.position, player.position, sightFilter, sightHits);
+            for (int i = 0; i < count; i++)
             {
-                if (hit.collider == null || hit.collider.isTrigger) continue;
-                var root = hit.collider.transform.root;
+                var col = sightHits[i].collider;
+                if (col == null || col.isTrigger) continue;
+                var root = col.transform.root;
                 if (root == transform.root || root == player.root) continue;
                 return false;
             }

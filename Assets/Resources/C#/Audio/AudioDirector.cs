@@ -114,10 +114,15 @@ namespace TimeKiller.Audio
             if (fade < 1f)
             {
                 fade = Mathf.MoveTowards(fade, 1f, Time.deltaTime / Mathf.Max(0.05f, config.crossfadeSeconds));
-                active.volume = targetVolume * fade;
-                standby.volume = standbyStartVolume * (1f - fade);
+                standby.volume = standbyStartVolume * (1f - fade) * AudioDucking.World;
                 if (fade >= 1f && standby.isPlaying) standby.Stop();
             }
+
+            // The score is the "world" that PlayerHeartbeat pulls away once the
+            // maniac has you, leaving only your own heart. Applied here every
+            // frame rather than folded into targetVolume so it survives the
+            // crossfade above and so nothing breaks if the dial never moves.
+            if (active != null) active.volume = targetVolume * fade * AudioDucking.World;
         }
 
         float targetVolume;

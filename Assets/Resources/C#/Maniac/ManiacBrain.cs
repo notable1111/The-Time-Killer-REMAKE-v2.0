@@ -53,10 +53,25 @@ namespace TimeKiller.Maniac
                 ? cfg.brainSearchWeight * (1f - tSeen / cfg.brainSearchMemory)
                 : 0f;
 
-            // Investigate: pulled by a recent, nearby noise (recency × proximity).
+            // Investigate: pulled by a recent noise (recency × proximity).
+            //
+            // Proximity is a BIAS, not a veto. Perception only reports a noise that
+            // was already inside hearingRadius, so scaling it linearly to zero at
+            // that same radius punished it twice: a fresh footstep past 6.2u scored
+            // under Patrol+stickiness and was discarded, which made two-thirds of
+            // his 9u hearing decoration. It now falls off to noiseFarWeight instead.
             float recency = tNoise < cfg.brainNoiseMemory ? 1f - tNoise / cfg.brainNoiseMemory : 0f;
-            float prox = cfg.hearingRadius > 0f ? Mathf.Clamp01(1f - distNoise / cfg.hearingRadius) : 0f;
+            float near = cfg.hearingRadius > 0f ? Mathf.Clamp01(1f - distNoise / cfg.hearingRadius) : 0f;
+            float prox = Mathf.Lerp(cfg.noiseFarWeight, 1f, near);
             float investigate = cfg.brainNoiseWeight * recency * prox;
+
+            // Mid-hunt, a noise NEWER than the last sighting is better information
+            // than the belief map, which is pointing at where the player WAS. Only
+            // once the chase valve has expired — during the grace window the
+            // breadcrumb trail is still the better lead, and while he can see you
+            // nothing should outrank Chase.
+            bool hunting = !seen && tSeen > cfg.loseSightSeconds && tSeen < cfg.brainSearchMemory;
+            if (hunting && tNoise < tSeen) investigate *= cfg.brainFreshNoiseBoost;
 
             float patrol = cfg.brainPatrolBaseline;
 
