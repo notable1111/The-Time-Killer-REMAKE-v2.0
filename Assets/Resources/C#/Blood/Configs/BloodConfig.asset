@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3894843ca40b832448ce208e799e0cd4, type: 3}
+  m_Name: BloodConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Blood.BloodConfig
+  capacity: 220
+  sortingOrder: -6
+  sizeRange: {x: 0.28, y: 0.72}
+  dryingSeconds: 26
+  freshTint: {r: 1, g: 1, b: 1, a: 1}
+  driedTint: {r: 0.52, g: 0.46, b: 0.42, a: 0.85}
+  bleedAtHp: 2
+  dripInterval: 0.75
+  dripMinDistance: 0.55
+  dripStains: 1
+  criticalBleedBonus: 0.9
+  stainsPerHit: 7
+  hitSpread: 0.85
+  hitSizeBoost: 1.35
