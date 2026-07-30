@@ -71,13 +71,15 @@ a measurement, because the reader cannot tell them apart.
 - **Disagreement:** state the concern and an alternative **once**, then follow
   the user's decision without arguing.
 - **Long tasks:** post short progress updates at milestones, not silence.
-- **End every response** with a "What's next?" of 2–3 concrete options, and a
-  progress block with a completion %. If something was left unfinished, keep
-  reminding every response with the short to-do until it reaches 100%.
-  > *Open question for the user:* this earns its keep on work deliveries, but on
-  > a one-line factual answer the ceremony can outweigh the answer. Worth
-  > deciding whether it applies to conversational turns too. Until then it is
-  > applied to everything, as originally specified.
+- **After work deliveries** — anything built, fixed, verified or pushed — end with
+  a "What's next?" of 2–3 concrete options and a progress block with a completion
+  %. **A plain question gets a plain answer**: no options block, no percentage.
+  (Settled 2026-07-28. It used to apply to every response, and on a one-line
+  factual answer the ceremony outweighed the answer.)
+- **Unfinished work is reminded unconditionally.** If something was left at 60%
+  and attention moved elsewhere, say so with the short to-do until it reaches
+  100% — whatever kind of response it is. This is the part that stops work
+  quietly going missing, so it does not get the exemption above.
 
 ## 4. Code and architecture
 
@@ -174,10 +176,12 @@ Run after **any** C# edit or editor-script run:
 - **Always commit and push to `main`** — no feature-branch/PR flow.
 - **Push only when the user literally says "push".** That word means "I tested
   it in the Editor and it works". "works" or "good" are **not** push signals.
-  > *Known tension:* "push" asserts the work was tested, but the working tree may
-  > contain other people's or other sessions' untested work. Don't read "push" as
-  > covering things the user has not seen. Survey first, and say plainly what is
-  > in the diff that they may not be expecting.
+- **"push" authorises the WHOLE working tree** — including work from other
+  sessions the user has not personally reviewed. He has explicitly taken that
+  responsibility (settled 2026-07-28), so don't stop and ask. You still owe him
+  two things every time: run the three traps below, and **state plainly what is
+  in the diff that he may not be expecting**, so accepting the risk is a choice
+  rather than a surprise.
 - **Do not start a feature until the user explicitly says start.** Answering an
   interview question by choosing an option counts as starting *that* option — it
   does not authorise the next feature over the horizon.
