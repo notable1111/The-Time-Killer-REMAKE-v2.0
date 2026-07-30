@@ -74,6 +74,10 @@ a measurement, because the reader cannot tell them apart.
 - **End every response** with a "What's next?" of 2–3 concrete options, and a
   progress block with a completion %. If something was left unfinished, keep
   reminding every response with the short to-do until it reaches 100%.
+  > *Open question for the user:* this earns its keep on work deliveries, but on
+  > a one-line factual answer the ceremony can outweigh the answer. Worth
+  > deciding whether it applies to conversational turns too. Until then it is
+  > applied to everything, as originally specified.
 
 ## 4. Code and architecture
 
@@ -109,8 +113,12 @@ Treated by the user as **"never forget — important"**:
 
 ### No placeholder art
 
-Never make grey-box or stand-in visuals. AI-generate the **real** art so
-features ship with actual styled assets. See §8.
+Never **ship** grey-box or stand-in visuals. AI-generate the **real** art so
+features arrive with actual styled assets. See §8.
+
+A throwaway fixture used to prove a pipeline works is fine — and often the right
+move, since it separates "does the plumbing work" from "is the art good". Delete
+it in the same session. Nothing provisional stays in `Assets/`.
 
 ## 5. Scenes and hand-tuned work — the protected zone
 
@@ -130,8 +138,13 @@ features ship with actual styled assets. See §8.
   look random to him. Any setup script that creates draggable objects must
   **preserve existing instances**. If scene objects look "wrongly placed", **ask
   before fixing** — it is probably his tuning.
-- **Never re-run `Setup/9`, `Setup/11` or `Setup/25` over existing hand-tuned
-  content** without explicit approval.
+- **Before running ANY `Setup/NN` on a scene that already has content, read the
+  script and confirm it preserves what is there.** Don't trust a menu name.
+  `Setup/9` and `Setup/11` rebuild the CastleHall colliders and will wipe the
+  user's tuning — never run them on the existing hall without explicit approval.
+  `Setup/22`, `Setup/25` and `Setup/38` have since been made preserving, but that
+  is a property of their current code, not a guarantee about the next script
+  someone writes.
 - **Clean up after yourself.** Temporary objects get
   `HideFlags.HideAndDontSave`; check the scene's `isDirty` before and after, and
   never save a scene you did not intend to modify.
@@ -147,8 +160,10 @@ Run after **any** C# edit or editor-script run:
    `EditorApplication.isCompiling == false` **and**
    `EditorUtility.scriptCompilationFailed == false`.
 2. `TimeKiller.EditorTools.SmokeCheck.Report()` → expect `"ok": true`.
-3. **EditMode tests** (Window ▸ General ▸ Test Runner, or `run_tests`) — 20
-   tests currently cover `ManiacBrain` and `ManiacPerception`.
+3. **EditMode tests** (Window ▸ General ▸ Test Runner, or `run_tests`). They live
+   in `C#/Testing/Editor/` and currently cover the maniac's scoring and
+   perception. Expect all of them to pass — a pre-existing failure is not a
+   reason to add another.
 4. For anything visual or audible, **verify in the real scene**, at the real
    camera, against the real background (§1).
 
@@ -159,7 +174,13 @@ Run after **any** C# edit or editor-script run:
 - **Always commit and push to `main`** — no feature-branch/PR flow.
 - **Push only when the user literally says "push".** That word means "I tested
   it in the Editor and it works". "works" or "good" are **not** push signals.
-- **Do not start a feature until the user explicitly says start.**
+  > *Known tension:* "push" asserts the work was tested, but the working tree may
+  > contain other people's or other sessions' untested work. Don't read "push" as
+  > covering things the user has not seen. Survey first, and say plainly what is
+  > in the diff that they may not be expecting.
+- **Do not start a feature until the user explicitly says start.** Answering an
+  interview question by choosing an option counts as starting *that* option — it
+  does not authorise the next feature over the horizon.
 - **Three traps to check before every push:**
   1. **Read the staged `.unity` diff, not the summary.** The URP template import
      once overwrote `SampleScene` (114 GameObjects → 3) and it looked like an
@@ -180,9 +201,10 @@ Run after **any** C# edit or editor-script run:
 ## 8. Tools
 
 - **PixelLab** (MCP) — generates concept art *and* real game assets. Tier 1 sub,
-  ~1900 generations/month, so art is effectively free. Check
-  `get_character` / `get_object` **before** regenerating something you may
-  already own.
+  **2000 generations/month**, so art is effectively free — iterate rather than
+  agonise. Call `get_balance` if you need the current figure instead of quoting
+  one from memory. Check `get_character` / `get_object` **before** regenerating
+  something you may already own.
 - **Unity MCP** — Claude drives the Editor directly (setup scripts, tests,
   offscreen renders).
 - **Blender** for 3D environments, **Daz** for character sprite sheets.
@@ -245,9 +267,13 @@ constraints that affect *code* decisions:
 - Survival horror, **hide & run** (Outlast-like), little to no combat.
 - Angled ¾ 2.5D (HD-2D), hand-drawn sprites, dark painterly mood, PC only,
   WASD + Shift.
-- **No stamina system** (cancelled by team decision). **Health = 3 points.**
-  Sanity/fear still planned.
+- **No stamina system** (cancelled by team decision — don't reintroduce it).
+  **Health = 3 points.** Sanity/fear is planned but **not designed yet** — don't
+  build it before the design interview.
 - **Co-op is planned** — never write player singletons, keep input separable.
 - **World scale contract: 32 pixels per world unit, ~29px characters, feet 17px
-  below the sprite pivot.** Match all three or new art looks pasted in.
-- The map is **not finished** — treat map work as an ongoing open task.
+  below the sprite pivot.** Match all three or new art looks pasted in, or
+  out-scales the maniac.
+- **The map is a work in progress.** Don't treat the current layout as final, and
+  don't assume a room's absence is a decision. Check `CHANGELOG.md` for where it
+  actually got to rather than trusting this line.
