@@ -4,6 +4,12 @@ How the systems of The Time Killer Remake connect. Update this file whenever a s
 
 ## Principles
 
+- **Research first, then act — always.** Measure the thing you are about to change, *in the place it actually lives*, before changing it. Check the API before calling it, look at the asset before judging it, render in the real scene before tuning for it. This is the rule this project has paid for most often:
+  - The hit VFX was tuned against an isolated neutral backdrop and *darkened* for "palette match". In the real castle it covered **0.26% of the screen and vanished in 0.75s** — invisible. Nobody rendered it in-scene until after it shipped.
+  - Blood droplets were drawn without once placing them beside the wardrobe. They came out at **saturation 0.93 / value 165** against game art measuring **0.07 / 52** — candy-red gumballs on muted pixel art. One `git`-free minute of comparison would have caught it.
+  - `TextureSheetAnimation.startFrame` was set in *frames* because the ScriptReference example uses a 0–7 slider. Unity 6 clamps it to **0–1**; the docs example is from an older version. It only surfaced because a value read back as `0.9999` instead of the `6` that was written.
+  - `Setup/22` and `Setup/25` destroyed and rebuilt their whole rig on every run, silently deleting a `DamageSfx` object nobody put back. It had been that way for months because nobody diffed the scene before and after.
+  - **Corollary:** when you catch yourself about to eyeball something twice, build the measurement instead. `TimeKiller/Verify/VFX Visibility` exists because "does this read?" is a number, not an opinion — and a number is repeatable by the next person.
 - **Heavy architecture, small pieces:** single-purpose components; every tunable number lives in a ScriptableObject config (`C#/<Feature>/Configs/`), never hardcoded.
 - **Event-driven:** systems talk through the Core event bus, not direct references. A system should compile even if the systems it talks about don't exist yet.
 - **Input ≠ logic:** input reading is a separate layer from character/system behavior, so a second player (future co-op) or an AI can drive the same character code.
