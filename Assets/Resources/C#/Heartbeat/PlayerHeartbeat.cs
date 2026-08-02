@@ -272,7 +272,11 @@ namespace TimeKiller.Heartbeat
                 volume = config.maxVolume * loudness * soften * (hidden ? config.hiddenBoost : 1f);
                 audioSource.pitch = Mathf.Lerp(1f, config.pitchAtMax, Intensity);
             }
-            volume = Mathf.Clamp01(volume);
+            // NOT Clamp01. maxHeartVolume deliberately exceeds 1 to undo the 2.7 dB
+            // the clips lost to the headroom pass — clamping here would silently
+            // throw that compensation away and leave the heart quieter than the
+            // level the user approved. PlayOneShot accepts >1 and simply amplifies.
+            volume = Mathf.Clamp(volume, 0f, 2f);
             lastBeatVolume = volume;
 
             // ONE clip, always. A crossfade between three variants was tried on

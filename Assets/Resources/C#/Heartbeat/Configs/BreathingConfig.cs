@@ -23,17 +23,39 @@ namespace TimeKiller.Heartbeat
         [Tooltip("Seconds to recover back to calm once he is gone. Longer than it took to build, because catching your breath always takes longer than losing it.")]
         public float secondsToRecover = 11f;
 
+        [Header("Breath cycle — alternating inhale/exhale one-shots")]
+        // Research 2026-08-02 (CRI Middleware's player-breathing system, and how
+        // Alien: Isolation drives Ripley's breathing off its Stealth value):
+        // "the basis for a breathing system is the alternance between inhale and
+        // exhale sounds" — sequential one-shots, shuffled from pools, with
+        // intensity driving the SEQUENCING RATE.
+        //
+        // This replaced one looping clip pitched 0.9 -> 1.4. That approach failed
+        // three ways: a loop has a seam the ear locks onto, one sample means
+        // every breath is identical, and pitching a breath up 40% does not sound
+        // faster — it sounds like a SMALLER PERSON. Rate carries effort; pitch
+        // barely moves.
+        [Tooltip("Seconds held between an inhale and its exhale, when calm. Short — the turnaround at the top of a breath is quick.")]
+        public float calmHold = 0.25f;
+        [Tooltip("Seconds of rest after the exhale, when calm. This is the long pause, and shortening it is what makes breathing sound frightened.")]
+        public float calmRest = 2.15f;
+        [Tooltip("Hold between inhale and exhale when fully winded.")]
+        public float panicHold = 0.10f;
+        [Tooltip("Rest after the exhale when fully winded. The gap almost vanishes — that alone reads as panic, with no pitch change at all.")]
+        public float panicRest = 0.85f;
+        [Tooltip("Playback pitch at full exertion. Deliberately TINY compared to the old 1.4: past about 1.1 the player stops sounding winded and starts sounding like a different, smaller person.")]
+        [Range(1f, 1.3f)] public float panicPitch = 1.06f;
+
         [Header("Volume")]
         [Tooltip("Below this exertion there is NO breathing at all. This is what keeps the calm parts of the map silent instead of a permanent panting bed.")]
         [Range(0f, 1f)] public float silenceBelow = 0.22f;
         [Tooltip("Volume when fully winded.")]
         [Range(0f, 1f)] public float windedVolume = 0.7f;
 
-        [Header("Rate")]
-        [Tooltip("Playback pitch when barely winded — slow, controlled.")]
-        [Range(0.5f, 1.5f)] public float easyPitch = 0.9f;
-        [Tooltip("Playback pitch when fully winded — fast and shallow.")]
-        [Range(0.5f, 2f)] public float windedPitch = 1.4f;
+        // easyPitch/windedPitch (0.9 -> 1.4) were removed 2026-08-02 with the
+        // looping breath they drove. Rate is carried by the cycle gaps above now;
+        // pitch only jitters slightly around panicPitch. A config field that
+        // outlives its reader is a trap for the next person.
 
         [Header("The recovery breath")]
         [Tooltip("Seconds he must stay OFF you before the relief breath fires (user ruling 2026-07-28: 8-9s). Relief is not instant — and 'Detected' drops every time line of sight breaks behind a pillar, so firing immediately meant the breath went off mid-chase. Re-acquiring you cancels it and the wait starts over.")]

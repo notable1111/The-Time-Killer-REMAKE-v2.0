@@ -37,6 +37,11 @@ namespace TimeKiller.Heartbeat
     public class PlayerBreathing : MonoBehaviour
     {
         [SerializeField] BreathingConfig config;
+        [Tooltip("Inhale pool. Sliced from continuous takes by Tools/AudioPipeline/slice_breaths.py and assigned by Setup/36. Swap the pool to swap the voice — no code change.")]
+        [SerializeField] AudioClip[] inhaleClips;
+        [Tooltip("Exhale pool. Kept separate from the inhales on purpose: a breath is an ALTERNANCE, and one mixed bag would play two inhales in a row.")]
+        [SerializeField] AudioClip[] exhaleClips;
+        [Tooltip("Legacy single looping breath. Unused by the sequencer — kept only so an older scene does not lose its reference before Setup/36 is re-run.")]
         [SerializeField] AudioClip breathLoop;
         [Tooltip("The long recovery breath played once when a chase ends.")]
         [SerializeField] AudioClip gaspClip;
@@ -50,6 +55,10 @@ namespace TimeKiller.Heartbeat
 
         float exertion;      // 0..1, how winded you are
         float voiced;        // smoothed value actually driving the audio
+        float breathVolume;  // smoothed one-shot loudness
+        float nextBreathAt;
+        bool nextIsInhale = true;
+        int lastInhale = -1, lastExhale = -1;
         float fear;          // from the conductor, if one is running
         bool haveFear;
         float lastFearAt = float.NegativeInfinity;
@@ -200,10 +209,54 @@ namespace TimeKiller.Heartbeat
             // breath in a wardrobe still overrides both.
             if (!Holding) target = Mathf.Max(target, FearBreath);
 
-            loopSource.pitch = Mathf.Lerp(config.easyPitch, config.windedPitch, voiced);
-            loopSource.volume = Mathf.MoveTowards(loopSource.volume,
-                target * TimeKiller.Audio.AudioMix.GainFor(TimeKiller.Audio.MixChannel.PlayerBreath),
-                dt * 1.5f);
+            // Smoothed so the sequencer's gaps do not jitter frame to frame.
+            breathVolume = Mathf.MoveTowards(breathVolume, target, dt * 1.5f);
+            DriveBreathCycle(effort: voiced);
+        }
+
+        /// The alternance. Inhale, hold, exhale, rest — and it is the two GAPS
+        /// that shorten with effort, not the samples that speed up.
+        void DriveBreathCycle(float effort)
+        {
+            if (inhaleClips == null || inhaleClips.Length == 0 ||
+                exhaleClips == null || exhaleClips.Length == 0)
+                return;                                  // no pool: stay silent rather than fall back to a loop
+
+            // Silent below the gate, and the cycle RESETS rather than pausing —
+            // resuming mid-cycle would exhale without having inhaled.
+            if (breathVolume <= 0.001f) { nextBreathAt = 0f; nextIsInhale = true; return; }
+
+            if (Time.time < nextBreathAt) return;
+
+            AudioClip clip = nextIsInhale
+                ? PickDifferentFrom(inhaleClips, ref lastInhale)
+                : PickDifferentFrom(exhaleClips, ref lastExhale);
+            if (clip == null) return;
+
+            float gain = TimeKiller.Audio.AudioMix.GainFor(TimeKiller.Audio.MixChannel.PlayerBreath);
+            // Pitch moves barely at all, and jitters slightly so repeated clips
+            // from a small pool do not read as the same file twice.
+            loopSource.pitch = Mathf.Lerp(1f, config.panicPitch, effort)
+                             + Random.Range(-0.02f, 0.02f);
+            loopSource.PlayOneShot(clip, Mathf.Clamp01(breathVolume) * gain);
+
+            float gap = nextIsInhale
+                ? Mathf.Lerp(config.calmHold, config.panicHold, effort)
+                : Mathf.Lerp(config.calmRest, config.panicRest, effort);
+            nextBreathAt = Time.time + clip.length / Mathf.Max(0.1f, loopSource.pitch) + gap;
+            nextIsInhale = !nextIsInhale;
+        }
+
+        /// Never the same clip twice running. With a pool of four an honest
+        /// random repeats often enough to be noticed, and one repeat is all it
+        /// takes to hear "a sample" instead of "a person".
+        AudioClip PickDifferentFrom(AudioClip[] pool, ref int last)
+        {
+            if (pool.Length == 1) return pool[0];
+            int index = Random.Range(0, pool.Length);
+            if (index == last) index = (index + 1) % pool.Length;
+            last = index;
+            return pool[index];
         }
 
         /// The chase just ended — start counting, do not breathe yet. Gated on

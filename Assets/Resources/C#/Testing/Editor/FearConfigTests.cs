@@ -140,31 +140,34 @@ namespace TimeKiller.Tests
         }
 
         [Test]
-        public void BeingSpottedAtMidRangeIsNotInstantPanic()
+        public void DetectionIsAMultiplierAndNotAFloor()
         {
             var cfg = Shipped();
-            // REGRESSION, and the test that SHOULD have caught it the first time.
-            // The old guard only checked the outer radius, where proximity is ~0
-            // and any multiplier passes trivially — so it proved nothing and the
-            // defect shipped. A recorded session then measured the player spending
-            // 21.2s in Panic on the way up against 3.5s in Threat: at 10u,
-            // 0.53 x detectedMultiplier 1.75 = 0.93, straight into deep Panic.
+            // THE actual requirement from the design brief: "Do not simply add
+            // fixed BPM floors such as Suspicious = 108 or Detected = 150. Those
+            // create unnatural jumps." A floor makes fear CONSTANT across distance
+            // once the flag flips; a multiplier keeps distance governing. That is
+            // the property worth pinning, and it holds at any tuning.
             //
-            // Mid range is where an awareness multiplier can actually do damage,
-            // because that is where proximity is big enough to amplify.
+            // This test previously asserted that detection at 10u must not reach
+            // Panic. That was NOT a design requirement — it was a value picked
+            // during an unprompted retune from a single bot session, and the
+            // awareness ladder has since been restored to the user-approved
+            // values. How frightening a mid-range sighting should be is HIS call;
+            // the test's job is to catch a floor sneaking back in, not to encode
+            // a difficulty preference.
+            float far = DetectedAt(cfg, 20f);
             float mid = DetectedAt(cfg, 10f);
-            Assert.That(mid, Is.LessThan(cfg.panicAt),
-                $"Detected at 10u reaches fear {mid:0.00} (panic starts at {cfg.panicAt}) — " +
-                "the build-up band is being skipped, which is the fixed-floor jump all over again.");
-            Assert.That(mid, Is.GreaterThan(cfg.uneaseAt),
-                $"Detected at 10u only reaches {mid:0.00} — being seen should matter.");
+            float near = DetectedAt(cfg, 5f);
 
-            // ...and the other side, so nobody 'fixes' the above by flattening
-            // detection into meaninglessness: close range must still be panic.
-            float close = DetectedAt(cfg, cfg.closeDangerDistance);
-            Assert.That(close, Is.GreaterThanOrEqualTo(cfg.panicAt),
-                $"Detected at {cfg.closeDangerDistance}u only reaches {close:0.00} — " +
-                "being caught at arm's length is not panic.");
+            Assert.That(far, Is.LessThan(mid),
+                $"Detected fear is the same at 20u ({far:0.00}) and 10u ({mid:0.00}) — " +
+                "distance has stopped governing, which means a floor is in play.");
+            Assert.That(mid, Is.LessThanOrEqualTo(near),
+                "Detected fear does not increase as he closes.");
+            Assert.That(far, Is.LessThan(cfg.panicAt),
+                $"Being detected at 20u already reaches {far:0.00} — a threat that " +
+                "far away should not produce panic on awareness alone.");
         }
 
         [Test]

@@ -14,10 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Heartbeat.BreathingConfig
   secondsToWinded: 6
   secondsToRecover: 11
+  calmHold: 0.25
+  calmRest: 2.15
+  panicHold: 0.1
+  panicRest: 0.85
+  panicPitch: 1.06
   silenceBelow: 0.22
   windedVolume: 0.7
   easyPitch: 0.9
   windedPitch: 1.4
+  recoveryDelaySeconds: 8.5
+  settleDecayScale: 0.35
   recoveryNeedsExertion: 0.45
   recoveryVolume: 1
   exertionAfterRecovery: 0.25

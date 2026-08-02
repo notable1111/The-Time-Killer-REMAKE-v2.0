@@ -8,6 +8,7 @@
 // children that HealthVfx and HidingVfx used to create are cleared out by
 // Setup/37 instead — deleting scene objects is kept in its own menu item so it
 // is always something you asked for.
+using System.Linq;
 using TimeKiller.Heartbeat;
 using TimeKiller.Player;
 using UnityEditor;
@@ -30,6 +31,16 @@ namespace TimeKiller.EditorTools
         // at full volume — and it was really five breath cycles over six seconds
         // with a silent half-second lead-in, not one deep breath.
         const string GaspPath = "Assets/Resources/Assets/Heartbeat/breath_recovery.wav";
+
+        // Breath one-shots, cut from the pack's continuous takes by
+        // Tools/AudioPipeline/slice_breaths.py. THIS is the voice switch: set it
+        // to "strong" (4 inhale / 3 exhale, deeper and more effortful) or
+        // "sleeping" (9 / 9, far more variation but measurably hissier —
+        // zero-crossing rate ~0.49 against strong's ~0.10), then re-run Setup/36.
+        // The two are never blended: they are different people in different
+        // rooms, and mixing them breathes like two players.
+        const string BreathFolder = "Assets/Resources/Assets/Heartbeat/Breaths";
+        const string BreathVoice = "strong";
 
         [MenuItem("TimeKiller/Setup/36 - Setup Player Heartbeat")]
         public static void Build()
@@ -94,6 +105,32 @@ namespace TimeKiller.EditorTools
                       "Watch the 'Heart' and 'Breath' lines on F1.");
         }
 
+        /// Fills a breath pool from the sliced one-shots. Swapping the VOICE is
+        /// changing BreathVoice above and re-running this menu item — no code,
+        /// no reassigning clips by hand, which is the swappable-content rule.
+        static void AssignBreathPool(SerializedObject so, string propertyName, string prefix)
+        {
+            var property = so.FindProperty(propertyName);
+            if (property == null) return;
+
+            var clips = AssetDatabase.FindAssets("t:AudioClip", new[] { BreathFolder })
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Where(p => System.IO.Path.GetFileName(p).StartsWith(prefix))
+                .OrderBy(p => p)
+                .Select(AssetDatabase.LoadAssetAtPath<AudioClip>)
+                .Where(c => c != null)
+                .ToArray();
+
+            property.arraySize = clips.Length;
+            for (int i = 0; i < clips.Length; i++)
+                property.GetArrayElementAtIndex(i).objectReferenceValue = clips[i];
+
+            if (clips.Length == 0)
+                Debug.LogWarning($"[TimeKiller Setup] No '{prefix}*' clips in {BreathFolder} — " +
+                                 "run Tools/AudioPipeline/slice_breaths.py. Breathing will be SILENT: " +
+                                 "the sequencer deliberately does not fall back to the old loop.");
+        }
+
         /// The lungs. Its own child object for the same reason the heart has one:
         /// these are 2D, in-your-head sources and must never inherit spatial
         /// settings from anything else on the player.
@@ -132,6 +169,8 @@ namespace TimeKiller.EditorTools
             bso.FindProperty("config").objectReferenceValue = breathConfig;
             bso.FindProperty("breathLoop").objectReferenceValue = loop;
             bso.FindProperty("gaspClip").objectReferenceValue = gasp;
+            AssignBreathPool(bso, "inhaleClips", $"{BreathVoice}_inhale_");
+            AssignBreathPool(bso, "exhaleClips", $"{BreathVoice}_exhale_");
             bso.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(breath);
             EditorUtility.SetDirty(host);

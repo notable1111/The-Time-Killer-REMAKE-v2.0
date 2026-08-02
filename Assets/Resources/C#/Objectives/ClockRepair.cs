@@ -1,9 +1,22 @@
 // Player-side driver for repairing clocks. Press E near a broken clock to start;
 // a marker sweeps a bar, press SPACE when it's in the green zone to add progress.
-// A miss costs a little progress and makes a QUIET noise the maniac may hear
-// (published as a low-loudness footstep — the hearing radius gates it to nearby).
 // The maniac reaching you cancels the repair. The HUD reads the public state to
 // draw the bar. Removable: no component -> clocks just sit broken.
+//
+// NOISE IS THE POINT (2026-08-02). Three separate sounds leave a repair, and they
+// are what make standing still at a clock a decision rather than a formality:
+//
+//   WORKING  — a steady quiet wind from the CLOCK, whether or not you are hitting
+//              the presses. Before this, a skilled player was completely silent
+//              and repairing was free; all the danger lived in fumbling and
+//              evaporated the moment someone got good at the mini-game. Skill now
+//              buys a SHORTER exposure, never total safety.
+//   MISS     — louder, from the PLAYER, and scaled by fear (see fearMissNoiseBoost).
+//   THE RING — the miss drawn at its true radius, so "fumbling summons him" is a
+//              rule the player can actually learn instead of bad luck.
+//
+// The difficulty of the press itself deliberately barely moves with fear. The
+// STAKES scale, not the skill: a press you earned is never taken from you.
 using TimeKiller.Core;
 using TimeKiller.Player;
 using UnityEngine;
@@ -20,14 +33,38 @@ namespace TimeKiller.Objectives
         ClockObjective active;
         RepairState repairState;
         float sweepT;
+        float nextWorkNoiseAt;
 
         public bool Repairing => active != null;
         public ClockObjective Active => active;
         public float Marker { get; private set; }       // 0..1 sweep position
         public float ZoneCenter { get; private set; }   // 0..1 target-zone center
-        public float ZoneWidth => config != null ? config.zoneWidth : 0.18f;
+        /// Live target-zone width. NOT the raw config value any more: fear narrows
+        /// it, so the UI must read THIS or the green band it draws would stop
+        /// matching the band the hit test actually uses — the player would be
+        /// judged against a zone they cannot see.
+        public float ZoneWidth => config == null ? 0.18f
+            : config.zoneWidth * Mathf.Lerp(1f, config.fearZoneShrink, FearFactor);
+
+        /// Live sweep speed, likewise fear-scaled.
+        public float MarkerSpeed => config == null ? 0.75f
+            : config.markerSpeed * Mathf.Lerp(1f, config.fearSpeedBoost, FearFactor);
+
+        /// 0..1 dread driving both. Reads the conductor through the event bus, so
+        /// deleting the Fear feature leaves the mini-game at its calm values
+        /// rather than breaking it.
+        public float FearFactor => config != null && config.fearAffectsRepair && haveFear
+            ? Mathf.Clamp01(fear) : 0f;
+
+        float fear;
+        bool haveFear;
 
         public void Init(ClockConfig cfg) => config = cfg;
+
+        void OnEnable() => TimeKiller.Core.EventBus.Subscribe<TimeKiller.Fear.FearChangedEvent>(OnFear);
+        void OnDisable() => TimeKiller.Core.EventBus.Unsubscribe<TimeKiller.Fear.FearChangedEvent>(OnFear);
+
+        void OnFear(TimeKiller.Fear.FearChangedEvent e) { fear = e.Fear; haveFear = true; }
 
         /// The clock E would start right now, or null. Exposed for the interact
         /// prompt: it must offer exactly what pressing E would actually do, so it
@@ -64,6 +101,7 @@ namespace TimeKiller.Objectives
             if (clock == null) return;
             active = clock;
             sweepT = 0f;
+            nextWorkNoiseAt = 0f;
             NewZone();
 
             // Face the clock so the work pose points at it, then lock: repairing
@@ -79,12 +117,13 @@ namespace TimeKiller.Objectives
             if (player.Input.InteractPressed) { Stop(); return; }   // E again = walk away
             if (ManiacTooClose()) { Stop(); return; }               // he caught you — run
 
-            sweepT += Time.deltaTime * config.markerSpeed;
+            sweepT += Time.deltaTime * MarkerSpeed;
             Marker = Mathf.PingPong(sweepT, 1f);
+            EmitWorkingNoise();
 
             if (player.Input.SkillCheckPressed)
             {
-                bool hit = Mathf.Abs(Marker - ZoneCenter) <= config.zoneWidth * 0.5f;
+                bool hit = Mathf.Abs(Marker - ZoneCenter) <= ZoneWidth * 0.5f;
                 if (hit)
                 {
                     active.AddProgress(config.progressPerHit);
@@ -93,14 +132,52 @@ namespace TimeKiller.Objectives
                 else
                 {
                     active.AddProgress(-config.missPenalty);
+                    // THE STAKES SCALE, NOT THE DIFFICULTY. The press window is
+                    // deliberately left alone (see fearSpeedBoost), so skill is
+                    // never taken away — what rises is the price of fumbling.
+                    // Calm, a miss is a small setback; panicking with him near, the
+                    // same miss is a beacon that carries roughly twice as far.
+                    float loudness = Mathf.Clamp01(config.missNoiseLoudness *
+                        Mathf.Lerp(1f, config.fearMissNoiseBoost, FearFactor));
                     EventBus.Publish(new PlayerFootstepEvent
                     {
                         Position = transform.position,
                         IsRunning = false,
-                        Loudness = config.missNoiseLoudness,
+                        Loudness = loudness,
+                    });
+                    // Announced so the mistake can be SEEN as well as heard. The
+                    // player has to be able to learn "fumbling summons him", and a
+                    // consequence you only ever hear is one most players never
+                    // connect to its cause. Carries the loudness so a visual can
+                    // size itself to the real noise rather than guessing.
+                    EventBus.Publish(new ClockMissEvent
+                    {
+                        Position = transform.position,
+                        Loudness = loudness,
+                        Fear = FearFactor,
                     });
                 }
             }
+        }
+
+        /// The clock is loud while you work it, hit or miss.
+        ///
+        /// Published from the CLOCK's position, not the player's: it is the
+        /// mechanism winding, and a maniac tracking it should be drawn to the
+        /// thing making the sound. Goes out as a WorldNoiseEvent rather than a
+        /// footstep because that is what it is — and that path already carries
+        /// the wall muffling, so a clock behind stone is genuinely quieter.
+        void EmitWorkingNoise()
+        {
+            if (config.repairNoiseLoudness <= 0f) return;
+            if (Time.time < nextWorkNoiseAt) return;
+            nextWorkNoiseAt = Time.time + Mathf.Max(0.1f, config.repairNoiseInterval);
+            EventBus.Publish(new WorldNoiseEvent
+            {
+                Position = active.transform.position,
+                Loudness = config.repairNoiseLoudness,
+                AlwaysHeard = false,   // distance and walls both still gate it
+            });
         }
 
         void Stop()

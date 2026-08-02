@@ -1,0 +1,944 @@
+{
+ "Assets/Resources/Assets/AudioNormalized/maniac_breath_loop.wav": {
+  "lowShare": -5.7,
+  "peak": -3.000097,
+  "rms": -15.101488,
+  "seconds": 5.16
+ },
+ "Assets/Resources/Assets/AudioNormalized/sting_death.wav": {
+  "lowShare": -1.3,
+  "peak": -3.000097,
+  "rms": -16.811853,
+  "seconds": 9.05
+ },
+ "Assets/Resources/Assets/AudioNormalized/sting_escape.wav": {
+  "lowShare": -2.3,
+  "peak": -3.000097,
+  "rms": -18.272728,
+  "seconds": 3.41
+ },
+ "Assets/Resources/Assets/AudioNormalized/sting_gate.wav": {
+  "lowShare": -0.2,
+  "peak": -3.000097,
+  "rms": -15.273927,
+  "seconds": 4.1
+ },
+ "Assets/Resources/Assets/AudioNormalized/sting_riser.wav": {
+  "lowShare": -6.6,
+  "peak": -3.000097,
+  "rms": -15.081133,
+  "seconds": 16.06
+ },
+ "Assets/Resources/Assets/AudioNormalized/sting_spotted_1.wav": {
+  "lowShare": -11.6,
+  "peak": -3.000097,
+  "rms": -15.215194,
+  "seconds": 2.06
+ },
+ "Assets/Resources/Assets/AudioNormalized/sting_spotted_2.wav": {
+  "lowShare": -5.7,
+  "peak": -3.000097,
+  "rms": -16.782028,
+  "seconds": 4.06
+ },
+ "Assets/Resources/Assets/AudioNormalized/sting_spotted_3.wav": {
+  "lowShare": -6.1,
+  "peak": -3.000097,
+  "rms": -15.921027,
+  "seconds": 10.73
+ },
+ "Assets/Resources/Assets/HealthVfx/heartbeat.wav": {
+  "lowShare": -0.1,
+  "peak": -1.514503,
+  "rms": -16.924342,
+  "seconds": 0.45
+ },
+ "Assets/Resources/Assets/Heartbeat/breath_recovery.wav": {
+  "lowShare": -25.1,
+  "peak": -3.045523,
+  "rms": -22.328764,
+  "seconds": 1.75
+ },
+ "Assets/Resources/Assets/Heartbeat/heartbeat_dry.wav": {
+  "lowShare": -0.4,
+  "peak": -2.964971,
+  "rms": -10.624816,
+  "seconds": 0.26
+ },
+ "Assets/Resources/Assets/Heartbeat/heartbeat_panic.wav": {
+  "lowShare": -0.7,
+  "peak": -2.964971,
+  "rms": -10.514453,
+  "seconds": 0.26
+ },
+ "Assets/Resources/Assets/Heartbeat/heartbeat_resting.wav": {
+  "lowShare": -0.2,
+  "peak": -2.964971,
+  "rms": -10.356889,
+  "seconds": 0.33
+ },
+ "Assets/Resources/Assets/Heartbeat/heartbeat_visceral.wav": {
+  "lowShare": -0.5,
+  "peak": -2.964971,
+  "rms": -10.085601,
+  "seconds": 0.33
+ },
+ "Assets/Resources/Assets/ManiacVoice/maniac_step_1.wav": {
+  "lowShare": -21.3,
+  "peak": -1.012388,
+  "rms": -29.30102,
+  "seconds": 0.43
+ },
+ "Assets/Resources/Assets/ManiacVoice/maniac_step_2.wav": {
+  "lowShare": -15.3,
+  "peak": -1.012388,
+  "rms": -29.235724,
+  "seconds": 0.43
+ },
+ "Assets/Resources/Assets/ManiacVoice/maniac_step_3.wav": {
+  "lowShare": -21.1,
+  "peak": -1.012388,
+  "rms": -29.75336,
+  "seconds": 0.43
+ },
+ "Assets/Resources/Assets/ManiacVoice/maniac_step_4.wav": {
+  "lowShare": -17.4,
+  "peak": -1.012388,
+  "rms": -29.990105,
+  "seconds": 0.43
+ },
+ "Assets/Resources/Assets/ManiacVoice/maniac_step_5.wav": {
+  "lowShare": -20.7,
+  "peak": -1.012388,
+  "rms": -29.472861,
+  "seconds": 0.43
+ },
+ "Assets/Resources/Assets/ManiacVoice/maniac_step_6.wav": {
+  "lowShare": -16.9,
+  "peak": -1.012388,
+  "rms": -26.998035,
+  "seconds": 0.43
+ },
+ "Assets/Resources/Assets/ManiacVoice/maniac_step_7.wav": {
+  "lowShare": -24.5,
+  "peak": -1.012388,
+  "rms": -27.930919,
+  "seconds": 0.43
+ },
+ "Assets/Resources/Assets/ManiacVoice/maniac_step_8.wav": {
+  "lowShare": -25.0,
+  "peak": -1.012388,
+  "rms": -28.274139,
+  "seconds": 0.43
+ },
+ "Assets/Resources/Assets/Voices/maniac_attack_1.wav": {
+  "lowShare": -4.1,
+  "peak": -4.430439,
+  "rms": -12.041619,
+  "seconds": 1.14
+ },
+ "Assets/Resources/Assets/Voices/maniac_attack_2.wav": {
+  "lowShare": -3.0,
+  "peak": -4.654479,
+  "rms": -12.041621,
+  "seconds": 1.25
+ },
+ "Assets/Resources/Assets/Voices/maniac_attack_3.wav": {
+  "lowShare": -4.9,
+  "peak": -3.526068,
+  "rms": -12.041587,
+  "seconds": 2.54
+ },
+ "Assets/Resources/Assets/Voices/maniac_lost_1.wav": {
+  "lowShare": -1.2,
+  "peak": -4.099966,
+  "rms": -12.041609,
+  "seconds": 3.52
+ },
+ "Assets/Resources/Assets/Voices/maniac_lost_2.wav": {
+  "lowShare": -1.0,
+  "peak": -3.203919,
+  "rms": -12.041549,
+  "seconds": 4.15
+ },
+ "Assets/Resources/Assets/Voices/maniac_lost_3.wav": {
+  "lowShare": -1.4,
+  "peak": -3.719149,
+  "rms": -12.04159,
+  "seconds": 3.31
+ },
+ "Assets/Resources/Assets/Voices/maniac_mutter_1.wav": {
+  "lowShare": -3.8,
+  "peak": -3.000097,
+  "rms": -15.189062,
+  "seconds": 5.57
+ },
+ "Assets/Resources/Assets/Voices/maniac_mutter_2.wav": {
+  "lowShare": -4.0,
+  "peak": -3.000097,
+  "rms": -15.092823,
+  "seconds": 3.89
+ },
+ "Assets/Resources/Assets/Voices/maniac_mutter_3.wav": {
+  "lowShare": -2.0,
+  "peak": -3.000097,
+  "rms": -15.324783,
+  "seconds": 4.19
+ },
+ "Assets/Resources/Assets/Voices/maniac_mutter_4.wav": {
+  "lowShare": -4.7,
+  "peak": -3.000097,
+  "rms": -15.147197,
+  "seconds": 5.04
+ },
+ "Assets/Resources/Assets/Voices/maniac_spotted_1.wav": {
+  "lowShare": -5.0,
+  "peak": -4.417646,
+  "rms": -12.041615,
+  "seconds": 1.6
+ },
+ "Assets/Resources/Assets/Voices/maniac_spotted_2.wav": {
+  "lowShare": -4.6,
+  "peak": -3.543589,
+  "rms": -12.041555,
+  "seconds": 2.35
+ },
+ "Assets/Resources/Assets/Voices/maniac_spotted_3.wav": {
+  "lowShare": -3.9,
+  "peak": -4.477361,
+  "rms": -12.041618,
+  "seconds": 3.94
+ },
+ "Assets/Resources/Assets/Voices/player_death_1.wav": {
+  "lowShare": -8.4,
+  "peak": -3.00197,
+  "rms": -15.042188,
+  "seconds": 3.24
+ },
+ "Assets/Resources/Assets/Voices/player_death_2.wav": {
+  "lowShare": -11.9,
+  "peak": -3.000097,
+  "rms": -16.03636,
+  "seconds": 3.42
+ },
+ "Assets/Resources/Assets/Voices/player_gasp_1.wav": {
+  "lowShare": -19.7,
+  "peak": -3.000097,
+  "rms": -15.195912,
+  "seconds": 0.54
+ },
+ "Assets/Resources/Assets/Voices/player_gasp_2.wav": {
+  "lowShare": -26.1,
+  "peak": -3.000097,
+  "rms": -15.734757,
+  "seconds": 0.95
+ },
+ "Assets/Resources/Assets/Voices/player_gasp_3.wav": {
+  "lowShare": -15.0,
+  "peak": -3.000097,
+  "rms": -15.467262,
+  "seconds": 1.06
+ },
+ "Assets/Resources/Assets/Voices/player_pain_1.wav": {
+  "lowShare": -8.0,
+  "peak": -3.000097,
+  "rms": -15.174925,
+  "seconds": 0.53
+ },
+ "Assets/Resources/Assets/Voices/player_pain_2.wav": {
+  "lowShare": -8.3,
+  "peak": -3.000097,
+  "rms": -15.662367,
+  "seconds": 1.13
+ },
+ "Assets/Resources/Assets/Voices/player_pain_3.wav": {
+  "lowShare": -3.8,
+  "peak": -3.000097,
+  "rms": -15.06634,
+  "seconds": 1.19
+ },
+ "Assets/Resources/Assets/Voices/player_paincrit_1.wav": {
+  "lowShare": -13.4,
+  "peak": -3.000097,
+  "rms": -16.504199,
+  "seconds": 2.89
+ },
+ "Assets/Resources/Assets/Voices/player_paincrit_2.wav": {
+  "lowShare": -4.7,
+  "peak": -3.000097,
+  "rms": -16.257463,
+  "seconds": 3.44
+ },
+ "Assets/Resources/Assets/Voices/player_paincrit_3.wav": {
+  "lowShare": -19.4,
+  "peak": -3.000097,
+  "rms": -19.045698,
+  "seconds": 4.3
+ },
+ "Assets/Resources/Assets/Voices/player_repair_1.wav": {
+  "lowShare": -2.6,
+  "peak": -3.000097,
+  "rms": -15.656229,
+  "seconds": 1.78
+ },
+ "Assets/Resources/Assets/Voices/player_repair_2.wav": {
+  "lowShare": -3.4,
+  "peak": -3.000097,
+  "rms": -15.367636,
+  "seconds": 1.77
+ },
+ "Assets/Resources/Assets/Voices/player_repair_3.wav": {
+  "lowShare": -3.4,
+  "peak": -3.000097,
+  "rms": -15.266613,
+  "seconds": 1.87
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/Ambience/An Empty Home_1.wav": {
+  "lowShare": -4.3,
+  "peak": -10.283581,
+  "rms": -26.089308,
+  "seconds": 126.29
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/Ambience/Dark Eerie_1.wav": {
+  "lowShare": -0.2,
+  "peak": -2.0996,
+  "rms": -10.693232,
+  "seconds": 78.51
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/Ambience/Dread_1.wav": {
+  "lowShare": -3.3,
+  "peak": -3.526465,
+  "rms": -23.638502,
+  "seconds": 113.32
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/Ambience/Monolith_1.wav": {
+  "lowShare": -0.5,
+  "peak": -7.181992,
+  "rms": -22.739279,
+  "seconds": 84.65
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/Ambience/Void_1.wav": {
+  "lowShare": -5.1,
+  "peak": -9.024068,
+  "rms": -26.707772,
+  "seconds": 140.0
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/OneShots/Deep Impact_1.wav": {
+  "lowShare": -0.2,
+  "peak": 0.0,
+  "rms": -15.680344,
+  "seconds": 4.1
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/OneShots/Door Creak2_1.wav": {
+  "lowShare": -12.1,
+  "peak": -9.604943,
+  "rms": -39.272292,
+  "seconds": 4.1
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/OneShots/Door Creak4_1.wav": {
+  "lowShare": -24.8,
+  "peak": -6.055927,
+  "rms": -26.733187,
+  "seconds": 4.78
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/OneShots/Hush2_1.wav": {
+  "lowShare": -17.3,
+  "peak": 0.0,
+  "rms": -24.244046,
+  "seconds": 2.73
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/OneShots/Impact_1.wav": {
+  "lowShare": -0.2,
+  "peak": 0.000265,
+  "rms": -13.332123,
+  "seconds": 4.78
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/OneShots/Jumpscare2_1.wav": {
+  "lowShare": -1.9,
+  "peak": 0.0,
+  "rms": -21.712576,
+  "seconds": 7.51
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/OneShots/Jumpscare4_1.wav": {
+  "lowShare": -2.1,
+  "peak": 0.000265,
+  "rms": -19.370545,
+  "seconds": 4.1
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/OneShots/Jumpscare6_1.wav": {
+  "lowShare": -1.9,
+  "peak": 0.0,
+  "rms": -21.712576,
+  "seconds": 7.51
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/OneShots/Monster Breath_1.wav": {
+  "lowShare": -1.1,
+  "peak": -20.611353,
+  "rms": -41.463109,
+  "seconds": 4.1
+ },
+ "Assets/Resources/Outsource/Audio/EchoChambersAmbience/OneShots/Whoosh_1.wav": {
+  "lowShare": -2.2,
+  "peak": 0.0,
+  "rms": -24.912989,
+  "seconds": 3.41
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Ambience Tracks/Creepy Ambience 1 master.mp3": {
+  "lowShare": -1.5,
+  "peak": -1.517648,
+  "rms": -14.696099,
+  "seconds": 96.05
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Ambience Tracks/Creepy Ambience 2 Master.mp3": {
+  "lowShare": -2.1,
+  "peak": -2.470582,
+  "rms": -15.3827,
+  "seconds": 96.05
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Ambience Tracks/Creepy Ambience 3 Master.mp3": {
+  "lowShare": -3.9,
+  "peak": -2.285326,
+  "rms": -15.746362,
+  "seconds": 43.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Ambience Tracks/Creepy Ambience 4 Track.mp3": {
+  "lowShare": -4.1,
+  "peak": -2.58064,
+  "rms": -20.966775,
+  "seconds": 57.56
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Ambience Tracks/Creepy Ambience 5 track.mp3": {
+  "lowShare": -4.4,
+  "peak": -3.335808,
+  "rms": -20.34631,
+  "seconds": 85.56
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Ambience Tracks/Tense Ambience 1 Master.mp3": {
+  "lowShare": -2.7,
+  "peak": -4.41758,
+  "rms": -15.753951,
+  "seconds": 96.05
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Ambience Tracks/Tense Ambience 2.mp3": {
+  "lowShare": -3.1,
+  "peak": -3.982622,
+  "rms": -17.612854,
+  "seconds": 40.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Ambience Tracks/Tense Ambience 3 Track .mp3": {
+  "lowShare": -1.1,
+  "peak": -3.729065,
+  "rms": -15.431303,
+  "seconds": 67.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Ambience Tracks/Tense Ambience 4.mp3": {
+  "lowShare": -6.2,
+  "peak": -2.198425,
+  "rms": -15.745271,
+  "seconds": 57.56
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Chase Tracks/Chase Track 1 Master.mp3": {
+  "lowShare": -2.6,
+  "peak": -3.041866,
+  "rms": -16.020089,
+  "seconds": 32.07
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Chase Tracks/Chase Track 2 Master.mp3": {
+  "lowShare": -3.2,
+  "peak": -2.750978,
+  "rms": -15.384438,
+  "seconds": 115.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Chase Tracks/Chase Track 3 Master.mp3": {
+  "lowShare": -6.8,
+  "peak": -3.68545,
+  "rms": -16.861771,
+  "seconds": 40.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Combat Tracks/Combat Music Track Master.mp3": {
+  "lowShare": -3.6,
+  "peak": -2.774515,
+  "rms": -15.107504,
+  "seconds": 70.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Combat Tracks/Combat Track 2 master.mp3": {
+  "lowShare": -3.0,
+  "peak": -3.610748,
+  "rms": -15.506843,
+  "seconds": 42.56
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Combat Tracks/Combat Track 3 master.mp3": {
+  "lowShare": -5.8,
+  "peak": -3.404086,
+  "rms": -17.09022,
+  "seconds": 64.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Credits Tracks/Credits Track 1 Master.mp3": {
+  "lowShare": -4.3,
+  "peak": -2.910566,
+  "rms": -16.212762,
+  "seconds": 48.05
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Credits Tracks/Credits Track 2 Master.mp3": {
+  "lowShare": -5.8,
+  "peak": -4.356517,
+  "rms": -15.116697,
+  "seconds": 52.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Main Menu Tracks/Main Menu Track 1 Master.mp3": {
+  "lowShare": -5.0,
+  "peak": -4.026749,
+  "rms": -17.777651,
+  "seconds": 115.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Main Menu Tracks/Main Menu Track 2 Master.mp3": {
+  "lowShare": -4.5,
+  "peak": -4.779161,
+  "rms": -17.596579,
+  "seconds": 88.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Main Menu Tracks/Main Menu Track 3 Master.mp3": {
+  "lowShare": -4.8,
+  "peak": -3.357086,
+  "rms": -17.322801,
+  "seconds": 72.05
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Main Menu Tracks/Main Menu Track 4 master.mp3": {
+  "lowShare": -5.1,
+  "peak": -4.709889,
+  "rms": -18.255243,
+  "seconds": 53.57
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Main Menu Tracks/Main Menu Track 5.mp3": {
+  "lowShare": -2.7,
+  "peak": -3.366733,
+  "rms": -16.03716,
+  "seconds": 57.56
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Main Menu Tracks/Main Menu Track 6.mp3": {
+  "lowShare": -2.5,
+  "peak": -4.838468,
+  "rms": -16.016041,
+  "seconds": 95.57
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Main Menu Tracks/Tense Music Track 1.mp3": {
+  "lowShare": -6.3,
+  "peak": -1.771898,
+  "rms": -15.687387,
+  "seconds": 58.56
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Other Tracks/Main Menu -Credits Track.mp3": {
+  "lowShare": -5.6,
+  "peak": -4.335396,
+  "rms": -15.952533,
+  "seconds": 77.07
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Other Tracks/Psychological -Unsettling Track Master.mp3": {
+  "lowShare": -5.9,
+  "peak": -3.96527,
+  "rms": -17.532683,
+  "seconds": 30.56
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Other Tracks/Psychological 2-Unsettling Track Master.mp3": {
+  "lowShare": -3.9,
+  "peak": -2.252578,
+  "rms": -16.977707,
+  "seconds": 85.56
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Creepy Sound Sfx 2.mp3": {
+  "lowShare": -8.9,
+  "peak": -12.477701,
+  "rms": -30.624106,
+  "seconds": 8.74
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Creepy Sound Sfx 3.mp3": {
+  "lowShare": -11.1,
+  "peak": -20.040102,
+  "rms": -37.7121,
+  "seconds": 6.72
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Creepy Sound Sfx 4.mp3": {
+  "lowShare": -1.3,
+  "peak": -11.664627,
+  "rms": -30.373911,
+  "seconds": 6.72
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Creepy Sound Sfx 5.mp3": {
+  "lowShare": -25.6,
+  "peak": -21.563721,
+  "rms": -43.189673,
+  "seconds": 23.4
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Creepy Sound Sfx 6.mp3": {
+  "lowShare": -10.1,
+  "peak": -4.752359,
+  "rms": -21.425118,
+  "seconds": 58.56
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Creepy Sound Sfx.mp3": {
+  "lowShare": -5.0,
+  "peak": -10.627305,
+  "rms": -33.577402,
+  "seconds": 20.24
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Dark Riser.mp3": {
+  "lowShare": -6.8,
+  "peak": -10.909979,
+  "rms": -28.023493,
+  "seconds": 16.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Death Sfx 2.mp3": {
+  "lowShare": -8.1,
+  "peak": -6.262559,
+  "rms": -25.167575,
+  "seconds": 9.39
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Death Sfx 3.mp3": {
+  "lowShare": -8.8,
+  "peak": -4.988446,
+  "rms": -27.311892,
+  "seconds": 12.72
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Death Sfx.mp3": {
+  "lowShare": -1.0,
+  "peak": -5.263789,
+  "rms": -29.589597,
+  "seconds": 9.05
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Deep breath.mp3": {
+  "lowShare": -26.2,
+  "peak": -18.29631,
+  "rms": -38.569598,
+  "seconds": 6.05
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Jumpscare SFX 3.mp3": {
+  "lowShare": -6.4,
+  "peak": -8.248443,
+  "rms": -29.608488,
+  "seconds": 10.73
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Jumpscare Sfx 2.mp3": {
+  "lowShare": -5.7,
+  "peak": -12.948677,
+  "rms": -36.123102,
+  "seconds": 4.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Jumpscare Sfx.mp3": {
+  "lowShare": -11.6,
+  "peak": -18.469389,
+  "rms": -35.944035,
+  "seconds": 2.07
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Mysterious Sound Sfx 2.mp3": {
+  "lowShare": -6.6,
+  "peak": -25.832328,
+  "rms": -45.063896,
+  "seconds": 10.73
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Mysterious Sound Sfx 3.mp3": {
+  "lowShare": -6.6,
+  "peak": -32.376209,
+  "rms": -50.890153,
+  "seconds": 10.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Mysterious Sound Sfx 4.mp3": {
+  "lowShare": -4.1,
+  "peak": -14.02411,
+  "rms": -32.835834,
+  "seconds": 16.73
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Mysterious Sound Sfx 5.mp3": {
+  "lowShare": -7.4,
+  "peak": -17.257712,
+  "rms": -48.486212,
+  "seconds": 6.72
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Mysterious Sound Sfx 6.mp3": {
+  "lowShare": -18.9,
+  "peak": -9.855997,
+  "rms": -32.80013,
+  "seconds": 10.73
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Mysterious Sound Sfx 7.mp3": {
+  "lowShare": -3.5,
+  "peak": -8.462704,
+  "rms": -29.318713,
+  "seconds": 21.39
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Mysterious Sound Sfx.mp3": {
+  "lowShare": -8.2,
+  "peak": -26.075457,
+  "rms": -42.726189,
+  "seconds": 10.73
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/New Mision Sfx.mp3": {
+  "lowShare": -10.1,
+  "peak": -25.557719,
+  "rms": -45.439801,
+  "seconds": 2.07
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Snow Footsteps.mp3": {
+  "lowShare": -4.8,
+  "peak": -4.510998,
+  "rms": -32.581203,
+  "seconds": 35.07
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/White Noise Sfx .mp3": {
+  "lowShare": -1.1,
+  "peak": -27.645756,
+  "rms": -41.389429,
+  "seconds": 26.07
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/SFX/Wind Sfx.mp3": {
+  "lowShare": -0.3,
+  "peak": -18.845735,
+  "rms": -32.278293,
+  "seconds": 32.07
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Safe Room Tracks/Safe Room Track 2 Master.mp3": {
+  "lowShare": -6.2,
+  "peak": -2.087251,
+  "rms": -15.643267,
+  "seconds": 48.05
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Safe Room Tracks/Safe Room Track 3.mp3": {
+  "lowShare": -7.1,
+  "peak": -4.209025,
+  "rms": -17.524198,
+  "seconds": 42.56
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorMusic/Pack/PSX Horror Music Pack & SFX/Safe Room Tracks/Safe Room- Safe Point Track Master.mp3": {
+  "lowShare": -8.9,
+  "peak": -5.239667,
+  "rms": -21.891334,
+  "seconds": 35.07
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/Soundtracks/Ambience/AMBIENCE 1.wav": {
+  "lowShare": -7.2,
+  "peak": -19.036739,
+  "rms": -34.020353,
+  "seconds": 12.0
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/Soundtracks/Ambience/AMBIENCE 2.wav": {
+  "lowShare": -17.4,
+  "peak": -12.410234,
+  "rms": -35.299159,
+  "seconds": 13.0
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/Soundtracks/Ambience/AMBIENCE WHITE NOISE.wav": {
+  "lowShare": -0.2,
+  "peak": -25.776736,
+  "rms": -41.515984,
+  "seconds": 15.75
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/Soundtracks/Ambience/AMBIENCE WIND.wav": {
+  "lowShare": -1.7,
+  "peak": -27.637955,
+  "rms": -46.382972,
+  "seconds": 33.0
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/Soundtracks/Ambience/SAFE FROM STORM OUT SFX.wav": {
+  "lowShare": -0.4,
+  "peak": -15.900586,
+  "rms": -31.477871,
+  "seconds": 24.0
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/Soundtracks/SAVING SCREEN SOUNDTRACK.mp3": {
+  "lowShare": -3.8,
+  "peak": -2.207191,
+  "rms": -15.323839,
+  "seconds": 62.07
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/EVENT SOUNDS 1.wav": {
+  "lowShare": -4.0,
+  "peak": -12.815619,
+  "rms": -31.560904,
+  "seconds": 22.5
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/EVENT SOUNDS 2.wav": {
+  "lowShare": -6.3,
+  "peak": -16.978374,
+  "rms": -34.582928,
+  "seconds": 12.0
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/EVENT SOUNDS 3.wav": {
+  "lowShare": -8.3,
+  "peak": -24.733662,
+  "rms": -42.505207,
+  "seconds": 12.0
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/EVENT SOUNDS 4.wav": {
+  "lowShare": -6.9,
+  "peak": -30.939075,
+  "rms": -44.436047,
+  "seconds": 18.0
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/blood slpash 1.wav": {
+  "lowShare": -20.9,
+  "peak": -0.833157,
+  "rms": -23.07205,
+  "seconds": 1.5
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/blood splash 2.wav": {
+  "lowShare": -22.6,
+  "peak": -2.098588,
+  "rms": -27.148087,
+  "seconds": 2.87
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/closing wood door.wav": {
+  "lowShare": -0.2,
+  "peak": -0.185109,
+  "rms": -17.373985,
+  "seconds": 2.4
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/demon breathing.wav": {
+  "lowShare": -5.9,
+  "peak": -8.144825,
+  "rms": -25.031005,
+  "seconds": 5.16
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/door key.wav": {
+  "lowShare": -5.7,
+  "peak": -2.614499,
+  "rms": -33.561572,
+  "seconds": 2.52
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/knock door.wav": {
+  "lowShare": -3.9,
+  "peak": -0.952725,
+  "rms": -20.923436,
+  "seconds": 1.15
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/open door store.wav": {
+  "lowShare": -10.5,
+  "peak": -0.978499,
+  "rms": -18.851335,
+  "seconds": 4.06
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/open door.wav": {
+  "lowShare": -1.5,
+  "peak": -0.325837,
+  "rms": -21.89285,
+  "seconds": 2.68
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/scary impact.wav": {
+  "lowShare": -0.9,
+  "peak": -1.834316,
+  "rms": -18.87681,
+  "seconds": 2.62
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/slamming door.wav": {
+  "lowShare": -1.1,
+  "peak": -1.55806,
+  "rms": -15.999744,
+  "seconds": 1.69
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/sleeping breathe.wav": {
+  "lowShare": -22.8,
+  "peak": -13.203572,
+  "rms": -33.266742,
+  "seconds": 5.24
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Creepy Events Sounds/strong breathe person.wav": {
+  "lowShare": -4.6,
+  "peak": -12.172339,
+  "rms": -29.075317,
+  "seconds": 5.11
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Objects & Interaction/CALLING PHONE SFX.wav": {
+  "lowShare": -11.2,
+  "peak": -24.733662,
+  "rms": -36.073549,
+  "seconds": 14.0
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Objects & Interaction/DIALING PHONE SFX.wav": {
+  "lowShare": -25.3,
+  "peak": -17.142781,
+  "rms": -30.583101,
+  "seconds": 4.0
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Objects & Interaction/NO ANSWER PHONE SFX.wav": {
+  "lowShare": -19.9,
+  "peak": -16.017109,
+  "rms": -28.992771,
+  "seconds": 5.5
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Objects & Interaction/PICK UP OBJECT.wav": {
+  "lowShare": -6.5,
+  "peak": -8.361505,
+  "rms": -28.527854,
+  "seconds": 3.0
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Objects & Interaction/PUZZLE SOLVED.wav": {
+  "lowShare": -5.5,
+  "peak": -9.881639,
+  "rms": -32.373206,
+  "seconds": 2.25
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Objects & Interaction/SAVE GAME.wav": {
+  "lowShare": -7.1,
+  "peak": -16.142016,
+  "rms": -39.492859,
+  "seconds": 5.25
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/Objects & Interaction/WRONG OBJECT.wav": {
+  "lowShare": -3.6,
+  "peak": -16.789503,
+  "rms": -37.404635,
+  "seconds": 2.25
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/UI retro PSX/CLOSE MENU 1.wav": {
+  "lowShare": -3.4,
+  "peak": -6.558319,
+  "rms": -22.859208,
+  "seconds": 1.5
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/UI retro PSX/CLOSE MENU.wav": {
+  "lowShare": -4.0,
+  "peak": -7.991866,
+  "rms": -28.276839,
+  "seconds": 2.25
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/UI retro PSX/OPEN MENU 1.wav": {
+  "lowShare": -4.0,
+  "peak": -6.694177,
+  "rms": -25.07567,
+  "seconds": 2.25
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/UI retro PSX/OPEN MENU.wav": {
+  "lowShare": -7.5,
+  "peak": -11.74389,
+  "rms": -30.538528,
+  "seconds": 1.5
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/footsteps/forest steps.wav": {
+  "lowShare": -1.9,
+  "peak": -0.393408,
+  "rms": -36.286615,
+  "seconds": 34.2
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/footsteps/mattress steps.wav": {
+  "lowShare": -1.6,
+  "peak": -13.01021,
+  "rms": -39.712425,
+  "seconds": 26.12
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/footsteps/mud steps.wav": {
+  "lowShare": -4.9,
+  "peak": -15.032689,
+  "rms": -45.919082,
+  "seconds": 31.6
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/footsteps/tall grass steps.wav": {
+  "lowShare": -21.0,
+  "peak": -0.086849,
+  "rms": -43.887811,
+  "seconds": 23.1
+ },
+ "Assets/Resources/Outsource/Audio/PSXHorrorSFX/pack itchio PSX/sfx/footsteps/tunnel steps.wav": {
+  "lowShare": -19.1,
+  "peak": -3.171779,
+  "rms": -37.985361,
+  "seconds": 8.14
+ }
+}

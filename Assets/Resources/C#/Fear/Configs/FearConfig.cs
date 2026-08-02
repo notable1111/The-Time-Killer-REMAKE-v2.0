@@ -46,13 +46,13 @@ namespace TimeKiller.Fear
         [Tooltip("Multiplier while he has no idea you exist. This is the baseline the curve was shaped for, so 1 = distance alone.")]
         [Range(0.1f, 3f)] public float unawareMultiplier = 0.85f;
         [Tooltip("Multiplier while his awareness meter is filling but has not crossed suspicion. The heart reacting BEFORE you know you were noticed is the most frightening beat in the system — you feel your body react, cannot find a cause, and invent a worse one.")]
-        [Range(0.1f, 3f)] public float noticingMultiplier = 1f;
+        [Range(0.1f, 3f)] public float noticingMultiplier = 1.1f;
         [Tooltip("Multiplier while he is Suspicious — stopped, staring, not yet sure.")]
-        [Range(0.1f, 3f)] public float suspiciousMultiplier = 1.1f;
-        [Tooltip("Multiplier while he is actively Searching for you after losing sight. Just under Suspicious: a hunt is dread, a stare is worse, because a stare might already be about you.")]
-        [Range(0.1f, 3f)] public float searchingMultiplier = 1.08f;
-        [Tooltip("Multiplier while he has you — Detected or chasing. Note this MULTIPLIES proximity, so being seen from across the map is still not panic.\n\nMEASURED DOWN FROM 1.75 (2026-08-02). A recorded bot session showed the player spending 21.2s in the Panic band on the way up and only 3.5s in Threat — the build-up was being skipped. Cause: at 10u the distance curve gives 0.53, and 0.53 x 1.75 = 0.93, so being spotted at mid range slammed straight past Threat into deep Panic. That is the same 'unnatural jump' the fixed BPM floors used to cause, just wearing a multiplier. At 1.25 the same sighting lands at 0.66 (Threat) while 5u and closer still clamps to full Panic.")]
-        [Range(0.1f, 3f)] public float detectedMultiplier = 1.25f;
+        [Range(0.1f, 3f)] public float suspiciousMultiplier = 1.35f;
+        [Tooltip("Multiplier while he is actively Searching for you after losing sight.")]
+        [Range(0.1f, 3f)] public float searchingMultiplier = 1.3f;
+        [Tooltip("Multiplier while he has you — Detected or chasing. Note this MULTIPLIES proximity, so being seen from across the map is still not panic.\n\nUSER-APPROVED VALUE — DO NOT RETUNE. It was dropped to 1.25 once on 2026-08-02 from a single bot session, and reverted: the justification was a Threat-band duration already known to be partly an artifact of our own stage labelling, measured at n=1. The whole awareness ladder is frozen at values the user verified by ear. Report a disagreeing metric; do not act on it.")]
+        [Range(0.1f, 3f)] public float detectedMultiplier = 1.75f;
 
         [Header("Closing speed — a nudge, not a driver")]
         [Tooltip("Extra multiplier when he is closing on you at speed. An enemy sprinting at you should feel worse than one standing still the same distance away — but only slightly, or fear becomes a speedometer.")]
@@ -99,8 +99,8 @@ namespace TimeKiller.Fear
             new Keyframe(1f, 1f, 1.25f, 1.25f));
 
         [Header("Heartbeat volume")]
-        [Tooltip("Loudest the heart ever gets, before the mix trim.")]
-        [Range(0f, 1f)] public float maxHeartVolume = 0.95f;
+        [Tooltip("Loudest the heart ever gets, before the mix trim.\n\nRANGE GOES ABOVE 1 ON PURPOSE. The heartbeat CLIPS lost 2.7 dB when every project asset was re-normalised to -3 dB peak (2026-08-02), which would have quietly made the heart quieter than the loudness the user approved by ear. 0.95 x 1.366 = 1.30 restores exactly that loudness, while every OTHER layer keeps its headroom — so the summed mix still clips less than before, and the one thing tuned by ear is untouched.")]
+        [Range(0f, 1.5f)] public float maxHeartVolume = 1.30f;
         [Tooltip("Volume across the fear range, as a share of maxHeartVolume. MUST start near zero — the old system began at 0.55-0.72, so the first audible beat arrived already loud and there was nowhere left to build to.")]
         public AnimationCurve heartVolumeCurve = new AnimationCurve(
             new Keyframe(0f, 0f, 0.47f, 0.47f),

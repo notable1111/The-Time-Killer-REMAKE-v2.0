@@ -18,5 +18,15 @@ MonoBehaviour:
   zoneWidth: 0.18
   progressPerHit: 0.2
   missPenalty: 0.05
+  repairNoiseLoudness: 0.3
+  repairNoiseInterval: 1.2
+  fearAffectsRepair: 1
+  fearSpeedBoost: 1
+  fearZoneShrink: 0.85
   missNoiseLoudness: 0.4
+  fearMissNoiseBoost: 2.2
+  showMissRing: 1
+  missRingSeconds: 0.55
+  missRingCalmColor: {r: 0.85, g: 0.78, b: 0.55, a: 0.75}
+  missRingPanicColor: {r: 0.95, g: 0.35, b: 0.25, a: 0.9}
   lightWhenFixed: 1
