@@ -20,6 +20,9 @@ namespace TimeKiller.Maniac
         [Header("Hearing")]
         [Tooltip("A footstep is heard when distance < loudness * this radius. Run loudness 1 -> full radius; quiet walk shrinks it.")]
         public float hearingRadius = 9f;
+        [Range(0f, 1f)]
+        [Tooltip("Fraction of the heard radius that survives ONE wall standing between him and the noise; each further wall multiplies again. Hearing used to be the only sense that ignored geometry, so a footstep through solid stone reached him exactly as loud as one beside him and the 9u radius was really a 9u sphere of omniscience. Walls here are the same sightBlockers layers that stop his eyes, so 'solid' means one thing. Set to 1 to restore the old wall-ignoring behaviour.")]
+        public float hearingWallMuffle = 0.45f;
         [Tooltip("Seconds he searches around the last heard position before returning to patrol.")]
         public float investigateSeconds = 5f;
 
@@ -95,6 +98,13 @@ namespace TimeKiller.Maniac
         public float loseSightSeconds = 2.5f;
         [Tooltip("Seconds between breadcrumbs recorded while chasing (he follows the player's trail through corridors).")]
         public float breadcrumbInterval = 0.15f;
+        [Tooltip("While he can SEE you he beelines with no pathfinding, on the reasoning that line of sight means the way is clear. It does not: sight is a CENTRE-TO-CENTRE line and his body is ~0.6u wide, so a doorway seen at an angle passes the line and stops the body. Measured on CastleWingLDtk (TimeKiller/Verify/Maniac Chase Grind, 2026-08-02): 9.5% of all sightings, rising to 18.3% at 6-7u — which is sightRange, so it is worst at the moment he first acquires you. He now watches his own progress over this window instead of guessing which sightings those are.")]
+        public float beelineStallWindow = 0.35f;
+        [Range(0f, 1f)]
+        [Tooltip("Fraction of the ground his speed SHOULD have covered in that window. Below it he is grinding on geometry rather than closing. Deliberately low: brushing a wall and sliding along it is normal chasing, being stopped dead by one is not.")]
+        public float beelineStallFraction = 0.4f;
+        [Tooltip("Seconds the navigator drives the chase after a stall before he tries the straight line again. The beeline is the better look wherever it works, so this hands control back rather than keeping it for the rest of the chase.")]
+        public float beelineNavSeconds = 0.9f;
 
         [Header("Attack")]
         public int damage = 1;

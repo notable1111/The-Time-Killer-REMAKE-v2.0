@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b9b9ddbd4f067343890edc12b2221de, type: 3}
   m_Name: ManiacVoiceConfig
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Maniac.ManiacVoiceConfig
-  breathLoop: {fileID: 8300000, guid: fe33866afd6cb05449669dbf1de52c92, type: 3}
+  breathLoop: {fileID: 8300000, guid: 1f51270609f80c14e8f52d53ab0bc1e6, type: 3}
   hearingRadius: 11
   fullVolumeRadius: 1.5
   breathVolumeUnaware: 0.35

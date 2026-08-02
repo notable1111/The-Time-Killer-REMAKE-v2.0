@@ -182,6 +182,80 @@ namespace TimeKiller.Tests
                 "Even fully certain, his guess never lands on the player.");
         }
 
+        // ---- hearing through walls (2026-08-02 pass) -------------------------
+
+        static TimeKiller.Player.PlayerFootstepConfig Footsteps()
+        {
+            var cfg = AssetDatabase.LoadAssetAtPath<TimeKiller.Player.PlayerFootstepConfig>(
+                "Assets/Resources/C#/Player/Configs/PlayerFootstepConfig.asset");
+            Assert.That(cfg, Is.Not.Null, "PlayerFootstepConfig.asset missing.");
+            return cfg;
+        }
+
+        [Test]
+        public void EveryWallShortensHowFarANoiseCarries()
+        {
+            var cfg = Shipped();
+            // REGRESSION: hearing was the only sense that ignored geometry. A
+            // footstep two rooms away through solid stone set the noise fields
+            // exactly as a footstep taken beside him did.
+            float prev = ManiacPerception.HeardRadiusFor(cfg, 1f, 0);
+            Assert.That(prev, Is.EqualTo(cfg.hearingRadius).Within(0.001f),
+                "An unobstructed noise no longer carries the full hearing radius.");
+
+            for (int walls = 1; walls <= 4; walls++)
+            {
+                float carried = ManiacPerception.HeardRadiusFor(cfg, 1f, walls);
+                Assert.That(carried, Is.LessThan(prev),
+                    $"Wall {walls} did not muffle the noise any further than {walls - 1} did.");
+                prev = carried;
+            }
+        }
+
+        [Test]
+        public void TheShippedConfigActuallyMufflesAtAll()
+        {
+            var cfg = Shipped();
+            // hearingWallMuffle = 1 is a legitimate setting — it restores the old
+            // behaviour exactly — which is precisely why shipping it by accident
+            // has to fail loudly rather than silently undo this pass.
+            Assert.That(cfg.hearingWallMuffle, Is.LessThan(1f),
+                "hearingWallMuffle is 1: walls have stopped muffling and his hearing is geometry-blind again.");
+        }
+
+        [Test]
+        public void AMuffleOfOneReproducesTheOldGeometryBlindHearing()
+        {
+            var cfg = UnityEngine.Object.Instantiate(Shipped());   // a copy — never touch the asset
+            try
+            {
+                cfg.hearingWallMuffle = 1f;
+                Assert.That(ManiacPerception.HeardRadiusFor(cfg, 1f, 3),
+                    Is.EqualTo(ManiacPerception.HeardRadiusFor(cfg, 1f, 0)).Within(0.001f),
+                    "The escape hatch back to the old behaviour does not work.");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(cfg); }
+        }
+
+        [Test]
+        public void AWallIsCoverForWalkingButNotForSprinting()
+        {
+            var cfg = Shipped();
+            var steps = Footsteps();
+            // The point of the whole change: putting a wall between you must make
+            // WALKING genuinely safe, while running remains a mistake you can be
+            // caught for if he happens to be right on the other side of it.
+            float walking = ManiacPerception.HeardRadiusFor(cfg, steps.walkLoudness, 1);
+            float running = ManiacPerception.HeardRadiusFor(cfg, steps.runLoudness, 1);
+
+            Assert.That(walking, Is.LessThan(2f),
+                $"Walking still carries {walking:F2}u through a wall — a wall is not cover.");
+            Assert.That(running, Is.GreaterThan(walking * 2f),
+                "Running and walking through a wall are too close together for the choice to matter.");
+            Assert.That(running, Is.GreaterThan(1.5f),
+                $"Running only carries {running:F2}u through a wall — one wall has become a total cloak.");
+        }
+
         [Test]
         public void HeCannotOutrunTheSuspiciousApproach()
         {

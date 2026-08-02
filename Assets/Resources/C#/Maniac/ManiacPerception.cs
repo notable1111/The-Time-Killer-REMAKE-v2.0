@@ -19,9 +19,13 @@
 //     reads it as "line of sight is clear" and beelines while it is true.
 // Walls block sight (linecast); a wardrobe hides you outright.
 //
-// HEARING is unchanged: footstep/world noises within loudness*hearingRadius set
-// the noise fields that drive Investigate. States read the flags; this component
-// never drives movement itself.
+// HEARING: footstep/world noises within loudness*hearingRadius set the noise
+// fields that drive Investigate — and since 2026-08-02 WALLS MUFFLE THEM. It had
+// been the one sense that ignored geometry, so a footstep two rooms away through
+// solid stone arrived exactly as loud as one taken beside him. Note what the fix
+// does NOT need to do: distance already handles the far case, so muffling only
+// has to fix the SAME distance heard THROUGH a wall. States read the flags; this
+// component never drives movement itself.
 using System.Collections.Generic;
 using TimeKiller.Core;
 using TimeKiller.Hiding;
@@ -50,6 +54,11 @@ namespace TimeKiller.Maniac
         // allocated array on each of those calls.
         readonly List<RaycastHit2D> sightHits = new List<RaycastHit2D>(8);
         ContactFilter2D sightFilter;
+
+        // Hearing casts against the same solid geometry as sight, but from an
+        // EventBus callback rather than from Update. A second buffer means the two
+        // can never end up sharing one list mid-iteration if that ever changes.
+        readonly List<RaycastHit2D> hearingHits = new List<RaycastHit2D>(8);
 
         /// True while the player is inside a hiding spot — sight can't find them.
         public bool PlayerHidden { get; private set; }
@@ -133,20 +142,68 @@ namespace TimeKiller.Maniac
         void OnFootstep(PlayerFootstepEvent step)
         {
             if (config == null) return;
-            float heardRadius = config.hearingRadius * Mathf.Clamp01(step.Loudness);
-            if (Vector2.Distance(transform.position, step.Position) > heardRadius) return;
+            if (!Reaches(step.Position, step.Loudness)) return;
             HearNoise(step.Position);
         }
 
         void OnWorldNoise(WorldNoiseEvent noise)
         {
             if (config == null) return;
-            if (!noise.AlwaysHeard)
-            {
-                float heardRadius = config.hearingRadius * Mathf.Clamp01(noise.Loudness);
-                if (Vector2.Distance(transform.position, noise.Position) > heardRadius) return;
-            }
+            // AlwaysHeard is the LEVEL telling him something — the exit gate
+            // grinding open. It is not a sound competing with the building, so
+            // neither distance nor walls apply to it.
+            if (!noise.AlwaysHeard && !Reaches(noise.Position, noise.Loudness)) return;
             HearNoise(noise.Position);
+        }
+
+        /// Does a noise of this loudness, made here, actually get to him?
+        bool Reaches(Vector2 position, float loudness)
+        {
+            float distance = Vector2.Distance(transform.position, position);
+            // Cheapest test first: even with nothing in the way, is it in range at
+            // all? Walls can only ever shrink the radius, so this rejects the vast
+            // majority of footsteps without paying for a physics query.
+            if (distance > config.hearingRadius * Mathf.Clamp01(loudness)) return false;
+            return distance <= HeardRadiusFor(config, loudness,
+                                              WallsBetween(transform.position, position));
+        }
+
+        /// How many solid bodies stand between him and a point.
+        ///
+        /// Counts DISTINCT colliders, which grades honestly across this castle's
+        /// separate wall boxes — but a tilemap merged into one CompositeCollider2D
+        /// reports a single hit however many of its walls the line crosses. So this
+        /// is a FLOOR on the real count, never a measure of thickness, which is why
+        /// the tuning knob is "how much survives one wall" rather than metres of
+        /// stone. Under-counting only ever makes him hear better, i.e. it fails
+        /// toward the old behaviour rather than toward a deaf maniac.
+        int WallsBetween(Vector2 from, Vector2 to)
+        {
+            int count = Physics2D.Linecast(from, to, sightFilter, hearingHits);
+            int walls = 0;
+            for (int i = 0; i < count; i++)
+            {
+                var col = hearingHits[i].collider;
+                if (col == null || col.isTrigger) continue;
+                var root = col.transform.root;
+                // His own body, and the player's — the noise is made AT the player's
+                // feet, so their collider sits on the far end of every cast.
+                if (root == transform.root) continue;
+                if (player != null && root == player.root) continue;
+                walls++;
+            }
+            return walls;
+        }
+
+        /// Pure: the radius within which a noise of this loudness still reaches him
+        /// after `walls` solid bodies have muffled it. Each wall multiplies what is
+        /// left, so depth falls off fast without needing a second cutoff knob.
+        /// hearingWallMuffle = 1 reproduces the old geometry-blind hearing exactly.
+        public static float HeardRadiusFor(ManiacConfig cfg, float loudness, int walls)
+        {
+            float radius = cfg.hearingRadius * Mathf.Clamp01(loudness);
+            if (walls <= 0) return radius;
+            return radius * Mathf.Pow(Mathf.Clamp01(cfg.hearingWallMuffle), walls);
         }
 
         // A discrete noise (footstep, gate) — sets the noise fields AND announces it.

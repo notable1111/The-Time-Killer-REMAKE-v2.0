@@ -18,6 +18,7 @@ MonoBehaviour:
   acceleration: 25
   deceleration: 35
   hearingRadius: 9
+  hearingWallMuffle: 0.45
   investigateSeconds: 5
   sightRange: 7
   sightConeAngle: 140
@@ -52,6 +53,9 @@ MonoBehaviour:
   searchScanSpeed: 2
   loseSightSeconds: 2.5
   breadcrumbInterval: 0.15
+  beelineStallWindow: 0.35
+  beelineStallFraction: 0.4
+  beelineNavSeconds: 0.9
   damage: 1
   attackRange: 0.9
   attackCooldown: 1.6

@@ -160,9 +160,24 @@ namespace TimeKiller.Maniac
     /// Full-speed pursuit along the player's breadcrumb trail.
     public class ChaseState : ManiacStateBase
     {
+        // Beeline stall watch. Sight is a centre-to-centre linecast and his body is
+        // ~0.6u wide, so "I can see you" does not imply "I can walk there" — through
+        // a doorway seen at an angle the line passes and the body does not. Rather
+        // than try to predict which sightings those are, he notices he has stopped
+        // covering ground and lets the navigator drive for a moment.
+        Vector2 stallAnchor;
+        float stallCheckAt;
+        float navUntil;
+
         public ChaseState(ManiacController maniac) : base(maniac) { }
 
-        public override void Enter() => maniac.Breadcrumbs.Clear();
+        public override void Enter()
+        {
+            maniac.Breadcrumbs.Clear();
+            stallAnchor = maniac.Motor.Position;
+            stallCheckAt = Time.time + maniac.Config.beelineStallWindow;
+            navUntil = 0f;   // every fresh chase starts by trusting the straight line
+        }
 
         public override void Tick(float deltaTime)
         {
@@ -205,7 +220,7 @@ namespace TimeKiller.Maniac
             // "chases stupidly around walls" look — chase now navigates like search.
             if (perception.CanSeePlayer)
             {
-                maniac.Motor.MoveTo(perception.LastSeenPosition, config.chaseSpeed);
+                Beeline(perception.LastSeenPosition, config.chaseSpeed);
             }
             else
             {
@@ -214,6 +229,38 @@ namespace TimeKiller.Maniac
                 maniac.Nav.MoveTo(target, config.chaseSpeed);
             }
         }
+
+        /// Straight at the target — unless the straight line has stopped working.
+        void Beeline(Vector2 target, float speed)
+        {
+            var config = maniac.Config;
+
+            // Caught grinding a moment ago, so the navigator drives. Note the
+            // destination is identical, which is why a false positive costs
+            // nothing: with a route he paths there, and with no route the
+            // navigator falls back to the same straight line he was already on.
+            if (Time.time < navUntil)
+            {
+                maniac.Nav.MoveTo(target, speed);
+                return;
+            }
+
+            maniac.Motor.MoveTo(target, speed);
+
+            if (Time.time < stallCheckAt) return;
+            // DISPLACEMENT, not velocity. The motor writes linearVelocity directly,
+            // so a body pressed into a wall reports full chase speed while going
+            // nowhere — only the ground actually covered can tell the two apart.
+            float moved = Vector2.Distance(maniac.Motor.Position, stallAnchor);
+            if (Stalled(config, moved, config.beelineStallWindow))
+                navUntil = Time.time + config.beelineNavSeconds;
+            stallAnchor = maniac.Motor.Position;
+            stallCheckAt = Time.time + config.beelineStallWindow;
+        }
+
+        /// Pure: did he cover enough ground in that window to count as closing?
+        public static bool Stalled(ManiacConfig cfg, float movedDistance, float window) =>
+            movedDistance < cfg.chaseSpeed * window * cfg.beelineStallFraction;
 
         public override void Exit() => maniac.Breadcrumbs.Clear();
     }
