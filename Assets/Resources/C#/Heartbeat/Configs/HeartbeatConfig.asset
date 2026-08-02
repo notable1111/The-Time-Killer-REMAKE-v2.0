@@ -18,7 +18,6 @@ MonoBehaviour:
   distanceCurve: 2.2
   suspiciousFloorBpm: 108
   detectedFloorBpm: 150
-  injuredFloorBpm: 95
   riseSpeed: 6
   fallSpeed: 0.7
   maxVolume: 1
@@ -32,3 +31,7 @@ MonoBehaviour:
   duckOutSeconds: 2.5
   irregularity: 0.06
   lurchOnDetected: 1
+  anticipationBpm: 88
+  palpitationAbove: 0.55
+  palpitationChance: 0.13
+  palpitationPause: 1.7

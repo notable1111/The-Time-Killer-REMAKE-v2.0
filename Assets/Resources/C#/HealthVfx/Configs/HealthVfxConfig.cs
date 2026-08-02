@@ -24,8 +24,14 @@ namespace TimeKiller.HealthVfx
         [Range(0f, 1f)] public float subtleOverlayAlpha = 0.35f;
         [Range(0f, 1f)] public float criticalOverlayAlpha = 0.85f;
 
+        [Header("Dread vignette — the heartbeat you can SEE")]
+        [Tooltip("Extra vignette added on each heartbeat, scaled by the heart's own intensity. Works at ANY health, unlike the blood bands below, because a hunted player at full HP still needs to see the heart they can hear — otherwise the sound is a lone channel and reads as an audio cue rather than as their own body. 0 switches it off.")]
+        [Range(0f, 0.6f)] public float heartVignette = 0.22f;
+        [Tooltip("Seconds for one beat's vignette punch to fall away. Short — it must read as a pulse, not a fade.")]
+        [Range(0.05f, 1.5f)] public float heartFlashFade = 0.42f;
+
         [Header("Screen pulse (visual throb only — the SOUND lives in HeartbeatConfig)")]
-        [Tooltip("Beats per minute at 2 HP — an elevated but steady heart.")]
+        [Tooltip("Beats per minute at 2 HP. Note the heartbeat OVERRIDES this at runtime once a pulse arrives, so the screen and the chest stay in step; these remain the fallback when no heartbeat exists in the scene.")]
         public float subtleBpm = 74f;
         [Tooltip("BPM at 1 HP — tachycardia, a panicking heart.")]
         public float criticalBpm = 118f;

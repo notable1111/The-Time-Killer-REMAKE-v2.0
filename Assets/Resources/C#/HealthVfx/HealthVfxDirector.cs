@@ -45,8 +45,21 @@ namespace TimeKiller.HealthVfx
 
         float bandStrength, targetStrength;
         float targetVignette, targetOverlay, targetChromatic, targetGrain, targetDesat;
+        // Fear's visual share, pre-scaled by FearConductor. Zero when no
+        // conductor is running or fear visuals are switched off, which is why
+        // nothing below needs a null check or a feature flag.
+        float fearVignette, fearPulse, fearDesaturation;
         float bpm, pulseDepth, pulsePhase;
         float breathingTarget;
+
+        // Driven by HeartbeatPulseEvent. The screen used to throb on its OWN
+        // 74/118bpm clock off health while the heart ran 56-160 off the maniac,
+        // so the two were never once in sync. Now the beat resets this phase and
+        // the dread term below rides the real rate — two channels landing on the
+        // same instant is what makes a heartbeat FELT rather than merely heard
+        // (James-Lange: the player attributes the racing heart to their own fear).
+        float heartIntensity;
+        float heartFlash;      // decays from 1 on each beat
 
         public void Init(HealthVfxConfig vfxConfig) => config = vfxConfig;
 
@@ -71,12 +84,16 @@ namespace TimeKiller.HealthVfx
             flashGroup.alpha = 0f;
             EventBus.Subscribe<PlayerHealthChangedEvent>(OnHealthChanged);
             EventBus.Subscribe<PlayerHitEvent>(OnHit);
+            EventBus.Subscribe<TimeKiller.Heartbeat.HeartbeatPulseEvent>(OnHeartbeat);
+            EventBus.Subscribe<TimeKiller.Fear.FearChangedEvent>(OnFearChanged);
         }
 
         void OnDestroy()
         {
             EventBus.Unsubscribe<PlayerHealthChangedEvent>(OnHealthChanged);
             EventBus.Unsubscribe<PlayerHitEvent>(OnHit);
+            EventBus.Unsubscribe<TimeKiller.Heartbeat.HeartbeatPulseEvent>(OnHeartbeat);
+            EventBus.Unsubscribe<TimeKiller.Fear.FearChangedEvent>(OnFearChanged);
         }
 
         void OnHealthChanged(PlayerHealthChangedEvent evt)
@@ -100,6 +117,27 @@ namespace TimeKiller.HealthVfx
                 targetStrength = 0f;
                 breathingTarget = 0f;
             }
+        }
+
+        /// The heart beat. Snap the screen's pulse phase to it so the throb and
+        /// the thump land together, and kick a decaying flash the dread vignette
+        /// rides. A palpitation's thud hits harder — that beat is the one the
+        /// player feels in their throat.
+        void OnFearChanged(TimeKiller.Fear.FearChangedEvent evt)
+        {
+            fearVignette = evt.VisualVignette;
+            fearPulse = evt.VisualPulse;
+            fearDesaturation = evt.VisualDesaturation;
+        }
+
+        void OnHeartbeat(TimeKiller.Heartbeat.HeartbeatPulseEvent evt)
+        {
+            heartIntensity = evt.Intensity;
+            heartFlash = evt.Palpitation ? 1.35f : 1f;
+            // The visual systole sits at phase x.5 (see Beat below), so putting
+            // the phase half a cycle back puts the peak ON the sound.
+            pulsePhase = Mathf.Floor(pulsePhase) + 0.5f;
+            if (evt.Bpm > 1f) bpm = evt.Bpm;
         }
 
         void SetBand(Sprite spriteA, Sprite spriteB, float vig, float overlay, float beatsPerMinute, float depth,
@@ -130,6 +168,15 @@ namespace TimeKiller.HealthVfx
             bandStrength = Mathf.Lerp(bandStrength, targetStrength, 1f - Mathf.Exp(-config.transitionSharpness * dt));
             float s = bandStrength;
 
+            // The dread vignette. The blood bands are health's business and show
+            // nothing at 3 HP — but a hunted player at full health still needs to
+            // SEE the heart they can hear, or the sound is the only channel and
+            // reads as an audio cue rather than as their own body. Scaled by the
+            // heart's own intensity and punched on each beat, so it is invisible
+            // when calm and unmistakable when he is closing.
+            heartFlash = Mathf.MoveTowards(heartFlash, 0f, dt / Mathf.Max(0.02f, config.heartFlashFade));
+            float heartVig = config.heartVignette * heartIntensity * heartFlash;
+
             // Heartbeat: sharp systole, slow diastole (|sin|^3), layer B counter-beats.
             pulsePhase += (bpm / 60f) * dt;
             float beatA = Beat(pulsePhase);
@@ -137,10 +184,25 @@ namespace TimeKiller.HealthVfx
             float pulseA = 1f - pulseDepth * (1f - beatA);
             float pulseB = 1f - pulseDepth * (1f - beatB);
 
-            if (vignette != null) vignette.intensity.value = targetVignette * s * pulseA;
+            // FEAR, on top of health. These arrive pre-scaled from FearConductor
+            // (already through visualFearEnabled and the master multiplier), so
+            // there is nothing to honour here and no config of theirs to read —
+            // with fear visuals off they are simply zero. Health owns the blood
+            // bands; fear owns this quiet tightening at the edge of the frame.
+            float fearVig = fearVignette * (1f - fearPulse * (1f - beatA));
+            float fearDesat = -100f * fearDesaturation;   // saturation is -100..100
+
+            if (vignette != null) vignette.intensity.value = targetVignette * s * pulseA + heartVig + fearVig;
             if (chromatic != null) { chromatic.intensity.overrideState = true; chromatic.intensity.value = targetChromatic * s * pulseA; }
             if (grain != null) { grain.intensity.overrideState = true; grain.intensity.value = targetGrain * s; }
-            if (colorAdjust != null) { colorAdjust.saturation.overrideState = true; colorAdjust.saturation.value = targetDesat * s; }
+            if (colorAdjust != null)
+            {
+                colorAdjust.saturation.overrideState = true;
+                // Both pull the same direction (toward grey), so take whichever is
+                // stronger rather than summing — stacking them would drain the
+                // colour out of the screen entirely at low health during a chase.
+                colorAdjust.saturation.value = Mathf.Min(targetDesat * s, fearDesat);
+            }
 
             bandGroup.alpha = targetOverlay * s * pulseA;
             bandImage.rectTransform.localScale = Vector3.one * (1f + config.scalePulse * beatA * s);

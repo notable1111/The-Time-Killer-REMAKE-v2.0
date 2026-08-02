@@ -45,8 +45,24 @@ namespace TimeKiller.Heartbeat
         AudioSource oneShotSource;
         ManiacController maniac;
 
+        [Tooltip("Optional. Lets FEAR raise the breathing floor independently of exertion, so standing frozen while he searches nearby still breathes. Empty = exertion only, exactly as before.")]
+        [SerializeField] TimeKiller.Fear.FearConfig fearConfig;
+
         float exertion;      // 0..1, how winded you are
         float voiced;        // smoothed value actually driving the audio
+        float fear;          // from the conductor, if one is running
+        bool haveFear;
+        float lastFearAt = float.NegativeInfinity;
+
+        bool FearDriven => fearConfig != null && haveFear && Time.time - lastFearAt < 0.5f;
+
+        /// Fear's contribution to breathing, 0..1. Separate from exertion on
+        /// purpose: the two are different facts about the body (how hard you have
+        /// worked vs how frightened you are) and they must be able to disagree.
+        /// Combined by MAX rather than sum, so a terrified player who has also
+        /// been sprinting does not breathe at 200%.
+        float FearBreath => !FearDriven ? 0f
+            : Mathf.InverseLerp(fearConfig.breathStartsAt, 1f, fear) * fearConfig.breathMaxVolume;
         bool hidden;
         bool wasChased;
         bool recoveryPending;                              // chase over, relief breath owed but not yet due
@@ -89,6 +105,9 @@ namespace TimeKiller.Heartbeat
         {
             EventBus.Subscribe<TimeKiller.Hiding.PlayerHidEvent>(OnHid);
             EventBus.Subscribe<TimeKiller.Hiding.PlayerUnhidEvent>(OnUnhid);
+            EventBus.Subscribe<TimeKiller.Fear.FearChangedEvent>(OnFearChanged);
+            if (fearConfig == null)
+                fearConfig = Resources.Load<TimeKiller.Fear.FearConfig>("C#/Fear/Configs/FearConfig");
             DebugOverlay.Watch("Breath", () =>
             {
                 if (config == null) return "NO CONFIG";
@@ -113,11 +132,19 @@ namespace TimeKiller.Heartbeat
         {
             EventBus.Unsubscribe<TimeKiller.Hiding.PlayerHidEvent>(OnHid);
             EventBus.Unsubscribe<TimeKiller.Hiding.PlayerUnhidEvent>(OnUnhid);
+            EventBus.Unsubscribe<TimeKiller.Fear.FearChangedEvent>(OnFearChanged);
             DebugOverlay.Unwatch("Breath");
         }
 
         void OnHid(TimeKiller.Hiding.PlayerHidEvent evt) => hidden = true;
         void OnUnhid(TimeKiller.Hiding.PlayerUnhidEvent evt) => hidden = false;
+
+        void OnFearChanged(TimeKiller.Fear.FearChangedEvent e)
+        {
+            fear = e.Fear;
+            haveFear = true;
+            lastFearAt = Time.time;
+        }
 
         void Update()
         {
@@ -165,6 +192,13 @@ namespace TimeKiller.Heartbeat
             else if (voiced < config.silenceBelow) target = 0f;
             else target = Mathf.Lerp(0f, config.windedVolume,
                                      Mathf.InverseLerp(config.silenceBelow, 1f, voiced));
+
+            // Fear breathes too — being frozen in a corridor while he searches
+            // three metres away is terrifying and involves no exertion at all.
+            // MAX, never sum: one set of lungs, so the louder reason wins rather
+            // than the two stacking into a hyperventilating cartoon. Holding your
+            // breath in a wardrobe still overrides both.
+            if (!Holding) target = Mathf.Max(target, FearBreath);
 
             loopSource.pitch = Mathf.Lerp(config.easyPitch, config.windedPitch, voiced);
             loopSource.volume = Mathf.MoveTowards(loopSource.volume,

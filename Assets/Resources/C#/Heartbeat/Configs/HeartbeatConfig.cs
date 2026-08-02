@@ -71,5 +71,17 @@ namespace TimeKiller.Heartbeat
         [Range(0f, 0.3f)] public float irregularity = 0.05f;
         [Tooltip("Fire one immediate extra beat the moment he detects you — the lurch your chest gives before the rate has caught up. Costs nothing and is the single most-felt moment in the system.")]
         public bool lurchOnDetected = true;
+
+        [Header("Anticipation — the heart knows before you do")]
+        [Tooltip("Rate the heart climbs toward as his AWARENESS rises, while he is still Unaware and you have no way to know he noticed anything.\n\nPanic research (2026-08-02): panic is driven by anticipatory anxiety and 'catastrophic misinterpretation' — people panic because they misread their own body BEFORE a threat is confirmed. A heart racing for no visible reason is far more frightening than one racing at a monster you can see. Set equal to calmBpm to switch this off.")]
+        public float anticipationBpm = 88f;
+
+        [Header("Palpitations — the skipped beat")]
+        [Tooltip("Above this intensity the heart can stumble. Pounding, fluttering and SKIPPED beats are the named symptoms of panic — a heart that merely gets faster reads as exertion, not fear.")]
+        [Range(0f, 1f)] public float palpitationAbove = 0.55f;
+        [Tooltip("Chance per beat of a stumble once above the threshold. Keep it low: it lands because it is rare and wrong, not because it is frequent.")]
+        [Range(0f, 0.5f)] public float palpitationChance = 0.13f;
+        [Tooltip("How much longer the skipped interval runs (1.7 = 70% longer). The PAUSE is the frightening part; the beat after it lands at FULL volume, which is the thud you feel in your throat.")]
+        [Range(1f, 3f)] public float palpitationPause = 1.7f;
     }
 }

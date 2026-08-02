@@ -1,0 +1,214 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5e9f745a8793434f90f530b06e1db9c, type: 3}
+  m_Name: FearConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Fear.FearConfig
+  fearStartDistance: 26
+  closeDangerDistance: 3
+  distanceCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0.35
+      outSlope: 0.35
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.5
+      value: 0.32
+      inSlope: 1.1
+      outSlope: 1.1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2.2
+      outSlope: 2.2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  exitHysteresis: 4
+  usePathDistance: 1
+  maxPathDetour: 3.5
+  pathInterval: 0.35
+  unawareMultiplier: 0.85
+  noticingMultiplier: 1
+  suspiciousMultiplier: 1.1
+  searchingMultiplier: 1.08
+  detectedMultiplier: 1.25
+  closingBoost: 0.22
+  closingSpeedForFull: 4
+  riseSeconds: 1.4
+  detectionRiseSeconds: 0.45
+  spikeThreshold: 0.55
+  recoveryDelaySeconds: 3.5
+  recoverySeconds: 9
+  memorySeconds: 8
+  memoryFloorShare: 0.55
+  uneaseAt: 0.12
+  threatAt: 0.4
+  panicAt: 0.72
+  minBpm: 52
+  maxBpm: 165
+  bpmCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0.35
+      outSlope: 0.35
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.15
+      value: 0.053
+      inSlope: 0.62
+      outSlope: 0.62
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.35
+      value: 0.23
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.6
+      value: 0.51
+      inSlope: 1.16
+      outSlope: 1.16
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.8
+      value: 0.75
+      inSlope: 1.22
+      outSlope: 1.22
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.25
+      outSlope: 1.25
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  maxHeartVolume: 0.95
+  heartVolumeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0.47
+      outSlope: 0.47
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.15
+      value: 0.07
+      inSlope: 0.68
+      outSlope: 0.68
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.35
+      value: 0.25
+      inSlope: 0.85
+      outSlope: 0.85
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.6
+      value: 0.45
+      inSlope: 1.02
+      outSlope: 1.02
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.8
+      value: 0.7
+      inSlope: 1.38
+      outSlope: 1.38
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.5
+      outSlope: 1.5
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  heartSilenceBelow: 0.06
+  hiddenBoost: 1.25
+  timingVariation: 0.028
+  volumeVariation: 0.035
+  breathStartsAt: 0.3
+  breathMaxVolume: 0.8
+  ambienceAtMaxFear: 0.75
+  duckInSeconds: 1.2
+  duckOutSeconds: 3.5
+  stingEnabled: 1
+  stingCooldown: 12
+  stingNeedsFear: 0.28
+  stingVolume: 0.7
+  visualFearEnabled: 1
+  visualFearVignette: 0.16
+  visualPulseIntensity: 0.06
+  visualDesaturation: 0.12
+  fearEffectMultiplier: 1
+  debugOverrideFear: 0
+  debugFear: 0
+  drawGizmos: 1

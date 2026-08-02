@@ -19,12 +19,27 @@ MonoBehaviour:
   criticalVignette: 0.47
   subtleOverlayAlpha: 0.35
   criticalOverlayAlpha: 0.85
-  subtlePulseRate: 1.1
-  criticalPulseRate: 1.9
+  heartVignette: 0.22
+  heartFlashFade: 0.42
+  subtleBpm: 74
+  criticalBpm: 118
   subtlePulseDepth: 0.18
   criticalPulseDepth: 0.35
+  hitSoundVolume: 0.85
+  hitPitchJitter: 0.08
+  deathSoundVolume: 0.9
+  scalePulse: 0.03
+  layerBPhase: 0.45
+  layerBWeight: 0.7
+  subtleChromatic: 0.15
+  criticalChromatic: 0.45
+  subtleGrain: 0.15
+  criticalGrain: 0.35
+  criticalDesaturation: -35
   hitFlashAlpha: 0.9
   hitFlashFade: 0.6
+  hitFlashPunchScale: 1.18
+  hitShake: 0.35
   breathingVolume: 0.75
   breathingFade: 1.2
   transitionSharpness: 5
