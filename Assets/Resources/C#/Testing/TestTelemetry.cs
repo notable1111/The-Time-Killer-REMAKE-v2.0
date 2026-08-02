@@ -106,6 +106,68 @@ namespace TimeKiller.Testing
         int suspicionEpisodeBase;
         bool suspicionBaselined;
 
+        // ---- blood-tracking feasibility (2026-08-02) -------------------------
+        // Measured BEFORE building maniac blood tracking, to answer one question:
+        // with the chosen gate (player at 1 HP, blood still wet), would the
+        // feature ever actually fire? A rule that triggers twice an hour is
+        // decoration, and that is cheaper to learn here than after a session of
+        // implementation.
+        //
+        // Nothing here changes the game. It records what the maniac WOULD have
+        // been able to read, using the same event the blood system already
+        // publishes, so no gameplay code is touched.
+
+        /// A spill the player left, remembered only while it is still wet.
+        struct Spill
+        {
+            public Vector2 Position;
+            public float BornAt;
+            public int HpWhenSpilled;
+            // One discovery per stain per radius, never one per frame. The two
+            // radii need SEPARATE flags: sharing one let the generous counter
+            // re-fire every fixed step for as long as he stood near a stain
+            // without reaching it, which turns a rate into a frame count.
+            public bool CountedTight;
+            public bool CountedGenerous;
+        }
+
+        readonly List<Spill> wetSpills = new List<Spill>(64);
+
+        /// Total spills the player left (wound splashes and drips alike).
+        public int BloodSpills;
+        /// Spills he came near while they were still wet — the ceiling on any
+        /// tracking rule that requires fresh blood, whatever the HP gate.
+        public int BloodFoundWet;
+        /// ...of those, the ones where the player was AT 1 HP right then. This is
+        /// the CHOSEN gate: tracking switches on at last health.
+        public int BloodFoundWetAtLastHp;
+        /// ...and the alternative reading of the same gate: the blood itself was
+        /// spilled at 1 HP. Recorded because the two differ whenever the player
+        /// is hit down to 1 HP and then walks over their own earlier trail, and
+        /// picking between them should be a measurement rather than a preference.
+        public int BloodFoundWetSpilledAtLastHp;
+        /// Same as BloodFoundWet but at a generous radius, so the answer's
+        /// sensitivity to a knob we have NOT chosen yet is visible rather than
+        /// hidden inside one number.
+        public int BloodFoundWetGenerous;
+        /// THE DENOMINATOR. "2 crossings a run" means nothing without knowing how
+        /// long the player was even eligible — 2 in 20s is a lot, 2 in 300s is not.
+        public float SecondsAtLastHp;
+        /// Run-second of the first qualifying discovery, -1 if it never happened.
+        public float FirstBloodFoundAt = -1f;
+
+        // He must be nearly standing on a stain to notice it — blood is a floor
+        // detail, not a beacon. The generous radius is deliberately about double.
+        const float BloodNoticeRadius = 1.2f;
+        const float BloodNoticeRadiusGenerous = 2.5f;
+
+        int currentHp = int.MaxValue;
+        float bloodDryingSeconds = 26f;
+        LayerMask bloodSightBlockers = ~0;
+        ContactFilter2D bloodFilter;
+        bool bloodFilterBuilt;
+        readonly List<RaycastHit2D> bloodHits = new List<RaycastHit2D>(8);
+
         void OnEnable()
         {
             startedAt = Time.time;
@@ -132,6 +194,13 @@ namespace TimeKiller.Testing
             EventBus.Subscribe<ManiacHeardNoiseEvent>(OnHeard);
             EventBus.Subscribe<ManiacStateChangedEvent>(OnManiacState);
             EventBus.Subscribe<ClockFixedEvent>(OnClockFixed);
+
+            ResetBlood();
+            var bloodConfig = Resources.Load<TimeKiller.Blood.BloodConfig>("C#/Blood/Configs/BloodConfig");
+            if (bloodConfig != null) bloodDryingSeconds = bloodConfig.dryingSeconds;
+            if (mc != null && mc.Config != null) bloodSightBlockers = mc.Config.sightBlockers;
+            EventBus.Subscribe<TimeKiller.Blood.BloodSpilledEvent>(OnBloodSpilled);
+            EventBus.Subscribe<PlayerHealthChangedEvent>(OnHealthChanged);
         }
 
         void OnDisable()
@@ -145,6 +214,120 @@ namespace TimeKiller.Testing
             EventBus.Unsubscribe<ManiacHeardNoiseEvent>(OnHeard);
             EventBus.Unsubscribe<ManiacStateChangedEvent>(OnManiacState);
             EventBus.Unsubscribe<ClockFixedEvent>(OnClockFixed);
+            EventBus.Unsubscribe<TimeKiller.Blood.BloodSpilledEvent>(OnBloodSpilled);
+            EventBus.Unsubscribe<PlayerHealthChangedEvent>(OnHealthChanged);
+        }
+
+        void ResetBlood()
+        {
+            wetSpills.Clear();
+            BloodSpills = BloodFoundWet = BloodFoundWetAtLastHp = 0;
+            BloodFoundWetSpilledAtLastHp = BloodFoundWetGenerous = 0;
+            SecondsAtLastHp = 0f;
+            FirstBloodFoundAt = -1f;
+            currentHp = int.MaxValue;
+        }
+
+        void OnHealthChanged(PlayerHealthChangedEvent e) => currentHp = e.Current;
+
+        void OnBloodSpilled(TimeKiller.Blood.BloodSpilledEvent e)
+        {
+            BloodSpills++;
+            wetSpills.Add(new Spill
+            {
+                Position = e.Position,
+                BornAt = Time.time,
+                HpWhenSpilled = currentHp,
+                // Both Counted flags default to false — a fresh stain has been
+                // discovered at neither radius yet.
+            });
+        }
+
+        /// Would the maniac have been able to read the floor this step?
+        ///
+        /// Deliberately a WOULD-HAVE: it counts opportunities, changes nothing,
+        /// and each stain can only be discovered once so a maniac standing on a
+        /// puddle does not inflate the number by 50 a second.
+        void SampleBloodOpportunities()
+        {
+            if (wetSpills.Count == 0) return;
+            Vector2 at = maniac.position;
+            float now = Time.time;
+
+            for (int i = wetSpills.Count - 1; i >= 0; i--)
+            {
+                var spill = wetSpills[i];
+                // Dried out — it can never be read again, so stop carrying it.
+                if (now - spill.BornAt >= bloodDryingSeconds) { wetSpills.RemoveAt(i); continue; }
+                if (spill.CountedTight && spill.CountedGenerous) continue;
+
+                float distance = Vector2.Distance(at, spill.Position);
+                if (distance > BloodNoticeRadiusGenerous) continue;
+                if (!CanSeeFloorAt(at, spill.Position)) continue;
+
+                bool changed = false;
+                if (!spill.CountedGenerous)
+                {
+                    spill.CountedGenerous = true;
+                    BloodFoundWetGenerous++;
+                    changed = true;
+                }
+
+                if (distance <= BloodNoticeRadius && !spill.CountedTight)
+                {
+                    spill.CountedTight = true;
+                    changed = true;
+
+                    BloodFoundWet++;
+                    if (currentHp == 1) BloodFoundWetAtLastHp++;
+                    if (spill.HpWhenSpilled == 1) BloodFoundWetSpilledAtLastHp++;
+                    if (FirstBloodFoundAt < 0f && currentHp == 1)
+                        FirstBloodFoundAt = now - startedAt;
+                }
+
+                if (changed) wetSpills[i] = spill;
+            }
+        }
+
+        /// Line of sight from him to a point on the floor, using the maniac's own
+        /// wall mask. Triggers (camera zones) and the two bodies are excluded —
+        /// a raw Linecast counts his own collider at the start point and every
+        /// trigger volume as a wall, which would report him as blind everywhere.
+        bool CanSeeFloorAt(Vector2 from, Vector2 to)
+        {
+            if (!bloodFilterBuilt)
+            {
+                bloodFilter = new ContactFilter2D { useTriggers = false };
+                bloodFilter.SetLayerMask(bloodSightBlockers);
+                bloodFilterBuilt = true;
+            }
+            int count = Physics2D.Linecast(from, to, bloodFilter, bloodHits);
+            for (int i = 0; i < count; i++)
+            {
+                var col = bloodHits[i].collider;
+                if (col == null || col.isTrigger) continue;
+                var root = col.transform.root;
+                if (maniac != null && root == maniac.root) continue;
+                if (player != null && root == player.root) continue;
+                return false;
+            }
+            return true;
+        }
+
+        public string BloodJson()
+        {
+            var ci = CultureInfo.InvariantCulture;
+            var sb = new StringBuilder("{");
+            sb.Append("\"spills\":").Append(BloodSpills);
+            sb.Append(",\"foundWet\":").Append(BloodFoundWet);
+            sb.Append(",\"foundWetAtLastHp\":").Append(BloodFoundWetAtLastHp);
+            sb.Append(",\"foundWetSpilledAtLastHp\":").Append(BloodFoundWetSpilledAtLastHp);
+            sb.Append(",\"foundWetGenerous\":").Append(BloodFoundWetGenerous);
+            sb.Append(",\"secondsAtLastHp\":").Append(SecondsAtLastHp.ToString("0.0", ci));
+            sb.Append(",\"firstFoundAt\":").Append(FirstBloodFoundAt.ToString("0.0", ci));
+            sb.Append(",\"noticeRadius\":").Append(BloodNoticeRadius.ToString("0.0", ci));
+            sb.Append(",\"noticeRadiusGenerous\":").Append(BloodNoticeRadiusGenerous.ToString("0.0", ci));
+            return sb.Append('}').ToString();
         }
 
         void OnFootstep(PlayerFootstepEvent e) => Footsteps++;
@@ -260,6 +443,13 @@ namespace TimeKiller.Testing
             // partly there to police. 50 Hz of game time costs one distance call.
             MinManiacDistance = Mathf.Min(MinManiacDistance,
                 Vector2.Distance(player.position, maniac.position));
+
+            // Blood-tracking feasibility. Sampled here for the same reason as the
+            // line above: fixed steps are fixed in GAME time, so a 6x batch still
+            // gets the same samples per game-second. On Update it would quietly
+            // under-count at speed and report the feature as less viable than it is.
+            if (currentHp == 1) SecondsAtLastHp += Time.fixedDeltaTime;
+            SampleBloodOpportunities();
 
             float now = Time.time;
             if (now < nextSampleAt) return;

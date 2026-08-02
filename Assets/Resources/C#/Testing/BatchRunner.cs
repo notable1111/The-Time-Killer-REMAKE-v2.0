@@ -567,6 +567,11 @@ namespace TimeKiller.Testing
                 // dead air, plus a 12-bucket threat curve. Win rate says whether
                 // the bot escaped; this says whether escaping was frightening.
                 sb.Append(",\"tension\":").Append(t.TensionJson());
+                // Blood-tracking feasibility (2026-08-02): would a "1 HP + wet
+                // blood" rule ever fire? Read `foundWetAtLastHp` against
+                // `secondsAtLastHp` — the count alone cannot tell a viable
+                // mechanic from a bot that was never at 1 HP to begin with.
+                sb.Append(",\"blood\":").Append(t.BloodJson());
             }
             // Exceptions below the budget still get recorded. A run with three
             // stray NREs is probably fine, but it is not nothing, and the only
