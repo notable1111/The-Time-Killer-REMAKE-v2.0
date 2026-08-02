@@ -72,10 +72,15 @@ a measurement, because the reader cannot tell them apart.
   the user's decision without arguing.
 - **Long tasks:** post short progress updates at milestones, not silence.
 - **After work deliveries** — anything built, fixed, verified or pushed — end with
-  a "What's next?" of 2–3 concrete options and a progress block with a completion
-  %. **A plain question gets a plain answer**: no options block, no percentage.
-  (Settled 2026-07-28. It used to apply to every response, and on a one-line
-  factual answer the ceremony outweighed the answer.)
+  a **"What I did"** recap, then a "What's next?" of 2–3 concrete options and a
+  progress block with a completion %. **A plain question gets a plain answer**:
+  no recap, no options block, no percentage. (Settled 2026-07-28. It used to
+  apply to every response, and on a one-line factual answer the ceremony
+  outweighed the answer.)
+- **The "What I did" recap** (added 2026-08-02) is a short list — one line per
+  thing changed, in plain language, explaining it briefly. It is a *recap*, not a
+  second explanation: the reader should be able to see the whole delivery at a
+  glance without re-reading the body above it.
 - **Unfinished work is reminded unconditionally.** If something was left at 60%
   and attention moved elsewhere, say so with the short to-do until it reaches
   100% — whatever kind of response it is. This is the part that stops work
