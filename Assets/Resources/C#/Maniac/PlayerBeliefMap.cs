@@ -141,6 +141,38 @@ namespace TimeKiller.Maniac
             return BestTarget(out world, minMass); // nothing far enough — take the global best
         }
 
+        /// Like BestTargetBeyond, but sometimes settles for the SECOND or third
+        /// likeliest place instead of the best one.
+        ///
+        /// A searcher who walks to the optimal cell every single time reads as a
+        /// pathfinder, not as a person: real doubt looks like checking the wrong
+        /// room first. Alien: Isolation searches its areas of interest in a
+        /// deliberately sub-optimal order for exactly this reason. `rank` 0 is the
+        /// old behaviour, so passing 0 leaves this identical to BestTargetBeyond.
+        public bool RankedTargetBeyond(Vector2 from, float minDist, int rank, out Vector2 world,
+                                       float minMass = 0.0002f)
+        {
+            if (rank <= 0) return BestTargetBeyond(from, minDist, out world, minMass);
+
+            // Collect the candidates that clear the distance gate, then take the
+            // nth. Cheap because the grid is small and this runs once per search
+            // point, not per frame.
+            var best = new System.Collections.Generic.List<int>();
+            float minDistSq = minDist * minDist;
+            for (int i = 0; i < prob.Length; i++)
+            {
+                if (prob[i] <= minMass) continue;
+                Vector2 c = CellCenter(i % cols, i / cols);
+                if ((c - from).sqrMagnitude < minDistSq) continue;
+                best.Add(i);
+            }
+            if (best.Count == 0) return BestTargetBeyond(from, minDist, out world, minMass);
+            best.Sort((a, b) => prob[b].CompareTo(prob[a]));
+            int pick = Mathf.Min(rank, best.Count - 1);
+            world = CellCenter(best[pick] % cols, best[pick] / cols);
+            return true;
+        }
+
         /// Belief sitting within `radius` of a world point.
         ///
         /// Used to ask "does he think the player came THIS way?" about a specific

@@ -35,4 +35,37 @@ namespace TimeKiller.Maniac
     {
         public UnityEngine.Vector2 Position;
     }
+
+    // ---- Messages the maniac ACCEPTS. Everything above is something he says;
+    // these two are things said to him. They are declared here rather than in the
+    // Director feature that sends them so the Director stays deletable: with these
+    // in Director, removing that folder would stop the maniac compiling, which is
+    // exactly the coupling the "cleanly removable" rule exists to prevent.
+
+    /// "Go and look over there." A REGION, never a position.
+    ///
+    /// Modelled on Alien: Isolation's two-brain split: a director that knows where
+    /// the player is steers the creature toward their AREA and never hands over
+    /// the location, so the creature still has to see or hear them. The Area here
+    /// is deliberately smeared by DirectorConfig.hintError — if that error ever
+    /// shrinks below his sight range, arriving at a hint becomes finding the
+    /// player and the whole thing has quietly become a cheat.
+    ///
+    /// Nothing that handles this may write awareness, LastSeenPosition or belief.
+    public struct ManiacHintEvent
+    {
+        public UnityEngine.Vector2 Area;
+        public float Radius;
+        public bool Desperate;
+    }
+
+    /// The player has taught him something. Unlocked by what they DO (hiding
+    /// successfully), never by dying — punishing failure is the one thing that
+    /// reads as unfair.
+    public struct ManiacLearnedEvent
+    {
+        /// Added to the wardrobe check chance.
+        public float WardrobeBonus;
+        public int SuccessfulHides;
+    }
 }

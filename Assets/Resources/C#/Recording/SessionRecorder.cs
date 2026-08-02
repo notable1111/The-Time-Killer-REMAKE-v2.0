@@ -267,8 +267,16 @@ namespace TimeKiller.Recording
                 line.Append(",\"beats\":").Append(heart.BeatCount);
             }
             if (maniac != null)
+            {
                 line.Append(",\"mx\":").Append(maniac.Motor.Position.x.ToString("0.0", ci))
                     .Append(",\"my\":").Append(maniac.Motor.Position.y.ToString("0.0", ci));
+                line.Append(",\"mstate\":\"").Append(maniac.CurrentStateName).Append('"');
+                // Which way the Outlast rule went, and WHY. Every rejection looks
+                // the same from outside — he stands by the wardrobe doing nothing —
+                // so without the reason a bad hide and a fair one are the same log.
+                line.Append(",\"hide\":\"").Append(Escape(maniac.LastHideVerdict)).Append('"');
+                line.Append(",\"spot\":").Append(maniac.CompromisedSpot.HasValue ? "true" : "false");
+            }
             line.Append(",\"world\":").Append(AudioDucking.World.ToString("0.00", ci));
             line.Append(",\"frame\":").Append(FramesSaved);
             line.Append('}');
@@ -280,6 +288,13 @@ namespace TimeKiller.Recording
             // few seconds — which is where the crash is.
             state.Flush();
         }
+
+        /// The hide verdict is free text written for a human, so it can contain
+        /// quotes. One unescaped quote turns that sample into unparseable JSON and
+        /// every tool reading the session skips the line — silently losing exactly
+        /// the moment worth reading.
+        static string Escape(string s) =>
+            string.IsNullOrEmpty(s) ? "" : s.Replace("\\", "\\\\").Replace("\"", "\\\"");
 
         /// Grab what the player actually saw, overlay and all.
         ///

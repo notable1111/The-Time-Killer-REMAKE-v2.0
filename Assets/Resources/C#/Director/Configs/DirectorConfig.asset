@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3968c2464eacfd4aa7541cacd83f093, type: 3}
+  m_Name: DirectorConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Director.DirectorConfig
+  enabled: 1
+  hintAfterQuietSeconds: 22
+  minSecondsBetweenHints: 15
+  minHintDistance: 14
+  hintError: 9
+  hintRadius: 7
+  errorGrowthPer10s: 2.5
+  maxHintError: 20
+  hidesBeforeLearning: 2
+  wardrobeBonusPerHide: 0.06
+  maxWardrobeBonus: 0.35
+  doubtChance: 0.3
+  backtrackChance: 0.12

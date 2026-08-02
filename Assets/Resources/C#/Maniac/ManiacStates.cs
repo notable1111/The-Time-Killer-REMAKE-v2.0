@@ -77,6 +77,29 @@ namespace TimeKiller.Maniac
                 return;
             }
 
+            // A Director hint outranks the patrol route. This is the whole point
+            // of the two-brain design: without it he walks his loop forever and a
+            // player who breaks line of sight is never troubled again — measured
+            // as an 80-second bot session with ZERO detections. He is only being
+            // sent to a SMEARED area and still has to see or hear them there, so
+            // this steers him without telling him anything.
+            var hint = maniac.Hint;
+            if (hint.HasValue)
+            {
+                maniac.Nav.MoveTo(hint.Value, config.patrolSpeed);
+                if (maniac.Nav.ReachedDestination(config.hintReachedTolerance))
+                {
+                    // Swept it and found nothing. Drop it and resume the route
+                    // rather than orbiting a guess that has already failed.
+                    maniac.ClearHint();
+                    pauseUntil = Time.time + config.waypointPauseSeconds;
+                    scanBase = CurrentFacing();
+                    waypointIndex = maniac.Route.ClosestIndex(maniac.Motor.Position);
+                    waypointDeadline = pauseUntil + config.patrolWaypointTimeout;
+                }
+                return;
+            }
+
             maniac.Nav.MoveTo(maniac.Route.Waypoint(waypointIndex), config.patrolSpeed);
             // Advance when reached OR when he's spent too long trying — a waypoint
             // wedged against a pillar/corner must never freeze the whole patrol.
@@ -316,7 +339,7 @@ namespace TimeKiller.Maniac
             rushing = true;
             rushUntil = Time.time + maniac.Config.searchRushSeconds;
             considersWardrobes = search != null && search.Ready
-                                 && Random.value < search.Config.checkChance;
+                                 && Random.value < search.EffectiveCheckChance;
 
             PickTarget();
         }
@@ -337,7 +360,14 @@ namespace TimeKiller.Maniac
         {
             // Stride to a belief spot a few units out (not the adjacent cell), so he
             // hunts in confident strides and ranges outward toward where you fled.
-            if (belief != null && belief.BestTargetBeyond(maniac.Motor.Position, 3f, out var t))
+            // DOUBT: occasionally take the second or third likeliest spot instead
+            // of the best. Always choosing the optimum is what makes a hunter read
+            // as a pathfinder — a person checks the wrong room first sometimes.
+            // rank 0 is the original behaviour, so with doubt disabled nothing
+            // about this line changes.
+            int rank = maniac.Config.searchDoubtChance > 0f && Random.value < maniac.Config.searchDoubtChance
+                ? Random.Range(1, 3) : 0;
+            if (belief != null && belief.RankedTargetBeyond(maniac.Motor.Position, 3f, rank, out var t))
             {
                 looking = false;
                 target = t;
@@ -465,7 +495,14 @@ namespace TimeKiller.Maniac
 
         public override void Enter()
         {
-            maniac.Motor.Stop();
+            // NO Motor.Stop() here. It used to, and it contradicted the design
+            // recorded on attackCooldown itself: "He KEEPS CHASING during this —
+            // the player's escape comes from the post-hit adrenaline burst, not
+            // from him stopping." Stopping cost a 0.71s standstill (0.15s brake +
+            // 0.35s recovery + 0.21s ramp back to 5.2), and in both recorded
+            // chases that is exactly where he lost the player: speed collapsed to
+            // 0.40-0.54 u/s and a running player gained 4.8u and 6.2u. From the
+            // outside it read as him catching you and inexplicably letting go.
             swung = false;
             recoverUntil = Time.time + maniac.Config.attackRecoverySeconds;
             maniac.NextAttackAllowed = Time.time + maniac.Config.attackCooldown;
@@ -473,6 +510,11 @@ namespace TimeKiller.Maniac
 
         public override void Tick(float deltaTime)
         {
+            // Keep closing THROUGH the swing, at a share of chase speed, so he
+            // carries momentum out of the attack instead of restarting from rest.
+            maniac.Motor.MoveTo(maniac.PlayerPosition,
+                maniac.Config.chaseSpeed * maniac.Config.attackMoveShare);
+
             if (!swung)
             {
                 swung = true;

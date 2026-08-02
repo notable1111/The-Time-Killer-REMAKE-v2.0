@@ -100,10 +100,12 @@ namespace TimeKiller.Maniac
 
             EventBus.Subscribe<TimeKiller.Hiding.PlayerHidEvent>(OnPlayerHid);
             EventBus.Subscribe<TimeKiller.Hiding.PlayerUnhidEvent>(OnPlayerUnhid);
+            EventBus.Subscribe<ManiacHintEvent>(OnHint);
 
             stateMachine.ChangeState(Patrol);
             DebugOverlay.Watch("Maniac", () => stateMachine.Current?.GetType().Name ?? "none");
             DebugOverlay.Watch("Maniac Sees", () => Perception.CanSeePlayer ? "PLAYER!" : "-");
+            DebugOverlay.Watch("Last Hide", () => LastHideVerdict);
             DebugOverlay.Watch("Awareness", () =>
             {
                 int pct = Mathf.RoundToInt(Perception.Awareness * 100f);
@@ -171,19 +173,72 @@ namespace TimeKiller.Maniac
             stateMachine.StateChanged -= OnStateChanged;
             EventBus.Unsubscribe<TimeKiller.Hiding.PlayerHidEvent>(OnPlayerHid);
             EventBus.Unsubscribe<TimeKiller.Hiding.PlayerUnhidEvent>(OnPlayerUnhid);
+            EventBus.Unsubscribe<ManiacHintEvent>(OnHint);
             DebugOverlay.Unwatch("Maniac");
             DebugOverlay.Unwatch("Maniac Sees");
+            DebugOverlay.Unwatch("Last Hide");
             DebugOverlay.Unwatch("Awareness");
             DebugOverlay.Unwatch("Brain");
         }
+
+        /// Why the last hide did or did not compromise the spot. Recorded because
+        /// this rule has TWO independent guards and, from outside, every rejection
+        /// looks identical: he stands next to the wardrobe doing nothing.
+        ///
+        /// Measured 2026-08-02 in Recordings/2026-08-02_154554: the player hid in
+        /// WardrobeA (1.7, 9.6) while he was 1.4u away and DETECTED, and he then
+        /// stood 0.44u from the door for 11.6s cycling suspicious/searching. One
+        /// of these two guards rejected it and there was no way to tell which.
+        public string LastHideVerdict { get; private set; } = "none yet";
+
+        // ---- The Director's hint. Optional: with no ManiacDirector in the scene
+        // this stays null forever and PatrolState behaves exactly as before.
+        Vector2? hintArea;
+        float hintRadius;
+        float hintUntil;
+
+        /// Where the Director suggested he look, or null. A SUGGESTION — it is
+        /// deliberately smeared before it reaches him and it never touches his
+        /// awareness, so arriving here is not the same as finding anyone.
+        public Vector2? Hint => hintArea.HasValue && Time.time < hintUntil ? hintArea : null;
+        public float HintRadius => hintRadius;
+
+        void OnHint(ManiacHintEvent evt)
+        {
+            hintArea = evt.Area;
+            hintRadius = evt.Radius;
+            // Expires on its own. A hint that never went stale would pin him to a
+            // spot the player left minutes ago.
+            hintUntil = Time.time + (config != null ? config.hintLifetimeSeconds : 45f);
+        }
+
+        /// Consumed once he has swept it, so he does not orbit a stale suggestion.
+        public void ClearHint() { hintArea = null; }
+
+        /// The state he is in right now, by name. Public so the recorder can log
+        /// it — a position track alone cannot tell "searching" from "patrolling",
+        /// and those look identical in the data while meaning opposite things.
+        public string CurrentStateName => stateMachine?.Current?.GetType().Name ?? "none";
 
         void OnPlayerHid(TimeKiller.Hiding.PlayerHidEvent evt)
         {
             // Saw them within the window? Then hiding fools nobody — but only if
             // the player could have KNOWN he was watching. See IsOnScreen.
-            if (Perception.TimeSinceSeen > config.seenEnterWindow) return;
-            if (config.compromiseOnlyWhenOnScreen && !IsOnScreen()) return;
+            float sinceSeen = Perception.TimeSinceSeen;
+            float distance = Vector2.Distance(Motor.Position, evt.SpotPosition);
 
+            if (sinceSeen > config.seenEnterWindow)
+            {
+                LastHideVerdict = $"SAFE: not seen recently ({sinceSeen:0.00}s > {config.seenEnterWindow:0.00}s window), {distance:0.0}u away";
+                return;
+            }
+            if (config.compromiseOnlyWhenOnScreen && !IsOnScreen())
+            {
+                LastHideVerdict = $"SAFE: he was OFF-SCREEN (seen {sinceSeen:0.00}s ago, {distance:0.0}u away) — the blind band";
+                return;
+            }
+
+            LastHideVerdict = $"CAUGHT: seen {sinceSeen:0.00}s ago, on screen, {distance:0.0}u away";
             CompromisedSpot = evt.SpotPosition;
             ChangeState(Chase);
         }

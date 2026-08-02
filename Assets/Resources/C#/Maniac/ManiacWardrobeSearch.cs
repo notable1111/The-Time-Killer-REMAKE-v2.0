@@ -36,16 +36,36 @@ namespace TimeKiller.Maniac
 
         public void Init(WardrobeSearchConfig searchConfig) => config = searchConfig;
 
+        // Taught by the Director, which counts hides the player actually got away
+        // with. Zero unless a ManiacDirector is in the scene, so this whole idea
+        // is opt-in and the base chance is untouched without one.
+        float learnedBonus;
+
+        /// The chance he opens wardrobes on THIS hunt: the authored base plus
+        /// whatever the player has taught him. Isolation unlocks behaviours from
+        /// player metrics for exactly this reason — a creature that starts
+        /// checking lockers only after you have used them reads as having noticed,
+        /// which is far more unsettling than one that always checked.
+        public float EffectiveCheckChance =>
+            config == null ? 0f : Mathf.Clamp01(config.checkChance + learnedBonus);
+
+        void OnLearned(ManiacLearnedEvent evt) => learnedBonus = evt.WardrobeBonus;
+
         void Start()
         {
             spots = Object.FindObjectsByType<HidingSpot>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            EventBus.Subscribe<ManiacLearnedEvent>(OnLearned);
             DebugOverlay.Watch("Wardrobe", () => config == null
                 ? "NO CONFIG"
                 : $"{lastSpotName} dist {lastDistance:0.0}/{config.maxDistanceFromLastSeen:0.0} " +
                   $"share {lastShare:0.00}/{config.openBeliefShare:0.00} ({spots?.Length ?? 0} spots)");
         }
 
-        void OnDestroy() => DebugOverlay.Unwatch("Wardrobe");
+        void OnDestroy()
+        {
+            EventBus.Unsubscribe<ManiacLearnedEvent>(OnLearned);
+            DebugOverlay.Unwatch("Wardrobe");
+        }
 
         /// The wardrobe worth a detour on the way to `beliefTarget`, or none.
         /// Nearest wins, so he clears the closest doubt first rather than

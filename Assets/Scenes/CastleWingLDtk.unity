@@ -21363,6 +21363,7 @@ GameObject:
   - component: {fileID: 1328952257}
   - component: {fileID: 1328952258}
   - component: {fileID: 1328952259}
+  - component: {fileID: 1328952260}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -21813,6 +21814,22 @@ MonoBehaviour:
   boringKey: 290
   unfairKey: 291
   greatKey: 292
+--- !u!114 &1328952260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1328952239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6e482a8f74d2614a8d7d74a6c3beb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Objectives.ClockMissRing
+  config: {fileID: 0}
+  segments: 48
+  width: 0.07
+  sortingOrder: -3
 --- !u!1 &1337540755
 GameObject:
   m_ObjectHideFlags: 0
@@ -21924,6 +21941,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1346061916}
   m_CullTransparentMesh: 1
+--- !u!1 &1348425673
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1348425675}
+  - component: {fileID: 1348425674}
+  m_Layer: 0
+  m_Name: ManiacDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1348425674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1348425673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3f63bd11ac07154f821bc50da34b795, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Director.ManiacDirector
+  config: {fileID: 11400000, guid: 120ece60233e96a4784996d006f2c075, type: 2}
+--- !u!4 &1348425675
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1348425673}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1350743276
 GameObject:
   m_ObjectHideFlags: 0
@@ -29572,6 +29634,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Heartbeat.PlayerBreathing
   config: {fileID: 11400000, guid: 67bab1849dca8244588805a9ac0b8573, type: 2}
+  inhaleClips:
+  - {fileID: 8300000, guid: dbdcda6785e308645a9cb52919f81fbc, type: 3}
+  - {fileID: 8300000, guid: 115d2e14694b6854e9039cfa4e0fde17, type: 3}
+  - {fileID: 8300000, guid: 5c42de1be581ef04cadf07e5201c9076, type: 3}
+  - {fileID: 8300000, guid: 0ab7765b54b6eb0408466c82568f1d94, type: 3}
+  exhaleClips:
+  - {fileID: 8300000, guid: 7a5062c273608994fa0c541942796974, type: 3}
+  - {fileID: 8300000, guid: b3270e7e82e72804f89854a631e5dd38, type: 3}
+  - {fileID: 8300000, guid: f62c93de0783bfc4280ae362730ff91e, type: 3}
   breathLoop: {fileID: 8300000, guid: 4fb2e14d25c3e7b47b269c5bb95bb179, type: 3}
   gaspClip: {fileID: 8300000, guid: 0cf11fd52ef2c0b46831eb561076e77f, type: 3}
   fearConfig: {fileID: 11400000, guid: 15b9ae136cc645847b1544a0836a2a1d, type: 2}
@@ -32796,3 +32867,4 @@ SceneRoots:
   - {fileID: 1337540756}
   - {fileID: 1106122094}
   - {fileID: 1804355008}
+  - {fileID: 1348425675}

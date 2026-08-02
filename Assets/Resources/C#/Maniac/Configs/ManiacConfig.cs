@@ -106,6 +106,15 @@ namespace TimeKiller.Maniac
         [Tooltip("Seconds the navigator drives the chase after a stall before he tries the straight line again. The beeline is the better look wherever it works, so this hands control back rather than keeping it for the rest of the chase.")]
         public float beelineNavSeconds = 0.9f;
 
+        [Tooltip("Chance he walks to the SECOND or third likeliest place instead of the best one while searching. A searcher who always takes the optimal cell reads as a pathfinder rather than a person — Alien: Isolation searches sub-optimally on purpose for exactly this reason. 0 restores the old always-optimal behaviour exactly.")]
+        [Range(0f, 1f)] public float searchDoubtChance = 0.3f;
+
+        [Header("Director hints (optional — no ManiacDirector in scene = never used)")]
+        [Tooltip("Seconds a Director hint stays worth acting on. It expires by itself because a hint that never went stale would pin him to a spot the player left minutes ago — and standing on old information is exactly what makes an AI look stupid.")]
+        public float hintLifetimeSeconds = 45f;
+        [Tooltip("How close to the hint's centre counts as having swept it. Generous: the hint is an AREA, and treating it as a point to stand on defeats the purpose.")]
+        public float hintReachedTolerance = 3.5f;
+
         [Header("Attack")]
         public int damage = 1;
         public float attackRange = 0.9f;
@@ -113,6 +122,8 @@ namespace TimeKiller.Maniac
         public float attackCooldown = 1.6f;
         [Tooltip("Brief swing recovery before he resumes the chase — just enough to read the attack.")]
         public float attackRecoverySeconds = 0.35f;
+        [Tooltip("Share of chaseSpeed he keeps while swinging. NOT zero: AttackState used to call Motor.Stop(), which contradicted the line above and cost him a 0.71s standstill (0.15s brake + 0.35s recovery + 0.21s ramp back up) — measured in both recorded chases as a 0.40-0.54 u/s collapse that let a running player gain 4.8-6.2u. Below 1 so the swing still reads as a commitment and the shove still buys an escape.")]
+        [Range(0f, 1f)] public float attackMoveShare = 0.5f;
 
         [Header("Hiding (the Outlast rule)")]
         [Tooltip("If he had eyes on the player within this many seconds before they hid, the spot is compromised — he walks up and drags a hit out of it.")]
