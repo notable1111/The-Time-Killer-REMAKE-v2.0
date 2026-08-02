@@ -65,6 +65,38 @@ def mix_into(base, layer, gain):
     return base
 
 
+def highpass(samples, rate, hz, stages=2):
+    """Cascaded RBJ high-pass. Applied BEFORE the loudness normalise, which is the
+    whole point: stripping energy nobody's speakers reproduce means the normalise
+    then has to lift the audible part to hit the target, so the clip gets louder
+    where it counts.
+
+    Measured need: the maniac's sustained mutters carry 53% of their energy below
+    60 Hz *before* any monsterising — the low hum is in the source, not something
+    the sub-octave added (that was tested and ruled out). Laptop speakers cannot
+    reproduce it, so without this the clip is mostly inaudible content."""
+    if hz <= 0:
+        return samples
+    out = list(samples)
+    w0 = 2 * math.pi * hz / rate
+    cs, sn = math.cos(w0), math.sin(w0)
+    alpha = sn / (2 * 0.707)                       # Butterworth Q, no corner bump
+    a0 = 1 + alpha
+    b0 = ((1 + cs) * 0.5) / a0
+    b1 = (-(1 + cs)) / a0
+    b2 = b0
+    a1 = (-2 * cs) / a0
+    a2 = (1 - alpha) / a0
+    for _ in range(stages):
+        x1 = x2 = y1 = y2 = 0.0
+        for i, x in enumerate(out):
+            y = b0 * x + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2
+            x2, x1 = x1, x
+            y2, y1 = y1, y
+            out[i] = y
+    return out
+
+
 def saturate(x, drive):
     return math.tanh(x * drive) / math.tanh(drive)
 
@@ -80,6 +112,7 @@ def main():
     drop = arg("--drop", 0.80)       # main pitch factor
     sub_gain = arg("--sub", 0.30)    # sub-octave level
     det_gain = arg("--detune", 0.40) # detuned double level
+    hp_hz = arg("--hp", 0.0)         # optional high-pass, applied before normalise
 
     names = sorted(n for n in os.listdir(src_dir) if n.lower().endswith(".wav"))
     if not names:
@@ -100,6 +133,8 @@ def main():
         body = mix_into(body, resample(samples, drop * 0.98), det_gain)
 
         body = [saturate(x, DRIVE) for x in body]
+        if hp_hz > 0:
+            body = highpass(body, rate, hp_hz)
         rms = math.sqrt(sum(x * x for x in body) / len(body))
         gain = TARGET_RMS / rms if rms > 0 else 1.0
         out = []
