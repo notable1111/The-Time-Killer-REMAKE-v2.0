@@ -263,6 +263,56 @@ normalising was tried first and rejected by measurement — it left the first ba
 7 dB under the heartbeat, because a clip with one sharp transient peaks the same
 as a sustained one.
 
+## 2026-08-03 — The maniac gets a second brain
+
+**Researched before building.** Alien: Isolation runs two brains: a **director**
+that always knows where the player is and periodically points the creature at
+their AREA, and the creature itself, which knows nothing and must use its own
+senses. The director never hands over the position — it only steers. Players
+trust that game precisely because it never cheats.
+
+**The problem it fixes was measured, not assumed:** a recorded bot session ran
+**80 seconds with zero detections**. When the maniac loses you, his belief map
+decays, he returns to patrol, and the encounter is simply over. No amount of
+sense-tuning fixes that, because nothing existed to bring him back.
+
+**`ManiacDirector`** (`C#/Director/`) issues a hint after `hintAfterQuietSeconds`
+of genuine quiet — he must be Unaware, and at least `minHintDistance` away, so it
+never piles onto something already happening. The hint is a **smeared point plus
+a radius**, never a position.
+
+**The dial that keeps it honest is `hintError` (9u) against his `sightRange` (7u).**
+If the error ever drops below the sight range, arriving at a hint *becomes*
+finding the player and the Director has started cheating whatever the code says.
+Setup/45 prints this comparison every run. Nothing in the feature writes his
+awareness, `LastSeenPosition` or belief map.
+
+Verified live: 6 hints over ~90s of a stationary player; the accepted hint landed
+**17.2u from the real position**; he travelled 31.7u → 7.1u to it and then found
+the player **himself** — ending Unaware→**Detected**, Patrol→**Chase**, 4.3u away.
+
+**He learns from what you DO, never from dying.** Isolation gates behaviours on
+player metrics; gating on deaths would punish losing, which is the one thing that
+reads as unfair. Hides that you actually got away with (he never found you during
+it) raise the wardrobe check chance past `hidesBeforeLearning`, capped at
+`maxWardrobeBonus` 0.35 so hiding can never become useless — the fix for the
+"hiding is inert" finding (81.8% vs 81.9% death) is to make it a decision, not to
+remove it.
+
+**Doubt.** `searchDoubtChance` 0.3 makes him take the second or third likeliest
+cell instead of the best. A searcher who always walks to the optimum reads as a
+pathfinder, not a person. `PlayerBeliefMap.RankedTargetBeyond(rank: 0)` is
+byte-for-byte the old behaviour, so the feature is off at 0.
+
+**Removability was designed in, and it changed the file layout.** `ManiacHintEvent`
+and `ManiacLearnedEvent` live in the **Maniac** feature, not the Director that
+sends them: declared in Director, deleting that folder would stop the maniac
+compiling — exactly the coupling the removability rule exists to prevent. The
+Director depends on the Maniac; the Maniac depends on nothing. Delete the object
+and he behaves exactly as before.
+
+38/38 EditMode tests still pass.
+
 ## 2026-08-02 — Every label is TextMeshPro now
 
 **All 15 labels were legacy `UnityEngine.UI.Text`**, which renders from a bitmap

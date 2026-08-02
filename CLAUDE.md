@@ -70,6 +70,20 @@ a measurement, because the reader cannot tell them apart.
   the user is learning Unity/C#) and *how to test it in Unity*.
 - **Disagreement:** state the concern and an alternative **once**, then follow
   the user's decision without arguing.
+- **"Finished" means FROZEN.** When the user says a feature is finished —
+  "heartbeat finished", "this is done" — stop touching it. Do not retune it, do
+  not "improve" it, do not adjust its numbers because a measurement looks off.
+  A metric that disagrees with a finished feature is a **report**, not a mandate:
+  say what it says and let him decide.
+  Objective defects inside a frozen feature (compile errors, null refs, crashes,
+  clipping) may still be fixed. Anything a player would **hear or feel** may not.
+  *(Added 2026-08-02, the expensive way. The fear system was built to a detailed
+  spec and verified against its own target table — then retuned unprompted from a
+  SINGLE bot session: the whole awareness ladder dropped, `detectedMultiplier`
+  1.75→1.25, and every heartbeat asset lost 3 dB. The justification was a number
+  that had been flagged one message earlier as partly an artifact of our own
+  stage-labelling code. Working feel was changed to satisfy a metric already known
+  to be unreliable, at n=1.)*
 - **Long tasks:** post short progress updates at milestones, not silence.
 - **After work deliveries** — anything built, fixed, verified or pushed — end with
   a **"What I did"** recap, then a "What's next?" of 2–3 concrete options and a
