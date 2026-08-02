@@ -50,7 +50,7 @@ MonoBehaviour:
     tier: 4
     duckDepth: 1
   - channel: 0
-    level: 0.8
+    level: 1
     tier: 5
     duckDepth: 0.35
   - channel: 1
@@ -59,7 +59,12 @@ MonoBehaviour:
     duckDepth: 0.4
   duckAttackSeconds: 0.08
   duckReleaseSeconds: 0.55
-  heartUnderManiacBreath: 0.4
+  heartUnderManiacBreath: 0.65
   heartDuckAtBreath: 0.5
+  musicEqEnabled: 1
+  musicHighPassHz: 80
+  musicDipHz: 220
+  musicDipDb: -3
+  musicDipQ: 0.9
   masterLevel: 0.85
   enabled: 1

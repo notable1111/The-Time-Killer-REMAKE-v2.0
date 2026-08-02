@@ -43,20 +43,20 @@ MonoBehaviour:
   - {fileID: 8300000, guid: ff3dfd5caf2be6f43a2da19297f779f6, type: 3}
   - {fileID: 8300000, guid: be218e0bc6cf16a43bfe639495d734cc, type: 3}
   - {fileID: 8300000, guid: 079024c654a0de842930fc0c5942b1db, type: 3}
-  dreadVolume: 0.35
-  mysteryVolume: 0.42
-  investigateVolume: 0.4
-  chaseVolume: 0.42
-  safeVolume: 0.28
-  endgameVolume: 0.6
+  dreadVolume: 0.27579162
+  mysteryVolume: 0.78628695
+  investigateVolume: 0.75089824
+  chaseVolume: 0.88222843
+  safeVolume: 0.23745488
+  endgameVolume: 0.6245699
   spottedStings:
-  - {fileID: 8300000, guid: 009508ea1ac75794490df9721a67b922, type: 3}
-  - {fileID: 8300000, guid: d603b2bcf5acf4245a1f0b7366591156, type: 3}
-  - {fileID: 8300000, guid: a568d631663f98c40bdfa98681ec5aef, type: 3}
-  heardRiser: {fileID: 8300000, guid: c3119d6ff9af02d4ba17b170fba9f461, type: 3}
-  deathSting: {fileID: 8300000, guid: db54117cd496bc649a55db4bf03a0e13, type: 3}
-  gateUnlockSting: {fileID: 8300000, guid: 9a0c81cf91e1ce742a6f1c3e291398f5, type: 3}
-  escapeSting: {fileID: 8300000, guid: a3046204c1af0a34cb73f357cbfa1611, type: 3}
+  - {fileID: 8300000, guid: a96a4308cc7537c459cb737733dc610a, type: 3}
+  - {fileID: 8300000, guid: d8223ec993a1a0740acaa6d32dd2404c, type: 3}
+  - {fileID: 8300000, guid: 6c805d923a56b7349b5507366fc18252, type: 3}
+  heardRiser: {fileID: 8300000, guid: d0cabe2b3aa9cd14eb83df3d7fb38435, type: 3}
+  deathSting: {fileID: 8300000, guid: c6ad6c37d4312784ca2ebd1a5d59917e, type: 3}
+  gateUnlockSting: {fileID: 8300000, guid: d4b19f6c7b365b04eb9e4976685c6c6d, type: 3}
+  escapeSting: {fileID: 8300000, guid: d604064c4c345ab4abc03f30b27157b3, type: 3}
   stingVolume: 0.7
   spottedStingCooldown: 4
   riserCooldown: 8
@@ -77,9 +77,4 @@ MonoBehaviour:
     y: -8
     width: 16
     height: 2
-  mysteryZones:
-  - serializedVersion: 2
-    x: 0
-    y: 0
-    width: 3
-    height: 3
+  mysteryZones: []

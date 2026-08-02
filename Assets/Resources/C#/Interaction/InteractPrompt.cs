@@ -17,6 +17,7 @@
 // design bug in the placement, not something this component can fix.
 using TimeKiller.Hiding;
 using TimeKiller.Objectives;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,7 +26,7 @@ namespace TimeKiller.Interaction
     public class InteractPrompt : MonoBehaviour
     {
         [SerializeField] GameObject root;
-        [SerializeField] Text label;
+        [SerializeField] TMP_Text label;
 
         ClockRepair repair;
         PlayerHiding hiding;

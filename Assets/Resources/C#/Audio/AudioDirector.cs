@@ -28,6 +28,7 @@ namespace TimeKiller.Audio
         float fade;                 // 0..1 progress of the crossfade
         string maniacState = nameof(PatrolState);
         Transform player;
+        MusicZone[] sceneZones;     // collected once; zones are authored, not spawned
         float nextSpottedSting;
         float nextRiser;
         bool endgame;               // gate is open — the run for the door
@@ -38,13 +39,15 @@ namespace TimeKiller.Audio
         {
             active = musicA;
             standby = musicB;
+            sceneZones = Object.FindObjectsByType<MusicZone>(FindObjectsSortMode.None);
             EventBus.Subscribe<ManiacStateChangedEvent>(OnManiacState);
             EventBus.Subscribe<ManiacSpottedPlayerEvent>(OnSpotted);
             EventBus.Subscribe<ManiacHeardNoiseEvent>(OnHeard);
             EventBus.Subscribe<PlayerDiedEvent>(OnDied);
             EventBus.Subscribe<AllClocksFixedEvent>(OnGateOpened);
             EventBus.Subscribe<GameWonEvent>(OnEscaped);
-            DebugOverlay.Watch("Music", () => $"{currentLayer} ({(active != null && active.clip != null ? active.clip.name : "-")})");
+            DebugOverlay.Watch("Music", () => $"{currentLayer} ({(active != null && active.clip != null ? active.clip.name : "-")})"
+                + $" zones:{(sceneZones == null ? 0 : sceneZones.Length)}");
             // The mix has to be visible to be tuned by ear — otherwise a duck
             // that is firing and a duck that is broken sound the same as "quiet".
             DebugOverlay.Watch("Mix", () => !AudioMix.Active ? "off" :
@@ -148,12 +151,16 @@ namespace TimeKiller.Audio
             return Layer.Dread;
         }
 
-        bool InSafeZone() => InAnyZone(config.safeZones);
-        bool InMysteryZone() => InAnyZone(config.mysteryZones);
+        bool InSafeZone() => InAnyZone(config.safeZones, MusicZone.Kind.Safe);
+        bool InMysteryZone() => InAnyZone(config.mysteryZones, MusicZone.Kind.Mystery);
 
-        bool InAnyZone(Rect[] zones)
+        /// Config rects OR a scene-placed MusicZone. Both, on purpose: the rects
+        /// are the original hand-typed servant-passage zones and still work, while
+        /// scene zones are per-map and draggable. AudioConfig is shared by every
+        /// scene, so a rect authored for one map is also live in the other — which
+        /// is exactly why scene zones exist.
+        bool InAnyZone(Rect[] zones, MusicZone.Kind kind)
         {
-            if (zones == null || zones.Length == 0) return false;
             if (player == null)
             {
                 var controller = Object.FindAnyObjectByType<PlayerController>();
@@ -161,8 +168,15 @@ namespace TimeKiller.Audio
                 player = controller.transform;
             }
             Vector2 p = player.position;
-            foreach (var zone in zones)
-                if (zone.Contains(p)) return true;
+
+            if (zones != null)
+                foreach (var zone in zones)
+                    if (zone.Contains(p)) return true;
+
+            if (sceneZones != null)
+                foreach (var zone in sceneZones)
+                    if (zone != null && zone.kind == kind && zone.Contains(p)) return true;
+
             return false;
         }
 

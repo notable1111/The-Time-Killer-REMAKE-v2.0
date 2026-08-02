@@ -15,6 +15,7 @@
 //
 // Removable: delete the ObjectiveHUD object and the game runs unchanged.
 using TimeKiller.Core;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,7 +27,7 @@ namespace TimeKiller.Objectives
 
         [Header("Counter (built by Setup/38)")]
         [SerializeField] GameObject counterRoot;
-        [SerializeField] Text counterText;
+        [SerializeField] TMP_Text counterText;
 
         [Header("Skill-check gauge (built by Setup/38)")]
         [SerializeField] GameObject gaugeRoot;

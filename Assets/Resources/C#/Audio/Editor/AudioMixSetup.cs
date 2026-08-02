@@ -9,6 +9,7 @@
 // faders every time it runs would destroy exactly the work it exists to hold.
 using System.IO;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace TimeKiller.Audio.EditorTools
@@ -41,6 +42,37 @@ namespace TimeKiller.Audio.EditorTools
                       $"{config.channels.Length} channels, master {config.masterLevel:0.00}.\n" +
                       "  Tune it live in Play Mode — ScriptableObject edits persist.");
             Selection.activeObject = config;
+            AttachMusicEq();
+        }
+
+        /// The EQ has to live ON the music AudioSources, because OnAudioFilterRead
+        /// only sees the stream of the source it is attached to. Separate menu
+        /// item as well as part of Build(), so it can be re-run on a scene whose
+        /// mix config already exists (Build() returns early in that case).
+        [MenuItem("TimeKiller/Setup/40b - Attach Music EQ to the music sources")]
+        public static void AttachMusicEq()
+        {
+            var director = Object.FindAnyObjectByType<AudioDirector>();
+            if (director == null)
+            {
+                Debug.LogWarning("[TimeKiller Setup] 40b - no AudioDirector in the open scene; " +
+                                 "run Setup/24 first, then this.");
+                return;
+            }
+            int added = 0, existing = 0;
+            foreach (var source in director.GetComponentsInChildren<AudioSource>(true))
+            {
+                // Music only. The sting source must stay dry — the stings measured
+                // 5% below 60Hz and 34% in 300-800, so they are not part of the
+                // problem and high-passing them would only thin them out.
+                if (source.gameObject.name.IndexOf("music", System.StringComparison.OrdinalIgnoreCase) < 0) continue;
+                if (source.GetComponent<MusicEq>() != null) { existing++; continue; }
+                Undo.AddComponent<MusicEq>(source.gameObject);
+                added++;
+            }
+            EditorUtility.SetDirty(director);
+            EditorSceneManager.MarkSceneDirty(director.gameObject.scene);
+            Debug.Log($"[TimeKiller Setup] 40b - Music EQ: {added} attached, {existing} already present.");
         }
     }
 }

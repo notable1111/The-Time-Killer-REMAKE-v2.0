@@ -2,6 +2,150 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-08-02 — Fear becomes one number, and the game learns to record itself
+
+**The heartbeat had three opinions about danger.** The heart ran a distance curve
+with awareness FLOORS bolted on, breathing ran its own exertion model, and the
+world duck ran off the heart's intensity. Floors snap: a maniac 30u away flipping
+to Detected slammed the heart from 88 to 150 bpm — maximum panic for a threat that
+could not reach you.
+
+**New feature `C#/Fear/`** — `FearConductor` owns one smoothed 0..1 value and
+publishes it; heartbeat, breathing, drone, sting and the vignette all subscribe.
+Awareness and closing speed are **multipliers, never floors**, which is the whole
+trick: any multiple of near-zero proximity is still near-zero, so context can
+colour fear without manufacturing it. `fearStartDistance` **26u** against a camera
+showing ~10.7u — the old 10.4u range meant the warning arrived at the same moment
+as the sight of him. Beats are **scheduled** (`60/bpm`), never pitch-shifted, and
+volume now starts near zero instead of the old 0.55.
+
+Rate verified against the design target: **0.15 → 58 bpm, 0.35 → 78, 0.60 → 110,
+0.80 → 137, 1.00 → 165**, all inside spec, both curves monotonic.
+
+**The tension drone was chosen by measurement.** Lowpassing `Monolith_1` at 200 Hz
+costs it only **0.5 dB** — genuinely all sub-bass. `Void_1` and `An Empty Home_1`
+lose 4-5 dB to the same filter (air and detail that would fight the heartbeat).
+Its loop seam measures -34.3/-36.8 dB against a -22.8 dB average, so the loop
+point is inaudible. It also **dips 55% below what fear alone justifies while
+recovering** — a bed that only tracks fear is a loudness meter; the silence is
+what makes the next swell land.
+
+**Ambience now ducks 2.4 dB at panic, not to 0.08.** The old duck effectively
+muted the castle and took the maniac's own footsteps with it, at exactly the
+moment the player most needs to hear where he is.
+
+**New feature `C#/Recording/`** — the game records itself, because a reviewer with
+no screen and no ears can still study a recording. Three streams per session:
+state JSONL at 4 Hz, downscaled frames, and the **final audio mix** captured off
+the AudioListener via `OnAudioFilterRead`. Plus **F9/F10/F11** for the tester to
+stamp *boring / unfair / great* — the only signal in the whole pipeline no machine
+can produce. `Tools/Playtest/analyze_session.py` ranks the suspects; `/watch`
+packages the ritual.
+
+**Three bugs the pipeline found on its own first runs:**
+- The analyser reported four stuck players and **all four were the game working**
+  — three were the clock mini-game (which requires standing still) and one was 24s
+  in a wardrobe. It now excuses hiding and repairing.
+- The F1 overlay was clipping at a fixed 500px box, silently drawing **nine
+  watches offscreen** including the entire Fear block. GUILayout gives no warning,
+  so it looked exactly like systems failing to register.
+- Frame filenames were written in the system locale (`f00003_3,3.jpg`), and the
+  analyser parses seconds back out of that name — so every finding lost its
+  evidence. Caught by running the tool, not by reading it.
+
+**`detectedMultiplier` 1.75 → 1.25, measured down.** A recorded session showed
+21.2s in the Panic band on the way up against **3.5s in Threat** — the build-up
+was being skipped, because at 10u `0.53 × 1.75 = 0.93`. The guard test that should
+have caught it only checked the OUTER radius, where proximity is ~0 and any
+multiplier passes trivially. It now checks mid-range, and asserts no >0.2 fear
+jump per metre.
+
+**Audio headroom: 42 project assets were peak-normalised to 0 dBFS**, which is the
+wrong target for audio that layers. Measured on a real session, the master output
+reached 0.000 dB with a **flat factor of 18.2** — the waveform flattening at the
+ceiling, the signature of real clipping. 31 files re-normalised to **-3 dB peak**;
+project-owned clipping assets **42 → 0**. New `Tools/AudioPipeline/audit_audio.py`
+measures every asset and guards an approved baseline.
+
+**NOT fixed, and worth knowing:** the 12.3 dB loudness spread inside `Heartbeat/`
+survived this pass at 12.2 dB. A uniform peak gain preserves relative loudness —
+peak and RMS are different things, exactly as this changelog already recorded once
+before. That needs LUFS normalisation, which changes relative loudness and is a
+separate decision.
+
+**Not playtested by a human.** The fear system, the hearing and chase fixes and the
+re-normalised audio have all been measured, never heard or played.
+
+## 2026-08-02 — The maniac stops hearing through stone, and stops walking into door frames
+
+Two defects in what he already had. No new senses and no new behaviours — both had
+been shipping for weeks and were found by measuring code, not by playing it.
+
+**Hearing was the only sense that ignored geometry.** `OnFootstep` and
+`OnWorldNoise` compared distance against `hearingRadius * loudness` and nothing
+else — no linecast, unlike sight. A footstep two rooms away through solid castle
+wall set the noise fields exactly as one taken beside him, so his 9u hearing was
+really a 9u sphere of omniscience. Walls now muffle: each solid body between him
+and the noise multiplies what is left by `hearingWallMuffle` (**0.45**), reusing
+the same `sightBlockers` mask that stops his eyes so "solid" means one thing.
+Note what the fix did *not* need to do — distance already handled the far case, so
+muffling only has to fix the SAME distance heard THROUGH a wall.
+
+Measured in CastleWingLDtk across **733 listening posts**, calling the shipped code
+path: it removes **11.7%** of his running earshot overall — but the median post
+loses only **2.6%** while the tight interior around (39, 9) loses **89.8%**. So it
+deletes the "he heard me through a wall" moment without broadly nerfing him.
+Walking is barely touched (**0.7%**), because walking earshot is 2.7u and rarely
+crosses a wall at all — this is a change to running, whatever intuition says. Max
+walls found on one sight line was **5**, and 19% of posts see 2+ somewhere, so the
+per-wall decay does real work instead of collapsing to a binary.
+
+Counting DISTINCT colliders is a floor, not a thickness: a tilemap merged into one
+`CompositeCollider2D` reports a single hit however many of its walls the line
+crosses. Deliberate — under-counting only ever makes him hear *better*, so it fails
+toward the old behaviour rather than toward a deaf maniac.
+
+**"If he can see you, the way is clear" was false.** ChaseState beelines with
+`Motor.MoveTo` while `CanSeePlayer`, on the reasoning that line of sight proves the
+path. But sight is a **centre-to-centre** linecast and his body is 0.57u wide, so a
+doorway seen at an angle passes the line and stops the body. Worse, the motor
+writes `linearVelocity` directly, so a maniac pressed into a wall reports full
+chase speed while going nowhere — velocity cannot detect this, only displacement.
+
+New `TimeKiller/Verify/Maniac Chase Grind` sweeps his real capsule along the line
+he would beeline down, over 4000 sampled pairs (3361 with clear sight).
+**9.46% of all sightings had a beeline his body cannot complete**, worst case
+reaching 4% of the way. The distribution is the damning part:
+
+| separation | beeline blocked |
+|---|---|
+| 1-2u | 0.80% |
+| 3-4u | 6.58% |
+| 5-6u | 13.57% |
+| **6-7u** | **18.28%** |
+
+Worst at 6-7u — which is `sightRange`. It was at its worst at the exact moment he
+first acquires you. He now watches his own **displacement** and hands the chase to
+the navigator for `beelineNavSeconds` whenever he covers less than
+`beelineStallFraction` of the ground his speed predicts: **0.73u every 0.35s, or
+the navigator drives for 0.9s**. A false positive costs nothing, because the
+destination is identical — with a route he paths there, and with no route the
+navigator falls back to the same straight line he was already on.
+
+**The fallback was checked before it was trusted.** Of the 318 blocked beelines the
+probe found, the navigator has a route for **318 — 100%**. Every case it fires on
+is one it can actually rescue; had that number been low, the honest conclusion
+would have been that the geometry was the problem and the fallback theatre.
+
+**8 new EditMode tests** (4 hearing, 4 chase), 28 passing in total. The hearing
+ones guard the muffle in both directions: that it muffles at all, and that
+`hearingWallMuffle = 1` still reproduces the old geometry-blind behaviour exactly,
+so the escape hatch back is real rather than assumed.
+
+**Not runtime-verified.** Both changes compile, pass tests, and measure clean in
+the editor — but neither has been played. The chase fallback in particular has
+never been observed firing in a live chase.
+
 ## 2026-07-28 — The blood was invisible, then it was gumballs, and the castle now keeps the evidence
 
 **One heart, and the dead wiring that outlived it.** `PlayerHeartbeat` had already
@@ -118,6 +262,186 @@ to −12 dBFS with a tanh soft limiter; 24 of 27 now land within 1 dB. Peak
 normalising was tried first and rejected by measurement — it left the first batch
 7 dB under the heartbeat, because a clip with one sharp transient peaks the same
 as a sustained one.
+
+## 2026-08-02 — Every label is TextMeshPro now
+
+**All 15 labels were legacy `UnityEngine.UI.Text`**, which renders from a bitmap
+atlas baked at one size — fine at 24pt, visibly soft at the sizes this game uses:
+the run-end Headline is **96pt**, the pause Title 78pt, the clock counter 64pt.
+Legacy Text also has no outline, and all of this type sits over a dark scene, the
+blood overlay and the hiding slats, where an unoutlined glyph loses its edge
+against whatever is behind it. TMP was already installed (it ships inside
+com.unity.ugui) and simply unused.
+
+`Setup/44` builds SDF font assets from the two project TTFs, swaps every label,
+and re-wires the serialised references in one pass — it has to be one pass,
+because changing the runtime fields from `Text` to `TMP_Text` makes every stored
+reference null with nothing left to trace it back to.
+
+**Two failures found by running it, both worth writing down:**
+
+1. **`tmp.outlineWidth` throws on a freshly added component.** `SetOutlineThickness`
+   dereferences a material instance that does not exist until the component first
+   renders, which never happens at edit time. It killed the loop after 2 of 15
+   labels. The outline now lives on the **font asset's material** instead — same
+   look, no per-label material instance, and batching survives.
+2. **Re-wiring by dead instance id does not work.** Once a field's type is
+   `TMP_Text`, the stored id no longer resolves, so every field reads null with no
+   trace: measured **0 of 6 re-wired**. It matches by convention now — a `TMP_Text`
+   on the component's own object, else a label whose name matches the field name
+   — and only ever fills fields that are already null.
+
+**And the fallback that convention needed:** `ObjectiveHUD` lives on
+`Clocks/ObjectiveManager`, entirely outside any canvas, driving
+`ObjectiveHudCanvas/CounterPlaque/CounterText` from there. Searching only the
+component's own canvas found nothing and failed silently on exactly one field. It
+now falls back to every canvas in the scene.
+
+Verified: 0 legacy Text, 15 TMP labels, 8/8 references wired, outline 0.18 with
+the keyword enabled on both font materials, and labels building real meshes in
+play mode (CounterText 5 glyphs, Title 6). ⚠️ **`MainMenu.unity` still needs
+`Setup/44` run in it** — the migration is per-scene.
+
+## 2026-07-28 — You can pause now, and set the volume
+
+**There was no pause and no audio settings.** An 11-channel mix had been built and
+a player had no way to touch any of it, or to stop the game at all.
+
+**`PauseMenu`** — Esc, one flat panel, three sliders (Master / Music / Sound) and
+Resume / Quit. No nested settings screen: three sliders behind two extra clicks is
+worse than three sliders. Built by `Setup/43` from art already in the project —
+`EndFrame` for the panel and **`Bar.png` for the slider tracks, which had been
+imported and used by nothing**. No new art: the direction is locked and this
+screen has no business inventing a second look.
+
+**Esc was free, and it was worth checking.** `GameFlow` binds Esc as its quit key,
+but only reads it once `Phase != Playing` — so it quits from the end screen and
+does nothing during play. Pause takes it during play and hands it back when the
+run ends; the menu also force-closes if a run ends underneath it.
+
+**Player volume is a separate layer from the mix, on purpose.** The sliders write
+to **PlayerPrefs**, never to `AudioMixConfig`. Writing a player's slider into the
+ScriptableObject would dirty the asset, overwrite tuning done by ear, and get
+committed on the next push. Verified in play mode: with the music slider at 0.25
+the music gain went 0.850 → 0.213 and master 0.5 stacked it to 0.106, while the
+config's Music level stayed at 1.00 with `assetDirty=False`.
+
+**Audio deliberately keeps playing at full level while paused** — sliders are
+unusable if you cannot hear what they do. Duck timing moved to `Time.unscaledTime`
+so a duck that was running when you paused expires instead of freezing, which
+would otherwise have had players setting the music slider against a ducked level.
+
+`Setup/43` also creates an **EventSystem** if the scene has none — the existing HUD
+canvases are all display-only, so uGUI input had never been needed before and
+would have silently done nothing.
+
+## 2026-07-28 — Carving the low end, and the Mystery layer finally fires
+
+**Researched before touching anything.** The literature that matters here is
+**upward spread of masking** — low frequencies mask higher ones far more than the
+reverse, a property of the basilar membrane, and the masking curves *widen* as
+level rises. Also relevant: roughness (30–150 Hz amplitude modulation, not pitch)
+is what makes screams read as danger, and 2–4 kHz is the reflex band.
+
+**The "19 Hz fear frequency" is a myth and is deliberately NOT used.** It traces to
+a single 1990s anecdote (Tandy) that never replicated; the follow-up measured
+38 dB at 19 Hz, roughly **50 dB below the perception threshold** at that
+frequency. Building sub-audible content on that basis would spend headroom on
+nothing.
+
+**Finer measurement moved the target.** The earlier "below 300 Hz" framing was too
+coarse — the real pile-up is **below 60 Hz**: chase music 61%, heartbeat 60%, his
+mutters 66%. And laptop speakers cannot reproduce below ~150–200 Hz at all, so
+**81% of the chase track's energy never reached most players** while still masking
+everything above it on headphones. The heartbeat learned this exact lesson in an
+earlier pass (v1 was 97% below 100 Hz and inaudible); the music had never been
+checked.
+
+**`MusicEq`** high-passes the music at **80 Hz with two cascaded biquads
+(24 dB/oct)** plus a −3 dB dip at 220 Hz, applied live via `OnAudioFilterRead` on
+the music sources only — the stings measured 5% below 60 Hz and are left dry.
+A single 12 dB/oct stage at 55 Hz was tried first and rejected by measurement: it
+only took the chase track from 61% to 51%, because it barely touches 40–60 Hz
+where the energy actually sits. Done at runtime rather than by baking 20 tracks,
+which would have added ~530 MB to a repo already carrying a 1.6 GB pack.
+
+Measured across all six layers: **sub-60 energy fell from 37–66% to 9–21%.**
+
+**The EQ's cost was uneven (−2.3 to −7.3 dB) and broke the ladder** — mystery
+dropped to −35.1, below even safe. Layer volumes were therefore recalibrated on
+the **post-EQ** RMS, which is the correct order, and the music channel level went
+to 1.00 to give back what the filter removed. Ladder now safe −34, dread −31,
+mystery −28.5, investigate −26, endgame −25, chase −23.5. **Dread → chase 7.5 dB**
+(it was 1.6 dB before any of this work).
+
+**A wrong hypothesis, corrected by measurement.** His mutters at 66% sub-60 were
+blamed on the monsteriser's sub-octave. They were not: the raw, un-monsterised
+take is already **53% sub-60** — it is a slow low hum in the source, and cutting
+the sub-octave made it no better (one variant measured *worse*). The fix that
+works is the same high-pass, at 130 Hz, applied *before* the loudness normalise so
+the audible part gets lifted: **66% → 15–32% sub-60, and 300–800 Hz up from 5% to
+18–31%.** Only the four mutters changed; the approved growls and roars are untouched.
+
+**The Mystery layer had never once fired in real play.** Its only entry was the
+demo `Rect(0,0,3,3)` that `AudioConfig` itself asked someone to replace. It also
+could not have worked properly, because `mysteryZones` lives in ONE asset shared
+by CastleWingLDtk and Catacombs — a rect authored for one map is live in the other.
+
+**`MusicZone` moves zones into the scene**, with gizmos, so they are draggable and
+belong to the map they were placed in. Config rects are still read (the servant-
+passage safe zones are untouched), so this is purely additive. `Setup/42` derives
+placement from the scene: a zone on each **clock** — committing to a repair pins
+you in place and owns your attention, so the layer should already be running
+before you commit — and one on the **exit door**, which only fires before the gate
+opens because Endgame outranks Mystery. Wardrobes were deliberately excluded:
+hiding is a reaction, and seven of them would leave Mystery permanently on, and a
+layer that is always on means nothing.
+
+Verified in play mode: Dread at spawn and in corridors, Mystery at and approaching
+all three clocks and the door, clean boundary at the edge. 4 zones, no overlaps,
+377 sq units, and the player does not spawn inside one.
+
+## 2026-07-28 — Full audio audit: the sting nobody could hear, and a 1.6 dB tension ladder
+
+Every wired clip measured for RMS, peak and a three-band energy split, then
+combined with its config volume and mix gain to get the **effective in-game
+level** — the only number that matters, and one nobody had ever computed.
+
+| sound | before | after |
+|---|---|---|
+| jumpscare sting | **−38.9 dB** | −17.6 |
+| maniac breath | **−30.8 dB** | −15.9 |
+| chase music | −27.7 | −21.0 |
+| heartbeat (unchanged) | −10.7 | −10.7 |
+
+**The jumpscare was the quietest thing in the game** — 28 dB under the heartbeat.
+And `AudioMix` makes it tier 0, so every other channel was ducking to clear space
+for a sound that could not be heard. Raising `stingVolume` could not fix it: at
+0.70 the entire remaining range is +3 dB against a 20 dB shortfall. The fault was
+in the files, so `Setup/41` normalises them (through Unity, because several are
+.mp3 and Python's `wave` cannot read those). Originals are untouched; normalised
+copies live in `Assets/Assets/AudioNormalized/` and the configs re-point.
+
+**His breath sat 20 dB under the player's own heartbeat** — the warning that is
+supposed to let you hide *before* being seen, buried under your pulse, and both
+sub-300 Hz so it was masked twice. Now 5 dB under, and 5 dB *above* the chase
+music instead of 4.6 dB below it.
+
+**The tension ladder was 1.6 dB.** The music is meant to BE the threat detector,
+yet dread → chase changed the level by less than a decibel and a half. Layer
+volumes recomputed from each layer's measured average RMS to hit a real
+progression — safe −33, dread −29, mystery −26.5, investigate −24, endgame −22.5,
+chase −21. **Dread → chase is now 8.0 dB.**
+
+**Still open, and deliberately not guessed at:**
+- `WAV_MENU_FULL_Systolic_Menace` — a **menu** track — is wired as chase music.
+  Replacing it is a taste call, not a measurement.
+- Track levels inside one layer span up to **7.2 dB** (investigate −26.2..−33.3),
+  so a random pick changes how loud the same threat sounds. Fixing it properly
+  needs a per-track gain array in `AudioConfig`.
+- **62–93% of every music track's energy is below 300 Hz**, as is the heartbeat
+  (92%) and his monsterised mutters (93%). The whole game is competing for one
+  octave. This is structural and is the next real piece of work.
 
 ## 2026-07-28 — Two rejections by ear, and the mix owed the player's lungs an apology
 

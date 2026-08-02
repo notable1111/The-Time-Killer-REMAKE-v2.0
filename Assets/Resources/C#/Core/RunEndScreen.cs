@@ -2,6 +2,7 @@
 // time (the game itself is frozen), then states how the run ended, how long it
 // lasted, and how to start another. Built by Setup/29. Removable — without it
 // the run still ends, you just don't see it.
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,9 +11,11 @@ namespace TimeKiller.Core
     public class RunEndScreen : MonoBehaviour
     {
         [SerializeField] CanvasGroup group;
-        [SerializeField] Text headline;
-        [SerializeField] Text detail;
-        [SerializeField] Text prompt;
+        // TMP_Text, not TextMeshProUGUI: the base type also covers the 3D variant,
+        // so nothing here has to change if a label is ever moved into world space.
+        [SerializeField] TMP_Text headline;
+        [SerializeField] TMP_Text detail;
+        [SerializeField] TMP_Text prompt;
         [SerializeField] float fadeSeconds = 1.1f;
         [SerializeField] Color wonColor = new Color(0.62f, 0.95f, 0.66f);
         [SerializeField] Color lostColor = new Color(0.85f, 0.25f, 0.25f);

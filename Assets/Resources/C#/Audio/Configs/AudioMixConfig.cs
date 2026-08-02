@@ -58,6 +58,18 @@ namespace TimeKiller.Audio
         [Tooltip("Maniac breath loudness at which that duck is at full strength.")]
         [Range(0f, 1f)] public float heartDuckAtBreath = 0.5f;
 
+        [Header("Music EQ — carving room for everything else")]
+        [Tooltip("Measured: the music holds 61% of its energy below 60Hz and 81% below 150Hz. Low frequencies mask higher ones far more than the reverse (upward spread of masking), so that sub-bass was smearing the whole game — and laptop speakers cannot reproduce it anyway, so most players never heard it in the first place. Applied live by MusicEq; turn this off to hear the difference instantly.")]
+        public bool musicEqEnabled = true;
+        [Tooltip("High-pass corner, applied as TWO cascaded biquads (24 dB/oct). 80Hz measured: the chase track's sub-60 energy drops 61% -> 28% and 5.7dB of headroom comes back, while everything from 80Hz up — where audible weight actually lives — is untouched. A single 12 dB/oct stage at 55Hz only reached 51% and was rejected.")]
+        [Range(20f, 200f)] public float musicHighPassHz = 80f;
+        [Tooltip("Centre of the 'mud zone' dip. 150-300Hz is where every element in this game was colliding and none of them were legible.")]
+        [Range(80f, 600f)] public float musicDipHz = 220f;
+        [Tooltip("Depth of that dip in dB (negative = a cut). Gentle on purpose — this is making room, not reshaping the music.")]
+        [Range(-12f, 0f)] public float musicDipDb = -3f;
+        [Tooltip("Width of the dip. Lower Q = wider. Around 0.9 covers 150-300 without touching the 300-800 band the maniac's growl lives in.")]
+        [Range(0.2f, 4f)] public float musicDipQ = 0.9f;
+
         [Header("Master headroom")]
         [Tooltip("Master trim applied to every channel. Below 1 because a dozen sources that each peak under 1.0 still sum well over it.")]
         [Range(0f, 1f)] public float masterLevel = 0.85f;

@@ -42,6 +42,11 @@ namespace TimeKiller.Audio
 
         public static bool Active => config != null && config.enabled;
 
+        /// The live config, for the few systems that need more than a gain —
+        /// MusicEq reads its filter settings from here so every audio number in
+        /// the game still lives in exactly one asset.
+        public static AudioMixConfig Config => config;
+
         /// Announce a one-shot that just started, so quieter tiers get out of its
         /// way for as long as it actually lasts. Duration comes from the clip, not
         /// from a guess — a fixed duck window is either too short for a death cry
@@ -50,9 +55,52 @@ namespace TimeKiller.Audio
         {
             if (!Active || !settings.TryGetValue(channel, out var s)) return;
             int tier = Mathf.Clamp(s.tier, 0, tierBusyUntil.Length - 1);
-            float until = Time.time + Mathf.Max(0.05f, seconds);
+            // UNSCALED, so a duck that was running when the player hit pause
+            // expires normally instead of being frozen for the whole menu — they
+            // would otherwise set the music slider against a ducked level.
+            float until = Time.unscaledTime + Mathf.Max(0.05f, seconds);
             if (until > tierBusyUntil[tier]) tierBusyUntil[tier] = until;
         }
+
+        // --- Player-facing volume, the settings menu's half of the mix ---
+        //
+        // Deliberately NOT stored in AudioMixConfig. Writing a player's slider
+        // into the ScriptableObject would dirty the asset, overwrite the tuning
+        // done by ear, and get committed to git the next time anyone pushed.
+        // These are a separate runtime layer multiplied on top, persisted in
+        // PlayerPrefs, and the config stays exactly as authored.
+        const string PrefMaster = "tk.vol.master";
+        const string PrefMusic  = "tk.vol.music";
+        const string PrefSfx    = "tk.vol.sfx";
+
+        static float userMaster = 1f, userMusic = 1f, userSfx = 1f;
+
+        public static float UserMaster { get => userMaster; set => Set(ref userMaster, value, PrefMaster); }
+        public static float UserMusic  { get => userMusic;  set => Set(ref userMusic,  value, PrefMusic);  }
+        public static float UserSfx    { get => userSfx;    set => Set(ref userSfx,    value, PrefSfx);    }
+
+        static void Set(ref float field, float value, string key)
+        {
+            field = Mathf.Clamp01(value);
+            PlayerPrefs.SetFloat(key, field);
+        }
+
+        /// Call once the player is done dragging — writing to disk on every
+        /// slider frame would hit the registry hundreds of times a second.
+        public static void SaveUserVolumes() => PlayerPrefs.Save();
+
+        static void LoadUserVolumes()
+        {
+            userMaster = PlayerPrefs.GetFloat(PrefMaster, 1f);
+            userMusic  = PlayerPrefs.GetFloat(PrefMusic,  1f);
+            userSfx    = PlayerPrefs.GetFloat(PrefSfx,    1f);
+        }
+
+        /// Music and ambience follow the music slider; everything else is SFX.
+        /// There is no separate voice slider because nobody in this game speaks —
+        /// a "Voice" control with no dialogue behind it only confuses players.
+        static float UserGainFor(MixChannel channel) =>
+            (channel == MixChannel.Music || channel == MixChannel.Ambience ? userMusic : userSfx) * userMaster;
 
         /// ManiacVoice reports how loud his breath currently is so the heartbeat
         /// can get out of the low band. Pushed rather than pulled: the mix must
@@ -62,10 +110,12 @@ namespace TimeKiller.Audio
         /// The multiplier for this channel right now.
         public static float GainFor(MixChannel channel)
         {
-            if (!Active || !settings.TryGetValue(channel, out var s)) return 1f;
+            // The player's sliders apply even when the mix system itself is off,
+            // otherwise turning the mix off would silently ignore their settings.
+            if (!Active || !settings.TryGetValue(channel, out var s)) return UserGainFor(channel);
             Tick();
 
-            float gain = s.level * smoothed[(int)channel] * config.masterLevel;
+            float gain = s.level * smoothed[(int)channel] * config.masterLevel * UserGainFor(channel);
 
             // The low-band rule. Both of these are sub-300Hz and measured 2.75
             // together; whoever is carrying information wins. His breath tells you
@@ -101,7 +151,7 @@ namespace TimeKiller.Audio
                 // would flip-flop the mix on whichever arrived last.
                 bool outranked = false;
                 for (int tier = 0; tier < s.tier && tier < tierBusyUntil.Length; tier++)
-                    if (Time.time < tierBusyUntil[tier]) { outranked = true; break; }
+                    if (Time.unscaledTime < tierBusyUntil[tier]) { outranked = true; break; }
 
                 float target = outranked ? s.duckDepth : 1f;
                 float seconds = target < smoothed[index] ? config.duckAttackSeconds : config.duckReleaseSeconds;
@@ -133,6 +183,7 @@ namespace TimeKiller.Audio
             smoothed = null;
             maniacBreath = 0f;
             lastFrame = -1;
+            LoadUserVolumes();
             Use(Resources.Load<AudioMixConfig>(ConfigResourcePath));
         }
 
