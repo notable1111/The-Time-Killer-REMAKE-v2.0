@@ -54,6 +54,10 @@ namespace TimeKiller.Maniac
         float pauseUntil;
         float waypointDeadline;   // give up on a waypoint he can't reach
         Vector2 scanBase;         // centre of the look-around sweep at a stop
+        // +1 or -1. The route used to be walked one way forever, which is
+        // learnable in about two circuits — and predictability is the thing that
+        // kills fear faster than anything else in the genre.
+        int direction = 1;
 
         public PatrolState(ManiacController maniac) : base(maniac) { }
 
@@ -63,6 +67,9 @@ namespace TimeKiller.Maniac
             pauseUntil = 0f;
             scanBase = CurrentFacing();
             waypointDeadline = Time.time + maniac.Config.patrolWaypointTimeout;
+            // Which way he sets off is decided fresh each time he returns to
+            // patrol, so two runs of the same level do not open identically.
+            direction = Random.value < 0.5f ? 1 : -1;
         }
 
         public override void Tick(float deltaTime)
@@ -105,7 +112,12 @@ namespace TimeKiller.Maniac
             // wedged against a pillar/corner must never freeze the whole patrol.
             if (maniac.Nav.ReachedDestination(config.waypointTolerance) || Time.time >= waypointDeadline)
             {
-                waypointIndex = (waypointIndex + 1) % Mathf.Max(1, maniac.Route.Count);
+                // Sometimes he simply turns round. Decided at the STOP, so the
+                // reversal happens while he is already paused and looking about —
+                // it reads as him changing his mind, not as a navigation glitch.
+                if (Random.value < config.patrolReverseChance) direction = -direction;
+                int count = Mathf.Max(1, maniac.Route.Count);
+                waypointIndex = ((waypointIndex + direction) % count + count) % count;
                 pauseUntil = Time.time + config.waypointPauseSeconds;
                 scanBase = CurrentFacing();
                 waypointDeadline = pauseUntil + config.patrolWaypointTimeout;

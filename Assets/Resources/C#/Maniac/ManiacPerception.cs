@@ -394,7 +394,17 @@ namespace TimeKiller.Maniac
         public static float StepAwareness(ManiacConfig cfg, float awareness, float rate,
                                           float deltaTime, float secondsSinceContactLost)
         {
-            if (rate > 0f) return Mathf.Clamp01(awareness + rate * cfg.awarenessFillRate * deltaTime);
+            if (rate > 0f)
+            {
+                // HESITATION. Past the suspicion threshold the climb slows, so
+                // becoming CERTAIN takes seconds rather than the measured 0.25s.
+                // Noticing you is unchanged — everything below the threshold still
+                // fills at the full rate — so this stretches the moment of being
+                // caught without making the game easier to sneak through.
+                float fill = cfg.awarenessFillRate;
+                if (awareness >= cfg.suspicionThreshold) fill *= cfg.awarenessCertaintyScale;
+                return Mathf.Clamp01(awareness + rate * fill * deltaTime);
+            }
             if (secondsSinceContactLost < cfg.awarenessHoldSeconds) return awareness;
             return Mathf.Clamp01(awareness - cfg.awarenessDrainRate * deltaTime);
         }

@@ -42,6 +42,9 @@ namespace TimeKiller.Maniac
         [Range(0f, 1f)] public float suspicionThreshold = 0.4f;
         [Tooltip("Base awareness gained per second under IDEAL exposure (central vision, close, lit, moving). Higher = spotted faster.")]
         public float awarenessFillRate = 2.6f;
+        [Range(0.05f, 1f)]
+        [Tooltip("HESITATION. Fraction of the fill rate that applies ONCE he is already suspicious — the climb from suspicionThreshold up to certain.\n\nThe suspicion beat was already built (he stops, stares, then closes at 1.4, slower than your walk so backing away works) but nobody ever experienced it: at fill rate 2.6 the climb from suspicious to spotted takes UNDER 0.25s, so he was through the window before the beat could play. Measured across a real session, that left the tension curve bimodal — Safe 48s, Panic 44s, but Threat only 6s. The build, which is where dread actually lives, was 13 of 143 seconds.\n\n0.35 stretches that final climb to roughly three times as long. Deliberately does NOT change how easily he NOTICES you: everything up to the threshold fills at the full rate, so stealth is exactly as hard as before. Only the moment of being caught stretches out. Set to 1 for the old instant certainty.")]
+        public float awarenessCertaintyScale = 0.35f;
         [Tooltip("Awareness lost per second when he can't sense you (out of range / behind cover / hidden). Must stay BELOW the effective fill rate, or ducking behind one pillar erases everything he'd built up.")]
         public float awarenessDrainRate = 0.35f;
         [Tooltip("Grace period: after losing you he HOLDS his current awareness this long before it starts draining. This is the 'he's onto you' beat — stepping behind cover for a moment no longer resets him to oblivious.")]
@@ -169,5 +172,8 @@ namespace TimeKiller.Maniac
         public float patrolScanSpeed = 1.1f;
         [Tooltip("Anti-stuck: if he can't reach a waypoint within this many seconds (wedged on a pillar/corner), he gives up and moves to the next. Patrol must never hang.")]
         public float patrolWaypointTimeout = 5f;
+        [Range(0f, 0.5f)]
+        [Tooltip("Chance, at each waypoint, that he turns round and walks the loop the other way.\n\nThe route used to be (index + 1) % Count forever: same ring, same direction, every run. Horror-design research names enemy predictability as the primary fear-killer — once a player can predict the threat, atmosphere cannot bring the fear back, and a fixed loop is learnable in about two circuits.\n\n0.25 means he reverses roughly every fourth stop, which is often enough that you cannot bank on where he will be next and rare enough that he does not read as dithering. 0 restores the old fixed loop exactly.")]
+        public float patrolReverseChance = 0.25f;
     }
 }

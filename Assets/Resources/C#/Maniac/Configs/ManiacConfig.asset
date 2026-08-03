@@ -29,6 +29,7 @@ MonoBehaviour:
   sightFalloffPower: 2
   suspicionThreshold: 0.4
   awarenessFillRate: 2.6
+  awarenessCertaintyScale: 0.35
   awarenessDrainRate: 0.35
   awarenessHoldSeconds: 1.2
   centralConeAngle: 100
@@ -56,6 +57,9 @@ MonoBehaviour:
   beelineStallWindow: 0.35
   beelineStallFraction: 0.4
   beelineNavSeconds: 0.9
+  searchDoubtChance: 0.3
+  hintLifetimeSeconds: 45
+  hintReachedTolerance: 3.5
   damage: 1
   attackRange: 0.9
   attackCooldown: 1.6
@@ -77,3 +81,4 @@ MonoBehaviour:
   patrolScanAngle: 100
   patrolScanSpeed: 1.1
   patrolWaypointTimeout: 5
+  patrolReverseChance: 0.25
