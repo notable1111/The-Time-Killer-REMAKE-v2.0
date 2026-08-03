@@ -69,6 +69,24 @@ the catalogue costs nothing.
 - **Wedged runs are not losses.** Timeouts clustered at the same coordinate
   across different seeds are the harness failing, not the game being hard.
 
+### Recording / instrumentation
+- **`Editor.log` is the durable console.** `read_console` returns 0 entries even
+  when Unity has plainly logged. `C:\Users\<you>\AppData\Local\Unity\Editor\Editor.log`
+  has everything, survives domain reloads and play-mode exits, and carries the
+  call stack — which is how "who started this recording?" got answered
+  (`MCPDynamicCode:Execute`) and what ended it (`[BatchRunner] 1/1 ... death`).
+  `grep -a` it; it is not valid UTF-8 throughout.
+- **One label for two events will cost you a day.** `SessionRecorder.OnDestroy`
+  marked BOTH "a scene is reloading, more is coming" and "play mode stopped, this
+  is the end" as `"reload"`. Every complete session therefore looked truncated,
+  and four of them were investigated as data loss before the resume was shown to
+  work perfectly. If a mark can mean two things, it is not evidence — it is a
+  coin flip. Marks now split into `reload` and `end`.
+- **A one-run batch ends play mode at the first death.** `BatchRunner` sets
+  `EditorApplication.isPlaying = false` when the batch completes, so a recording
+  stopping at the moment of death is the harness working, not the recorder
+  failing. Check the batch size before calling it a bug.
+
 ## The rule
 
 "I think the problem is..." is worth less than one F3 screenshot or one console

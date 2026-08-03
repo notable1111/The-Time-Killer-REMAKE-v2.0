@@ -2,6 +2,186 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-08-03 — "It looks cheap": nothing in the castle cast a shadow
+
+**The report was that the new ambience pass looked cheap.** It did, and the light
+shafts were the obvious suspect. Measured at the game camera in CastleWingLDtk:
+the beam never touches its own flame (a band of dark wall sits between the candles
+and a hard horizontal top edge), it does not fall off (+12.0 → +14.7 → +14.3 down
+its whole visible run — a constant stripe, not a beam), it never lands (`shaftLength`
+is a fixed 4.2 for all 18 regardless of where the floor is, so it stops in mid-air),
+its lit core is 0.39u wide at the source so it reads as a spotlight sliver, and all
+18 are byte-identical — `lossyScale (0.65, 0.53)`, alpha `0.160`, all at `y = 30.40`.
+
+**But the shafts were a symptom.** `ShadowCaster2D` count in the scene was **zero**
+and all 25 `Light2D` had `shadowsEnabled = false`. Light passed through every wall,
+pillar and wardrobe; a pillar standing under a torch threw nothing. That absence is
+most of what made the room read as a lit backdrop with sprites laid on top.
+
+**Setup/49 gives the castle occlusion.** 58 casters — 9 wall, 47 prop, 2 character —
+derived live from the colliders via URP's `ShapeProvider`, deliberately not baked
+outlines, because the colliders are hand-tuned and a baked shape would go stale the
+moment one moved. Idempotent (58 after one run and after three), excludes triggers,
+floors, rugs and the 66×52 `CameraBounds` volume, and `Setup/49b` returns the scene
+to zero casters, zero children, zero casting lights.
+
+**Two traps found the expensive way, both now handled in code.** `ShadowCaster2D`
+is `[DisallowMultipleComponent]`, so `HallColliders` — seven colliders on one
+GameObject — got one caster and the 20×1 hall wall cast nothing; extras now get a
+`__Shadow_N` child each. And all 18 torches carry `FlickerLight2D`, which rewrites
+`Light2D.intensity` every frame from its own `baseIntensity`, so a script setting
+only the light would work in the viewport and be silently discarded on Play.
+
+**All 25 lights sit on the Multiply blend style.** A Multiply light scales the
+sprite's own colour toward full albedo rather than adding light of its own, so it
+saturates — which is consistent with torch intensity 1.1 and 20 rendering
+identically. Whether that is wrong for this art style is a judgement for Play, not
+a defect being asserted here.
+
+**What is NOT verified, stated plainly: how much the shadows actually read.**
+Edit-mode renders in this project do not reflect `Light2D` property changes at all.
+Through the real game camera and the real Game View path, toggling every light's
+`shadowsEnabled`, toggling every caster's `castsShadows`, taking torch intensity
+from 1.1 to 20, and switching every point light from Multiply to Additive each
+changed **0.000% of pixels, peak 0/765**. Only adding or removing lights outright
+shows up. Earlier coverage figures from this session were produced through that same
+path and have been **retracted**; they were artifacts, not measurements.
+
+**So the probe measures only what data can answer.** `TimeKiller/Verify/Shadow
+Audit` reports caster counts by kind, how many lights cast, the blend-style
+histogram, how many casters sit inside a casting light's radius, and the
+maniac's fully-exposed radius (0.90u of the 4.5u torch radius) — and says outright
+that contrast must be judged in Play. It would have caught both real faults, zero
+casters and all-Multiply, in one call. The render-diff version was written first
+and deleted: it returned a confident `0.00%` that read as "the shadows do nothing",
+which is a measurement that lies.
+
+**Lighting is untouched.** `torchBoost` defaults to 1.0, which writes back exactly
+the authored values (`Light2D.intensity` 1.00, `FlickerLight2D.baseIntensity` 1.10,
+blend style 0). Raising it is the lever for making shadows read, and it costs
+stealth: `ManiacPerception.Exposure()` reads point-light intensity directly, so
+brighter torches enlarge the radius inside which the maniac treats the player as
+fully visible. Dimming the ambient instead was rejected — `Exposure()` starts from
+the `ambientExposure` **constant** and never reads `GlobalLight`, so dimming would
+darken the player's screen while leaving the stealth model untouched, the same
+desync `BrightnessSettings.cs` was written to forbid.
+
+## 2026-08-03 — The recorder was never truncating sessions; it was mislabelling them
+
+**The report was "sessions end early". They did not.** Every one of the 17
+recorded sessions that had stopped at a scene reload ended on a row marked
+`"reload"` with nothing after it — which reads exactly like a recorder that
+throws away the rest of the run. Four sessions were studied as a data-loss bug.
+
+**The resume works, and it was proved by running it.** Forcing `GameFlow.Restart()`
+mid-recording produced one continuous file: row 35 is the `reload` at t=**10.07**,
+and rows 36–45 carry straight on at **10.08 → 12.35**. `Editor.log` shows the
+matching `[SessionRecorder] RESUMED` from `Start()`. Nothing is lost across a
+scene reload and the timeline stays monotonic.
+
+**What actually ended those sessions was play mode ending.** `Editor.log` names
+the culprit for the newest one: `[BatchRunner] 1/1 (... seed 3001: death)`, and
+`BatchRunner` sets `EditorApplication.isPlaying = false` when its batch is done.
+A one-run batch therefore dies at the first death — correctly. `OnDestroy` then
+wrote `"reload"`, because it could not tell "a scene is reloading, expect more"
+from "the play session is over, this is the end", and called both the same thing.
+
+**Fixed by making the two endings different marks.** `OnApplicationQuit` sets a
+flag before the `OnDestroy` storm, so a clean end now writes **`"end"`** and clears
+the resume handle, while a real reload still writes `"reload"` and parks it.
+Runtime-verified: entering play mode, recording, and stopping produced a file
+whose last row is `{"t":9.15,"mark":"end",...}`.
+
+**And the analyser now asks the question first.** `analyze_session.py` opens with
+a session-integrity check: a file ending in `reload` is flagged `session:unresumed`
+(sev 97, "everything after this point is missing"), a file with no end marker at all
+is flagged `session:truncated` ("treat every number below as a floor"), and a clean
+`end` is silent. Verified against three real sessions — one of each. The cost of
+this bug was an investigation, not a byte of data, and that is exactly the cost the
+check now removes.
+
+**Note for the measurements queue:** the sessions on disk predate the
+`stalk`/`fade`/`susEps` fields, so **the hesitation still has no recorded evidence** —
+that needs a fresh run, not a re-read of the archive.
+
+## 2026-08-03 — The fonts were blurred at bake time, and no setting could undo it
+
+**Both UI fonts are pixel fonts that were rasterised off their own grid.** Display
+is drawn 32 units-per-pixel against a 1024 em, so its native em is 32px; Body is
+drawn at 64, so its em is 16px. The atlases shipped at `samplingPointSize` **90** —
+90/32 = 2.8125 and 90/16 = 5.625, both fractional. Every glyph edge was resampled
+onto a half-texel and the softness was baked into the texture, where no runtime
+setting could recover it. The fingerprint was in the glyph metrics: **54.1%**
+(Display) and **50.0%** (Body) of them were non-integer — widths like `56.25`,
+advances like `59.0625`.
+
+Rebaked at **96** (Display, 3× native) and **64** (Body, 4× native).
+Non-integer metrics: **54.1% → 0.0%** and **50.0% → 0.0%**.
+
+**The shader was `TextMeshPro/Mobile/Distance Field`** on a PC-only game. The mobile
+variant is the reduced-instruction one and does not expose Sharpness at all. Swapped
+to the desktop `TextMeshPro/Distance Field` and set `_Sharpness` to **0.4**.
+
+**Measured A/B, same string, same sizes, same dark floor value.** Rendering the old
+assets restored from git against the new ones: mid-tone (soft-edge) pixels fell
+**8274 → 6260, −24%**, while fully-lit pixels held at **15492 → 15393 (−0.6%)** —
+the glyphs kept their weight and lost their fuzz. The difference is real but subtle,
+and clearest on the small Body text.
+
+**The rebake is in place.** The material and atlas are sub-assets that the scenes
+reference by fileID, so `Setup/47` copies the new glyph data onto the existing
+objects rather than creating new ones. All six fileIDs verified identical afterwards.
+Padding stays 9 so `gradientScale` stays 10 and the tuned outline (0.18, black) keeps
+its exact weight; population mode stays Static, so the git-churn fix from `Setup/46`
+survives.
+
+**Three off-grid text sizes, all in the pause menu** — Title 78, Caption 30, Percent
+26 — snapped to 64/32/32. `Setup/48` encodes the *rule* (snap to the font's native em)
+rather than those three numbers, so text added later cannot quietly drift off-grid.
+Fixed at source in `PauseMenuSetup` too, so a re-run agrees.
+
+**Canvas scale match made explicit.** `RunEndCanvas` and `MenuCanvas` had never set
+`matchWidthOrHeight`, so it defaulted to 0 — width-only matching, which over-scales
+on an ultrawide and under-scales on 4:3. Both now 0.5, matching what `PauseMenuSetup`
+already chose. `ObjectiveHudCanvas` is **deliberately left at 1**: its setup script
+says "the HUD hugs top and bottom", and that is a decision, not an oversight.
+
+**The pause menu's layout was overlapping itself, and it was never a font problem.**
+Reported from a screenshot: captions outside the frame, sliders running past the right
+edge, RESUME/QUIT sitting on top of the MUSIC and SOUND rows. Two independent bugs,
+both in explicit rect literals that predate this session:
+
+- **`Anchor` forces pivot 0.5**, so an element anchored to a row's *left edge* must be
+  offset by half its own width to line up. The caption used offset **+10** with a
+  **210** width, putting its left edge at **−395** — 15px outside the 760-wide panel
+  entirely, and deep into the frame's 60px decorative border. Same trap on the right
+  for the readout.
+- **Rows at −40/−140/−240 with buttons at +130** put the buttons at **−214..−146**,
+  which overlapped both the Music row (−175..−105) *and* the Sfx row (−275..−205).
+
+Re-laid out against the 9-slice border **measured off the sprite** (60/48/60/58 at
+ppuScale 1 → true inner area x −320..320, y −262..252) rather than the numbers in the
+art README: title 156..252, rows at 90/0/−90, buttons at −224..−156, gaps a symmetric
+31/20/20/31. Verified by walking every RectTransform into panel-local boxes and
+pair-testing them — **6/6 inside the frame, 0 overlapping pairs**.
+
+**Found on the way out: Catacombs was never TMP-migrated.** `Setup/44` only ever ran
+on CastleWing, so Catacombs still holds legacy `UnityEngine.UI.Text` while
+`RunEndScreen`'s fields are `TMP_Text` — the references dangle the moment the scene
+loads, and merely opening and **saving** it writes the nulls to disk (it also drops
+`heartAudio`/`heartbeatClip` and gains `bodyRadius`, all re-serialisation of classes
+that changed since the scene was last written). That diff was reverted and `Setup/48`
+now skips Catacombs by name. **Its run-end screen is presently unwired** — worth
+fixing before anyone ships that level.
+
+**Still open — 30 characters cannot be baked.** `# $ % & * < = > @ [ \ ] ^ _ \` { | }
+~` and every curly quote, dash and ellipsis are missing from *the TTFs themselves*.
+`Setup/46` has been asking for them all along and logging `** could not add **`;
+nobody read the warning. These are hand-authored pixel fonts, so the glyphs have to
+be drawn as ASCII-art skeletons in `Tools/UIArt/add_glyphs.py`, in both weights.
+Nothing in the UI uses them today — `SliderPercentLabel` emits a bare number — so
+this is a latent trap, not a live bug.
+
 ## 2026-08-02 — Fear becomes one number, and the game learns to record itself
 
 **The heartbeat had three opinions about danger.** The heart ran a distance curve
