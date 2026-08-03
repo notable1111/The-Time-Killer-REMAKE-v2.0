@@ -29,7 +29,9 @@ namespace TimeKiller.EditorTools
 
         // Curly quotes and the dashes we use in UI copy; without these a baked
         // Static atlas silently drops them and the label shows a gap.
-        const string Extras = "—–‘’“”…•©";
+        // Public because Setup/47 rebakes the same fonts and the two character sets
+        // must not drift apart.
+        public const string Extras = "—–‘’“”…•©";
 
         [MenuItem("TimeKiller/Setup/46 - Bake TMP fonts to a Static atlas")]
         public static void Bake()

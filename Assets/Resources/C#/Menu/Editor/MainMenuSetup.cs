@@ -66,6 +66,9 @@ namespace TimeKiller.Menu.EditorTools
             var scaler = canvasGo.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
+            // See GameFlowSetup: unset defaults to width-only matching, which breaks
+            // on any non-16:9 monitor.
+            scaler.matchWidthOrHeight = 0.5f;
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;   // never crop the castle
             canvasGo.AddComponent<GraphicRaycaster>();
 

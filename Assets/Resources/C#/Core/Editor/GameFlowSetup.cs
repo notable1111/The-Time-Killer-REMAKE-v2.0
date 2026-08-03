@@ -32,6 +32,10 @@ namespace TimeKiller.Core.EditorTools
             var scaler = canvasGo.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
+            // Split the difference between width and height. Left unset it defaults to
+            // 0 (width only), which over-scales the run-end text on an ultrawide and
+            // under-scales it on 4:3. Identical to what PauseMenuSetup chose.
+            scaler.matchWidthOrHeight = 0.5f;
 
             var group = canvasGo.AddComponent<CanvasGroup>();
             group.alpha = 0f;

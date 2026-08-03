@@ -64,15 +64,30 @@ namespace TimeKiller.MenuTools
             var panel = Panel(root.transform, "Panel", frame, Color.white);
             Center(panel.rectTransform, new Vector2(760f, 620f));
 
-            var title = Label(panel.transform, "Title", "PAUSED", display, 78, TextAlignmentOptions.Center);
-            Anchor(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -96f), new Vector2(640f, 96f));
+            // 64, not 78: Display's native em is 32px, so it is only crisp at 32/64/96.
+            var title = Label(panel.transform, "Title", "PAUSED", display, 64, TextAlignmentOptions.Center);
+            Anchor(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -106f), new Vector2(640f, 96f));
 
-            var master = Row(panel.transform, "Master", "MASTER", body, bar, -40f);
-            var music = Row(panel.transform, "Music", "MUSIC", body, bar, -140f);
-            var sfx = Row(panel.transform, "Sfx", "SOUND", body, bar, -240f);
+            // VERTICAL BUDGET. Panel is 760x620 → panel-local y runs -310..310, and
+            // EndFrame's 9-slice borders MEASURED off the sprite (top 58, bottom 48,
+            // at ppuScale 1) leave a true inner area of y -262..252. Laid out as:
+            //     title   156 .. 252     gap 31
+            //     Master   55 .. 125     gap 20
+            //     Music   -35 ..  35     gap 20
+            //     Sfx    -125 .. -55     gap 31
+            //     buttons-224 ..-156     then 38 clear above the bottom plinth
+            // Symmetric 31/20/20/31, everything inside the frame.
+            //
+            // The shipped values (-40/-140/-240, buttons at +130) put the buttons at
+            // -214..-146, overlapping BOTH the Music row (-175..-105) and the Sfx row
+            // (-275..-205). That is the overlap in the bug report — it predates the
+            // font-size change, since every rect here is an explicit literal.
+            var master = Row(panel.transform, "Master", "MASTER", body, bar, 90f);
+            var music = Row(panel.transform, "Music", "MUSIC", body, bar, 0f);
+            var sfx = Row(panel.transform, "Sfx", "SOUND", body, bar, -90f);
 
-            var resume = Btn(panel.transform, "ResumeButton", "RESUME", body, new Vector2(-150f, 130f));
-            var quit = Btn(panel.transform, "QuitButton", "QUIT", body, new Vector2(150f, 130f));
+            var resume = Btn(panel.transform, "ResumeButton", "RESUME", body, new Vector2(-150f, 120f));
+            var quit = Btn(panel.transform, "QuitButton", "QUIT", body, new Vector2(150f, 120f));
 
             var menu = root.GetComponent<PauseMenu>();
             if (menu == null) menu = Undo.AddComponent<PauseMenu>(root);
@@ -125,15 +140,26 @@ namespace TimeKiller.MenuTools
 
         static Slider Row(Transform parent, string name, string caption, TMP_FontAsset font, Sprite bar, float y)
         {
+            // HORIZONTAL BUDGET. Row is 560 wide, so row-local x runs -280..280 and
+            // sits comfortably inside the frame's 60px side borders (panel -320..320).
+            //     caption -272 .. -72
+            //     slider   -60 .. 180
+            //     percent  192 .. 272
+            // NOTE the +108 below is not padding: `Anchor` forces pivot 0.5, so an
+            // element anchored to the row's LEFT edge must be offset by half its own
+            // width to line its left side up. The old +10 with a 210 width put the
+            // caption's left edge at -395 — 15px outside the panel entirely, and well
+            // into the decorative border. Same trap on the right for the readout.
             var row = Find(parent, name);
-            Anchor(Rect(row), new Vector2(0.5f, 0.5f), new Vector2(0f, y), new Vector2(600f, 70f));
+            Anchor(Rect(row), new Vector2(0.5f, 0.5f), new Vector2(0f, y), new Vector2(560f, 70f));
 
-            var cap = Label(row.transform, "Caption", caption, font, 30, TextAlignmentOptions.Left);
-            Anchor(cap.rectTransform, new Vector2(0f, 0.5f), new Vector2(10f, 0f), new Vector2(210f, 44f));
+            // 32, not 30: Body's native em is 16px (crisp at 16/32/48).
+            var cap = Label(row.transform, "Caption", caption, font, 32, TextAlignmentOptions.Left);
+            Anchor(cap.rectTransform, new Vector2(0f, 0.5f), new Vector2(108f, 0f), new Vector2(200f, 44f));
 
             var sliderGo = Find(row.transform, "Slider");
             var slider = sliderGo.GetComponent<Slider>() ?? Undo.AddComponent<Slider>(sliderGo);
-            Anchor(Rect(sliderGo), new Vector2(1f, 0.5f), new Vector2(-190f, 0f), new Vector2(360f, 26f));
+            Anchor(Rect(sliderGo), new Vector2(1f, 0.5f), new Vector2(-220f, 0f), new Vector2(240f, 26f));
 
             var bg = Panel(sliderGo.transform, "Background", bar, new Color(0.18f, 0.16f, 0.14f, 0.95f));
             Stretch(bg.rectTransform);
@@ -149,8 +175,11 @@ namespace TimeKiller.MenuTools
             slider.minValue = 0f; slider.maxValue = 1f; slider.wholeNumbers = false;
 
             // Readout so a player can see what they set, not just guess from a bar.
-            var pct = Label(row.transform, "Percent", "100", font, 26, TextAlignmentOptions.Right);
-            Anchor(pct.rectTransform, new Vector2(1f, 0.5f), new Vector2(-8f, 0f), new Vector2(70f, 40f));
+            // 32, not 26: nearest on-grid size for Body. This makes the value the same
+            // size as its caption; 16 is the other on-grid option if it should read as
+            // secondary instead.
+            var pct = Label(row.transform, "Percent", "100", font, 32, TextAlignmentOptions.Right);
+            Anchor(pct.rectTransform, new Vector2(1f, 0.5f), new Vector2(-48f, 0f), new Vector2(80f, 40f));
             var echo = pct.gameObject.GetComponent<SliderPercentLabel>() ?? Undo.AddComponent<SliderPercentLabel>(pct.gameObject);
             var eso = new SerializedObject(echo);
             eso.FindProperty("slider").objectReferenceValue = slider;
