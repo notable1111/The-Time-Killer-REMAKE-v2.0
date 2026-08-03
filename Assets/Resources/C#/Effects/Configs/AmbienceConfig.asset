@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31efd5232a3b8f840bd407952e096981, type: 3}
+  m_Name: AmbienceConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Effects.AmbienceConfig
+  dustCount: 150
+  dustArea: {x: 16, y: 11}
+  dustTint: {r: 0.62, g: 0.66, b: 0.74, a: 0.8}
+  dustSizeMin: 0.07
+  dustSizeMax: 0.18
+  dustDrift: 0.18
+  dustLifetime: {x: 6, y: 14}
+  emberRate: 3.5
+  emberTint: {r: 0.95, g: 0.48, b: 0.18, a: 0.95}
+  emberSizeMin: 0.05
+  emberSizeMax: 0.12
+  emberRise: 0.55
+  emberWander: 0.25
+  emberLifetime: {x: 0.9, y: 2.2}
+  emberRadius: 0.12
+  dustSortingOrder: -2
+  emberSortingOrder: 6
