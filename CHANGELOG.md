@@ -263,6 +263,29 @@ normalising was tried first and rejected by measurement — it left the first ba
 7 dB under the heartbeat, because a clip with one sharp transient peaks the same
 as a sustained one.
 
+## 2026-08-03 — TMP fonts baked to a Static atlas (they were churning in git)
+
+Both font assets shipped in TMP's **Dynamic** atlas mode, which adds glyphs the
+first time each character renders and writes them back into the `.asset`. The
+files therefore changed whenever anyone played — measured as **826 deleted lines**
+of glyph entries in a single session's diff. On a shared repo that is a recurring
+conflict on a file nobody edited.
+
+`Setup/46` bakes them once and switches to **Static**. Order matters and is the
+whole trick: a Static atlas contains only what was baked, so the glyphs are
+generated *before* the mode is switched. Flip the mode first and every uncached
+character renders as nothing.
+
+Verified: played a session with every label force-rendered including the pause
+menu, then checked git — **the font assets no longer change**.
+
+⚠️ **Both fonts only contain 76 of 95 printable ASCII characters.** Missing:
+``#$%&*<=>@[\]^_`{|}~`` and every typographic extra (em-dash, curly quotes, …).
+That is not a bake failure — the glyphs are absent from the AI-generated font
+files themselves. All current UI copy was checked string by string and is fully
+covered, but **new copy using `%`, `&`, `@` or an em-dash will render blank**, and
+in Static mode it fails silently. Re-run `Setup/46` after adding any font.
+
 ## 2026-08-03 — Reverted: the attack "contact-stop" was never a bug
 
 `AttackState` was changed to keep closing at half chase speed instead of calling
