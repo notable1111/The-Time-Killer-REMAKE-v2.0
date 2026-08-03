@@ -102,6 +102,23 @@ def analyse(path):
     def add(sev, kind, t, what):
         findings.append({"sev": sev, "kind": kind, "t": t, "what": what})
 
+    # 0. IS THIS FILE COMPLETE? Ask before reading a single number out of it.
+    #    A session that stopped early is BIASED, not merely short — the same trap
+    #    the batch harness already learned (a 75-run batch died at run 11 and left
+    #    a file that simply stopped). Four sessions were once studied as a
+    #    data-loss bug purely because every one of them ended on a "reload" row;
+    #    the recorder now says "end" when the file is complete, so the difference
+    #    is readable instead of guessable.
+    last_mark = next((r.get("mark", "") for r in reversed(rows) if r.get("mark")), "")
+    if last_mark == "reload":
+        add(97, "session:unresumed", duration,
+            "recording stopped at a scene reload and never resumed — everything "
+            "after this point is missing (did the next scene have no player?)")
+    elif last_mark != "end":
+        add(97, "session:truncated", duration,
+            "no end marker: the recorder was never told the session finished, so "
+            "this file is whatever survived. Treat every number below as a floor.")
+
     # 1. THE TESTER'S OWN MARKS. First, and highest weight: a human saying
     #    "this was boring" is information no measurement can reconstruct.
     for r in rows:

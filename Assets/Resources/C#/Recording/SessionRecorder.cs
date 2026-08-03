@@ -93,7 +93,11 @@ namespace TimeKiller.Recording
         TimeKiller.Fear.FearConductor fear;
         TimeKiller.Heartbeat.PlayerHeartbeat heart;
         SessionAudioCapture audioCapture;
+        TimeKiller.Objectives.ClockRepair repair;
+        TimeKiller.Objectives.ClockMissRing missRing;
+        TimeKiller.Fear.FearSting sting;
         int hp = -1;
+        bool quitting;   // set by OnApplicationQuit — see OnDestroy
         readonly StringBuilder line = new StringBuilder(512);
 
         void Start()
@@ -115,23 +119,51 @@ namespace TimeKiller.Recording
             if (resumeActive && !string.IsNullOrEmpty(resumeDir)) Begin();
         }
 
+        // Play mode is ending. Unity calls this BEFORE the OnDestroy storm, which
+        // is the only reason OnDestroy can tell the two endings apart.
+        void OnApplicationQuit() => quitting = true;
+
         void OnDestroy()
         {
             EventBus.Unsubscribe<PlayerHealthChangedEvent>(OnHealth);
             DebugOverlay.Unwatch("REC");
-            // A scene reload lands HERE, not in Stop(). Park what we know so the
-            // next instance can continue, then close the handles. Deliberately
-            // does NOT clear the statics — only an explicit Stop() ends a session.
-            if (Recording)
+            if (!Recording) return;
+
+            // TWO ENDINGS ARRIVE HERE AND THEY ARE NOT THE SAME EVENT.
+            //
+            // A scene reload lands here (the death restart, the next bot run), and
+            // so does play mode simply stopping. The first version marked both
+            // "reload", and that one wrong label cost a whole investigation: every
+            // recorded session ended on a "reload" row with nothing after it, which
+            // reads exactly like a recorder that truncates its own sessions. Four
+            // sessions were studied as a data-loss bug before Editor.log showed the
+            // resume working perfectly — the sessions had simply ENDED, because
+            // BatchRunner sets isPlaying = false when its batch is done.
+            //
+            // So the mark now says which it was. "reload" promises a continuation;
+            // "end" says this file is complete and nothing is missing.
+            if (quitting)
             {
-                resumeDir = SessionDir;
-                resumeFrames = FramesSaved;
-                resumeElapsed = Mathf.Max(0f, Time.unscaledTime - startedAt);
-                resumeActive = true;
-                WriteState("reload");
+                WriteState("end");
                 CloseFiles();
                 Recording = false;
+                // Nothing can resume into a dead play session. Leaving the handle
+                // armed would be harmless today (ResetStatics clears it on the next
+                // play) but it would be a live trap the moment that changes.
+                resumeActive = false;
+                resumeDir = "";
+                return;
             }
+
+            // Park what we know so the next instance can continue. Deliberately
+            // does NOT clear the statics — only an explicit Stop() ends a session.
+            resumeDir = SessionDir;
+            resumeFrames = FramesSaved;
+            resumeElapsed = Mathf.Max(0f, Time.unscaledTime - startedAt);
+            resumeActive = true;
+            WriteState("reload");
+            CloseFiles();
+            Recording = false;
         }
 
         void OnHealth(PlayerHealthChangedEvent e) => hp = e.Current;
@@ -191,6 +223,9 @@ namespace TimeKiller.Recording
             maniac = Object.FindAnyObjectByType<ManiacController>();
             fear = Object.FindAnyObjectByType<TimeKiller.Fear.FearConductor>();
             heart = Object.FindAnyObjectByType<TimeKiller.Heartbeat.PlayerHeartbeat>();
+            repair = Object.FindAnyObjectByType<TimeKiller.Objectives.ClockRepair>();
+            missRing = Object.FindAnyObjectByType<TimeKiller.Objectives.ClockMissRing>();
+            sting = Object.FindAnyObjectByType<TimeKiller.Fear.FearSting>();
 
             audioCapture = Object.FindAnyObjectByType<SessionAudioCapture>();
             if (audioCapture != null) audioCapture.Begin(Path.Combine(SessionDir, "audio.wav"), resuming);
@@ -277,6 +312,32 @@ namespace TimeKiller.Recording
                 line.Append(",\"hide\":\"").Append(Escape(maniac.LastHideVerdict)).Append('"');
                 line.Append(",\"spot\":").Append(maniac.CompromisedSpot.HasValue ? "true" : "false");
             }
+            // ---- systems that were previously unverifiable without playing ----
+            // Each is a raw value or a counter, so ONE recorded run confirms all
+            // of them at once instead of a bespoke probe per feature. Added
+            // 2026-08-03 under the rule "build it checkable".
+            // The RAW meter, not just the band NAME: the string "suspicious"
+            // cannot tell a 0.25s crossing from a 4s one, and that difference is
+            // the entire hesitation feature.
+            if (maniac != null && maniac.Perception != null)
+            {
+                line.Append(",\"aw\":").Append(maniac.Perception.Awareness.ToString("0.000", ci));
+                // ACCUMULATED per-frame, not sampled. Sampling the raw meter at
+                // 4 Hz measured the stalking band as 0.0s in a run where he
+                // clearly reached certainty — because the crossing is shorter
+                // than one sample. Perception already counts this every frame for
+                // exactly that reason; a sampler cannot measure a sub-second
+                // event and will confidently report that it never happened.
+                line.Append(",\"stalk\":").Append(maniac.Perception.StalkSeconds.ToString("0.00", ci));
+                line.Append(",\"fade\":").Append(maniac.Perception.FadeSeconds.ToString("0.00", ci));
+                line.Append(",\"susEps\":").Append(maniac.Perception.SuspicionEpisodes);
+            }
+            if (repair != null)
+                line.Append(",\"repairing\":").Append(repair.Repairing ? "true" : "false");
+            if (missRing != null) line.Append(",\"rings\":").Append(missRing.RingsShown);
+            if (sting != null) line.Append(",\"stings\":").Append(sting.StingCount);
+            line.Append(",\"bright\":").Append(TimeKiller.Settings.BrightnessSettings.Brightness.ToString("0.00", ci));
+
             line.Append(",\"world\":").Append(AudioDucking.World.ToString("0.00", ci));
             line.Append(",\"frame\":").Append(FramesSaved);
             line.Append('}');
