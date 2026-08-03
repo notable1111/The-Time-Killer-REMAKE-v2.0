@@ -493,16 +493,28 @@ namespace TimeKiller.Maniac
 
         public AttackState(ManiacController maniac) : base(maniac) { }
 
+        // ---- INVESTIGATED AND CLOSED, 2026-08-03. Do not "fix" this again. ----
+        //
+        // The Stop() below looks like a bug. Two recorded chases showed him
+        // reaching the player, his speed collapsing to 0.40-0.54 u/s, and a
+        // running player gaining 4.8u and 6.2u — which reads exactly like him
+        // catching you and inexplicably letting go. It was changed to keep
+        // closing at half chase speed through the swing. That change was
+        // measured across two more sessions and did NOTHING (31/38 and 34/43
+        // attack samples still at zero displacement), so it was reverted.
+        //
+        // Why it cannot work: their capsules touch at 0.58u and attackRange is
+        // 0.9u, so he is pressed against the player throughout the swing. The
+        // motor writes linearVelocity directly, physics cancels it against the
+        // contact, and he goes nowhere however fast he is told to move — the
+        // same trap the beeline stall-check documents for walls.
+        //
+        // And the ground he loses is not a defect at all: player speed after a
+        // hit was measured at 10.0-11.67 u/s against a 4.5 run cap. That is
+        // BeginPhaseThrough — the designed adrenaline escape, working.
         public override void Enter()
         {
-            // NO Motor.Stop() here. It used to, and it contradicted the design
-            // recorded on attackCooldown itself: "He KEEPS CHASING during this —
-            // the player's escape comes from the post-hit adrenaline burst, not
-            // from him stopping." Stopping cost a 0.71s standstill (0.15s brake +
-            // 0.35s recovery + 0.21s ramp back to 5.2), and in both recorded
-            // chases that is exactly where he lost the player: speed collapsed to
-            // 0.40-0.54 u/s and a running player gained 4.8u and 6.2u. From the
-            // outside it read as him catching you and inexplicably letting go.
+            maniac.Motor.Stop();
             swung = false;
             recoverUntil = Time.time + maniac.Config.attackRecoverySeconds;
             maniac.NextAttackAllowed = Time.time + maniac.Config.attackCooldown;
@@ -510,11 +522,6 @@ namespace TimeKiller.Maniac
 
         public override void Tick(float deltaTime)
         {
-            // Keep closing THROUGH the swing, at a share of chase speed, so he
-            // carries momentum out of the attack instead of restarting from rest.
-            maniac.Motor.MoveTo(maniac.PlayerPosition,
-                maniac.Config.chaseSpeed * maniac.Config.attackMoveShare);
-
             if (!swung)
             {
                 swung = true;

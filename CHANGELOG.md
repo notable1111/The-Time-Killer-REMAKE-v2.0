@@ -263,6 +263,28 @@ normalising was tried first and rejected by measurement — it left the first ba
 7 dB under the heartbeat, because a clip with one sharp transient peaks the same
 as a sustained one.
 
+## 2026-08-03 — Reverted: the attack "contact-stop" was never a bug
+
+`AttackState` was changed to keep closing at half chase speed instead of calling
+`Motor.Stop()`, because two recorded chases showed his speed collapsing to
+0.40–0.54 u/s on contact while a running player gained 4.8u and 6.2u. **Measured
+across two further sessions, the change did nothing** — 31/38 and 34/43 attack
+samples still at zero displacement. Reverted, and `attackMoveShare` deleted rather
+than left as a config nobody reads.
+
+**Why it could never have worked:** their capsules touch at **0.58u** and
+`attackRange` is **0.9u**, so he is pressed against the player for the whole swing.
+The motor writes `linearVelocity` directly and physics cancels it against the
+contact — the same trap the beeline stall-check already documents for walls.
+
+**And the ground he loses is the feature working.** Player speed after a hit
+measured **10.0–11.67 u/s against a 4.5 run cap** — that is `BeginPhaseThrough`,
+the designed adrenaline escape. The pathology scan had been flagging a mechanic as
+a defect.
+
+The finding is written into `AttackState` and `ManiacConfig` so the next person
+does not repeat the investigation.
+
 ## 2026-08-03 — The maniac gets a second brain
 
 **Researched before building.** Alien: Isolation runs two brains: a **director**

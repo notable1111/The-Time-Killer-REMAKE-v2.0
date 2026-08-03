@@ -122,8 +122,11 @@ namespace TimeKiller.Maniac
         public float attackCooldown = 1.6f;
         [Tooltip("Brief swing recovery before he resumes the chase — just enough to read the attack.")]
         public float attackRecoverySeconds = 0.35f;
-        [Tooltip("Share of chaseSpeed he keeps while swinging. NOT zero: AttackState used to call Motor.Stop(), which contradicted the line above and cost him a 0.71s standstill (0.15s brake + 0.35s recovery + 0.21s ramp back up) — measured in both recorded chases as a 0.40-0.54 u/s collapse that let a running player gain 4.8-6.2u. Below 1 so the swing still reads as a commitment and the shove still buys an escape.")]
-        [Range(0f, 1f)] public float attackMoveShare = 0.5f;
+        // attackMoveShare was removed on 2026-08-03. It let him keep closing
+        // during a swing instead of stopping, and measured across two sessions it
+        // changed nothing: their capsules touch at 0.58u inside a 0.9u attackRange,
+        // so physics cancels whatever velocity the motor is given. See the note on
+        // AttackState in ManiacStates.cs before reintroducing it.
 
         [Header("Hiding (the Outlast rule)")]
         [Tooltip("If he had eyes on the player within this many seconds before they hid, the spot is compromised — he walks up and drags a hit out of it.")]
