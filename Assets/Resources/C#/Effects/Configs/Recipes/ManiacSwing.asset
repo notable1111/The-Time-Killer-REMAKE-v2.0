@@ -21,7 +21,8 @@ MonoBehaviour:
   randomRotation: 0
   particlePrefab: {fileID: 0}
   particleScale: 1
-  clips: []
+  clips:
+  - {fileID: 8300000, guid: b4c6f73bcfcb40f48903db6f54624b7d, type: 3}
   volume: 0.85
   pitchJitter: 0.08
   shakeStrength: 0
