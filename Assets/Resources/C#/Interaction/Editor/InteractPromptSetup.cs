@@ -18,11 +18,19 @@ namespace TimeKiller.Interaction.EditorTools
         {
             if (TimeKiller.EditorTools.SetupGuard.Blocked("40 - Build Interact Prompt (E key cap)")) return;
 
-            // GameObject.Find IGNORES INACTIVE OBJECTS, and that is why this
-            // script silently created nothing in Catacombs on 2026-08-27: the
-            // canvas was there, so "run Setup/38 first" was wrong advice, and the
-            // error message sent the reader to fix a thing that was not broken.
-            // Search the loaded scene instead, inactive included.
+            // GameObject.Find IGNORES INACTIVE OBJECTS, so a canvas that exists
+            // but is switched off reads as absent and this script creates nothing
+            // while blaming a missing Setup/38. That is a real latent bug and the
+            // inactive-inclusive search below fixes it.
+            //
+            // ⚠️ IT WAS NOT, HOWEVER, THE CAUSE OF THE CATACOMBS CASE, and the
+            // first version of this comment said it was. Measured 2026-08-27:
+            // Catacombs contains ZERO ObjectiveHudCanvas, active or otherwise
+            // (CastleWingLDtk has one). So the original error message was giving
+            // CORRECT advice - that level genuinely never had Setup/38's HUD
+            // canvas built on it, and no amount of searching will find one.
+            // Recorded because a wrong diagnosis left in a comment outlives the
+            // bug it was written about.
             var canvasGo = FindHudCanvas();
             if (canvasGo == null)
             {
