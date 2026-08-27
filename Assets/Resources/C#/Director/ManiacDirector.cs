@@ -48,6 +48,14 @@ namespace TimeKiller.Director
                 Mathf.Max(0, successfulHides - config.hidesBeforeLearning) * config.wardrobeBonusPerHide);
         public float QuietSeconds => Time.time - lastSensedAt;
 
+        /// How much of the authored quiet threshold still applies. Reads the
+        /// maniac's own escalation, which is allowed: the Director already
+        /// depends on the Maniac feature (never the other way round), which is
+        /// why ManiacHintEvent is declared over there and not here.
+        public float HintQuietScale => maniac != null && maniac.Escalation != null
+            ? ManiacEscalation.HintQuietMultiplier(maniac.Escalation.Config, maniac.Escalation.Intensity)
+            : 1f;
+
         public void Init(DirectorConfig directorConfig) => config = directorConfig;
 
         void Start()
@@ -115,8 +123,13 @@ namespace TimeKiller.Director
                 return;
             }
 
-            if (QuietSeconds < config.hintAfterQuietSeconds) return;
-            if (Time.time - lastHintAt < config.minSecondsBetweenHints) return;
+            // Escalation shortens the wait late in the run — both thresholds by
+            // the SAME factor, so the ratio this was tuned with survives and he
+            // returns sooner rather than more often. 1 without escalation, so the
+            // Director is unchanged when the component or its config is gone.
+            float quietScale = HintQuietScale;
+            if (QuietSeconds < config.hintAfterQuietSeconds * quietScale) return;
+            if (Time.time - lastHintAt < config.minSecondsBetweenHints * quietScale) return;
 
             Vector2 playerPos = player.position;
             float distance = Vector2.Distance(maniac.Motor.Position, playerPos);

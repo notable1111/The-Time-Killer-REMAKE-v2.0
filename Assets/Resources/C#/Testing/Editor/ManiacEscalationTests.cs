@@ -35,6 +35,7 @@ namespace TimeKiller.Tests
         const string MovementPath = "Assets/Resources/C#/Player/Configs/PlayerMovementConfig.asset";
         const string FootstepPath = "Assets/Resources/C#/Player/Configs/PlayerFootstepConfig.asset";
         const string WardrobePath = "Assets/Resources/C#/Maniac/Configs/WardrobeSearchConfig.asset";
+        const string DirectorPath = "Assets/Resources/C#/Director/Configs/DirectorConfig.asset";
 
         /// DirectorConfig.maxWardrobeBonus — the cap on what a player can teach
         /// him by hiding successfully. Escalation stacks on top of it, so the
@@ -251,6 +252,65 @@ namespace TimeKiller.Tests
                 $"{ManiacEscalation.WardrobeBonusFor(escalation, 1f):0.00}). The Director's design note " +
                 "promises hiding can never become useless, and that promise is about the SUM. " +
                 "Lower maxWardrobeChance or wardrobeBonusAtFull.");
+        }
+
+        [Test]
+        public void TheDirectorDialShortensTheWaitAndNeverInvertsIt()
+        {
+            var cfg = Defaults();
+            Assert.That(ManiacEscalation.HintQuietMultiplier(cfg, 0f), Is.EqualTo(1f),
+                "before the first clock the Director must wait exactly as long as it always did");
+            Assert.That(ManiacEscalation.HintQuietMultiplier(null, 1f), Is.EqualTo(1f));
+
+            cfg.enabled = false;
+            Assert.That(ManiacEscalation.HintQuietMultiplier(cfg, 1f), Is.EqualTo(1f),
+                "the off switch has to cover this dial too");
+
+            // This is the one multiplier that goes DOWN, so the monotonicity test
+            // above cannot cover it and it needs its own direction check.
+            cfg.enabled = true;
+            float last = 1.0001f;
+            for (float ramp = 0f; ramp <= 1.0001f; ramp += 0.05f)
+            {
+                float m = ManiacEscalation.HintQuietMultiplier(cfg, ramp);
+                Assert.That(m, Is.LessThanOrEqualTo(last + 0.0001f),
+                            $"the wait grew at ramp {ramp:0.00} — escalation must never make him slower to return");
+                Assert.That(m, Is.GreaterThan(0f), "a zero multiplier would fire a hint every frame");
+                last = m;
+            }
+        }
+
+        [Test]
+        public void TheDirectorStillHasToWaitForRealQuiet()
+        {
+            var escalation = ShippedEscalationOrIgnore();
+            var director = Shipped<TimeKiller.Director.DirectorConfig>(DirectorPath);
+            if (director == null) Assert.Ignore($"No DirectorConfig at {DirectorPath}");
+
+            float waitAtFull = director.hintAfterQuietSeconds *
+                               ManiacEscalation.HintQuietMultiplier(escalation, 1f);
+
+            Assert.That(waitAtFull, Is.GreaterThan(10f),
+                $"At full escalation the Director waits {waitAtFull:0.0}s of genuine quiet before steering him " +
+                "back. Below about ten seconds it stops rescuing dead time and becomes a tracker that keeps " +
+                "pointing him at you, which is the exact thing hintError exists to prevent.");
+        }
+
+        [Test]
+        public void EscalationDoesNotMakeTheDirectorDishonest()
+        {
+            // The Director's whole claim to fairness is that its hint is smeared
+            // WIDER than his eyes: arriving at a hint must not BE finding the
+            // player. Escalation now reaches into the Director's timing, so this
+            // invariant is pinned here as well as printed by Setup/45 — a number
+            // only checked by a script nobody runs is not checked.
+            var director = Shipped<TimeKiller.Director.DirectorConfig>(DirectorPath);
+            if (director == null) Assert.Ignore($"No DirectorConfig at {DirectorPath}");
+            var maniac = Required<ManiacConfig>(ManiacPath);
+
+            Assert.That(director.hintError, Is.GreaterThan(maniac.sightRange),
+                $"hintError {director.hintError:0.0} must stay above sightRange {maniac.sightRange:0.0}, or " +
+                "arriving at a hint becomes finding the player and the Director is cheating whatever the code says.");
         }
 
         [Test]

@@ -60,6 +60,10 @@ namespace TimeKiller.Maniac
         /// Added to his wardrobe check chance. 0 = unchanged.
         public float WardrobeBonus => WardrobeBonusFor(config, Intensity);
 
+        /// Multiplier on the Director's quiet thresholds — smaller = he is
+        /// steered back at you sooner. 1 = unchanged.
+        public float HintQuiet => HintQuietMultiplier(config, Intensity);
+
         public bool Active => config != null && config.enabled;
 
         void Awake()
@@ -131,6 +135,15 @@ namespace TimeKiller.Maniac
             => cfg == null || !cfg.enabled
                 ? 1f
                 : Mathf.Lerp(1f, Mathf.Max(0.01f, cfg.hearingAtFull), Mathf.Clamp01(ramp));
+
+        /// Multiplier on the Director's quiet thresholds. Note this one goes
+        /// DOWN as he escalates — less waiting, not more — so the neutral value
+        /// is 1 and the escalated value is smaller. Clamped above 0 because a
+        /// zero here would make the Director fire every frame.
+        public static float HintQuietMultiplier(ManiacEscalationConfig cfg, float ramp)
+            => cfg == null || !cfg.enabled
+                ? 1f
+                : Mathf.Lerp(1f, Mathf.Clamp(cfg.hintQuietAtFull, 0.05f, 1f), Mathf.Clamp01(ramp));
 
         public static float WardrobeBonusFor(ManiacEscalationConfig cfg, float ramp)
             => cfg == null || !cfg.enabled

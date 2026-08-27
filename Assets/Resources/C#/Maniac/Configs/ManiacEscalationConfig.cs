@@ -44,6 +44,9 @@ namespace TimeKiller.Maniac
         [Tooltip("Added to his wardrobe check chance once every clock is fixed — hiding gets less reliable as the run goes on, which is what stops the endgame becoming 'sit in a box until he wanders off'.\n\n0 = no change. Stacks with what the Director teaches him from hides you got away with, and the SUM is held under maxWardrobeChance below.")]
         [Range(0f, 0.5f)] public float wardrobeBonusAtFull = 0.18f;
 
+        [Tooltip("Multiplier on how long the Director waits before steering him back toward you, once every clock is fixed.\n\nThis is the dial aimed straight at DEAD AIR. The Director exists because a recorded bot session ran 80 seconds with zero detections: when he loses you he goes back to his loop and the encounter is simply over. Shortening the quiet threshold late in the run means the back half has fewer of those empty stretches, which is the other half of 'the curve has no middle'.\n\nScales the between-hints cooldown by the same factor, so the RATIO the Director was tuned with is preserved - this makes him return sooner, it does not make him spam. 22s/15s become 15.4s/10.5s at 0.7.\n\n1 = no change.")]
+        [Range(0.3f, 1f)] public float hintQuietAtFull = 0.7f;
+
         [Header("Safety rails")]
         [Tooltip("Hard ceiling on the wardrobe check chance from ALL sources — the authored base, what the Director taught him, and escalation together.\n\nThe Director already promises that hiding can never become useless (it caps its own learned bonus at 0.35). Escalation adds a second source on top, so without a ceiling on the SUM that promise quietly stops being true in the exact part of the run where hiding matters most. Keep this well under 1.")]
         [Range(0.1f, 1f)] public float maxWardrobeChance = 0.6f;
