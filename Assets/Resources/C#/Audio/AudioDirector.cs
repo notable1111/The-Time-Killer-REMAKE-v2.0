@@ -114,7 +114,11 @@ namespace TimeKiller.Audio
             if (desired != currentLayer)
             {
                 currentLayer = desired;
-                BeginCrossfade(PickTrack(desired), LayerVolume(desired));
+                // The trim rides on the LAYER volume rather than replacing it:
+                // between-layer balance stays exactly as tuned by ear, and the
+                // trim only levels the tracks inside one pool against each other.
+                var next = PickTrack(desired);
+                BeginCrossfade(next, LayerVolume(desired) * config.TrimFor(next));
             }
 
             // Drive the crossfade.

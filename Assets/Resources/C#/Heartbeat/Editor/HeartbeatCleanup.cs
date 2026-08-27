@@ -35,6 +35,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/37 - Remove Dead Heartbeat Objects")]
         public static void Run()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("37 - Remove Dead Heartbeat Objects")) return;
+
             var removed = new List<string>();
             var skipped = new List<string>();
             Scene? touched = null;

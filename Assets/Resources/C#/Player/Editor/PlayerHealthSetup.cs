@@ -15,6 +15,8 @@ namespace TimeKiller.Player.EditorTools
         [MenuItem("TimeKiller/Setup/19 - Add Player Health (3 HP)")]
         public static void Setup()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("19 - Add Player Health (3 HP)")) return;
+
             var player = Object.FindAnyObjectByType<PlayerController>();
             if (player == null)
             {

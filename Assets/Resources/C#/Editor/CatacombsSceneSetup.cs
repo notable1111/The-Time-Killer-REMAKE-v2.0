@@ -40,6 +40,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/30 - Build Catacombs Scene")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("30 - Build Catacombs Scene")) return;
+
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             var stray = GameObject.Find("Directional Light");
@@ -81,6 +83,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/30 - Restyle Catacombs Map")]
         public static void RestyleMenu()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("30 - Restyle Catacombs Map")) return;
+
             var root = GameObject.Find(MapRootName);
             if (root == null) { Debug.LogError($"[TimeKiller Setup] {MapRootName} not found — is the Catacombs scene open?"); return; }
             Restyle(root);

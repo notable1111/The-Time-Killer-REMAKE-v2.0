@@ -27,6 +27,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/12 - Switch Camera to Cinemachine")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("12 - Switch Camera to Cinemachine")) return;
+
             var config = AssetDatabase.LoadAssetAtPath<CameraConfig>(ConfigPath);
             var cam = Camera.main;
             var player = Object.FindAnyObjectByType<PlayerController>();

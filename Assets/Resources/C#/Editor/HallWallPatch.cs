@@ -23,6 +23,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/13 - Patch Hall Walls (texture fix)")]
         public static void Patch()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("13 - Patch Hall Walls (texture fix)")) return;
+
             var hall = GameObject.Find("CastleHall");
             var wallFace = hall != null ? hall.transform.Find("WallFace")?.GetComponent<Tilemap>() : null;
             var overhead = hall != null ? hall.transform.Find("Overhead")?.GetComponent<Tilemap>() : null;

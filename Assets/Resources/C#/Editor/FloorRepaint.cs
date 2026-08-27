@@ -29,6 +29,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/16 - Repaint Floors (recovery)")]
         public static void Repaint()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("16 - Repaint Floors (recovery)")) return;
+
             var hall = GameObject.Find("CastleHall");
             var floor = hall?.transform.Find("Floor")?.GetComponent<Tilemap>();
             var rug = hall?.transform.Find("Rug")?.GetComponent<Tilemap>();

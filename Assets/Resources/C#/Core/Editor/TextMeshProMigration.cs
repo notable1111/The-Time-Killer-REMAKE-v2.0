@@ -34,6 +34,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/44 - Migrate UI Text to TextMeshPro")]
         public static void Migrate()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("44 - Migrate UI Text to TextMeshPro")) return;
+
             var log = new List<string>();
             var display = EnsureFontAsset("TimeKiller_Display", log);
             var body = EnsureFontAsset("TimeKiller_Body", log);

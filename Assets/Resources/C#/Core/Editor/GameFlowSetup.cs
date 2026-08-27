@@ -17,6 +17,8 @@ namespace TimeKiller.Core.EditorTools
         [MenuItem("TimeKiller/Setup/29 - Setup Run Flow (win/lose screen + restart)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("29 - Setup Run Flow (win/lose screen + restart)")) return;
+
             var old = GameObject.Find("GameFlow");
             if (old != null) Undo.DestroyObjectImmediate(old);
 

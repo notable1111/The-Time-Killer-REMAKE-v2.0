@@ -33,6 +33,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/8 - Build Catacombs Test Room")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("8 - Build Catacombs Test Room")) return;
+
             SliceSheet();
             var floorTile = MakeTile("Floor_Stone", FloorPick);
             var wallTile = MakeTile("Wall_Rock", WallPick);

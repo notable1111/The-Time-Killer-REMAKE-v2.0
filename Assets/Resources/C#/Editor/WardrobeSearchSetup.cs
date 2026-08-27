@@ -21,6 +21,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/36 - Wardrobe Search (maniac checks hiding spots)")]
         public static void Generate()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("36 - Wardrobe Search (maniac checks hiding spots)")) return;
+
             Directory.CreateDirectory(ConfigFolder);
 
             var config = AssetDatabase.LoadAssetAtPath<WardrobeSearchConfig>(ConfigPath);

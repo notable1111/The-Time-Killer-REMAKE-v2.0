@@ -31,6 +31,8 @@ namespace TimeKiller.Audio.EditorTools
         [MenuItem("TimeKiller/Setup/39 - Setup Voices (maniac presence + player reactions)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("39 - Setup Voices (maniac presence + player reactions)")) return;
+
             var log = new List<string>();
             var maniacConfig = LoadOrCreate<ManiacVoiceConfig>(ManiacConfigPath, log);
             var playerConfig = LoadOrCreate<PlayerVoiceConfig>(PlayerConfigPath, log);

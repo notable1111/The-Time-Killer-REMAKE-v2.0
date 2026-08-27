@@ -39,6 +39,8 @@ namespace TimeKiller.Audio.EditorTools
         [MenuItem("TimeKiller/Setup/41 - Normalise quiet SFX (stings, breath, steps)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("41 - Normalise quiet SFX (stings, breath, steps)")) return;
+
             Directory.CreateDirectory(OutDir);
             var log = new List<string>();
 

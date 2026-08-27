@@ -16,6 +16,8 @@ namespace TimeKiller.Interaction.EditorTools
         [MenuItem("TimeKiller/Setup/40 - Build Interact Prompt (E key cap)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("40 - Build Interact Prompt (E key cap)")) return;
+
             var canvasGo = GameObject.Find("ObjectiveHudCanvas");
             if (canvasGo == null)
             {

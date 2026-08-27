@@ -16,6 +16,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/3 - Create + Activate URP Pipeline")]
         public static void CreateAndActivate()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("3 - Create + Activate URP Pipeline")) return;
+
             if (!AssetDatabase.IsValidFolder(Folder))
                 AssetDatabase.CreateFolder(FolderParent, "Rendering");
 

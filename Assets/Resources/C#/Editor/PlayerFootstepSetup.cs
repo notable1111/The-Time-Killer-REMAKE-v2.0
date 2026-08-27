@@ -17,6 +17,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/6 - Setup Footsteps + Tight Camera")]
         public static void Setup()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("6 - Setup Footsteps + Tight Camera")) return;
+
             var config = AssetDatabase.LoadAssetAtPath<PlayerFootstepConfig>(ConfigPath);
             if (config == null)
             {

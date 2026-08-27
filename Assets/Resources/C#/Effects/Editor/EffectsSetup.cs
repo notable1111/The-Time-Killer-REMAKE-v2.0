@@ -30,6 +30,8 @@ namespace TimeKiller.Effects.EditorTools
         [MenuItem("TimeKiller/Setup/23 - Setup Effect Recipes")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("23 - Setup Effect Recipes")) return;
+
             var prefab = BuildBloodBurstPrefab();
             if (prefab == null) return;
             Directory.CreateDirectory(RecipeFolder);

@@ -20,6 +20,8 @@ namespace TimeKiller.Audio.EditorTools
         [MenuItem("TimeKiller/Setup/24 - Setup Audio Director (tension music)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("24 - Setup Audio Director (tension music)")) return;
+
             var config = AssetDatabase.LoadAssetAtPath<AudioConfig>(ConfigPath);
             if (config == null)
             {

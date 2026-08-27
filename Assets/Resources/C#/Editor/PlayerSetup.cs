@@ -20,6 +20,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/4 - Create Player In Scene")]
         public static void CreatePlayer()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("4 - Create Player In Scene")) return;
+
             var movementConfig = EnsureConfig<PlayerMovementConfig>("Assets/Resources/C#/Player/Configs/PlayerMovementConfig.asset");
             EnsureConfig<CoreConfig>("Assets/Resources/C#/Core/Configs/CoreConfig.asset");
             SliceAllSheets();

@@ -40,6 +40,8 @@ namespace TimeKiller.Audio.EditorTools
         [MenuItem("TimeKiller/Setup/42 - Place Mystery Zones (approach dread)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("42 - Place Mystery Zones (approach dread)")) return;
+
             var scene = EditorSceneManager.GetActiveScene();
             var log = new List<string>();
 

@@ -45,6 +45,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/36 - Setup Player Heartbeat")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("36 - Setup Player Heartbeat")) return;
+
             var player = Object.FindAnyObjectByType<PlayerController>();
             if (player == null)
             {

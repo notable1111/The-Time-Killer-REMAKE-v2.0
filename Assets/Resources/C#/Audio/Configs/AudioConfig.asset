@@ -43,6 +43,41 @@ MonoBehaviour:
   - {fileID: 8300000, guid: ff3dfd5caf2be6f43a2da19297f779f6, type: 3}
   - {fileID: 8300000, guid: be218e0bc6cf16a43bfe639495d734cc, type: 3}
   - {fileID: 8300000, guid: 079024c654a0de842930fc0c5942b1db, type: 3}
+  trackTrims:
+  - clip: {fileID: 8300000, guid: 654752d7968ebe345a706553d2604a78, type: 3}
+    trimDb: 3.5
+  - clip: {fileID: 8300000, guid: c8015f8dfbc8a8549aeb39d9272382c6, type: 3}
+    trimDb: -0.2
+  - clip: {fileID: 8300000, guid: 7de06b40a7c2c964f8b6c97a79ddd735, type: 3}
+    trimDb: 1.15
+  - clip: {fileID: 8300000, guid: 30428b845dbcf114c83d925e674339e5, type: 3}
+    trimDb: 0.95
+  - clip: {fileID: 8300000, guid: 13a355bc0d4857748a6ce88b1873fe16, type: 3}
+    trimDb: -1.45
+  - clip: {fileID: 8300000, guid: eb91435cbe86e654db5966f999c9b81d, type: 3}
+    trimDb: -0.95
+  - clip: {fileID: 8300000, guid: 5cc38dad50555ba41a27feceffc62504, type: 3}
+    trimDb: -2.2
+  - clip: {fileID: 8300000, guid: a78916b2c7d449b4487d221f96a8bfa7, type: 3}
+    trimDb: 0.3
+  - clip: {fileID: 8300000, guid: 431c66e74656e224fad4d37b8fdcdb4c, type: 3}
+    trimDb: -2.3
+  - clip: {fileID: 8300000, guid: 739ed5926c379ae4b9ab139f8b79fbc3, type: 3}
+    trimDb: 3
+  - clip: {fileID: 8300000, guid: 289dbfa0571b7a344990b7f9020f3e65, type: 3}
+    trimDb: 1.9
+  - clip: {fileID: 8300000, guid: 53638f8217848b34da2454770ba1c51c, type: 3}
+    trimDb: -1.3
+  - clip: {fileID: 8300000, guid: 8eb6590dfceb78947ba3fa4970dd117b, type: 3}
+    trimDb: 1.4
+  - clip: {fileID: 8300000, guid: 94fbf5717abaa774eb0eb123a2177842, type: 3}
+    trimDb: 2.3
+  - clip: {fileID: 8300000, guid: ff3dfd5caf2be6f43a2da19297f779f6, type: 3}
+    trimDb: 0.6
+  - clip: {fileID: 8300000, guid: be218e0bc6cf16a43bfe639495d734cc, type: 3}
+    trimDb: -0.6
+  - clip: {fileID: 8300000, guid: 079024c654a0de842930fc0c5942b1db, type: 3}
+    trimDb: -1.4
   dreadVolume: 0.27579162
   mysteryVolume: 0.78628695
   investigateVolume: 0.75089824

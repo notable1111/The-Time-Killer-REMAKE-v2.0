@@ -15,6 +15,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/1 - Install Packages (URP + Input System)")]
         public static void InstallPackages()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("1 - Install Packages (URP + Input System)")) return;
+
             packageRequest = Client.AddAndRemove(new[]
             {
                 "com.unity.render-pipelines.universal",
@@ -39,6 +41,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/2 - Configure Project Settings")]
         public static void ConfigureProjectSettings()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("2 - Configure Project Settings")) return;
+
             PlayerSettings.colorSpace = ColorSpace.Linear;
             PlayerSettings.productName = "The Time Killer";
             PlayerSettings.companyName = "The Time Killer Team";

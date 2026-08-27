@@ -28,6 +28,8 @@ namespace TimeKiller.Objectives.EditorTools
         [MenuItem("TimeKiller/Setup/38 - Build Objective HUD (carved stone & brass)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("38 - Build Objective HUD (carved stone & brass)")) return;
+
             var hud = Object.FindAnyObjectByType<ObjectiveHUD>();
             if (hud == null)
             {

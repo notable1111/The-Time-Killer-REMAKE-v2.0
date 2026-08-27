@@ -50,6 +50,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/5 - Generate Player Animations")]
         public static void Generate()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("5 - Generate Player Animations")) return;
+
             SliceSheets(IdleSheets.Concat(RunSheets));
             Directory.CreateDirectory(ClipFolder);
 

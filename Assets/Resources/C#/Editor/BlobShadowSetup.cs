@@ -17,6 +17,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/7 - Add Blob Shadow")]
         public static void AddShadow()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("7 - Add Blob Shadow")) return;
+
             BakeTextureIfMissing();
 
             var player = Object.FindAnyObjectByType<PlayerController>();

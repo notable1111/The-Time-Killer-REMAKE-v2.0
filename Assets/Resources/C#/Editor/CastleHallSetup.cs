@@ -33,6 +33,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/9 - Build Castle Hall")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("9 - Build Castle Hall")) return;
+
             tileCache.Clear();
             mainLookup = BuildLookup(MainSheet);
             decoLookup = BuildLookup(DecoSheet);

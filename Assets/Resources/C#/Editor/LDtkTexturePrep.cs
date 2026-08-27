@@ -20,6 +20,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/15 - Prep LDtk Textures (RGBA32)")]
         public static void Prep()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("15 - Prep LDtk Textures (RGBA32)")) return;
+
             foreach (var path in Sheets)
             {
                 var importer = AssetImporter.GetAtPath(path) as TextureImporter;

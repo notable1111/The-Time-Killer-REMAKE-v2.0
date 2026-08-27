@@ -58,6 +58,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/14 - Build Castle Wing (map v1)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("14 - Build Castle Wing (map v1)")) return;
+
             var hallGo = GameObject.Find("CastleHall");
             if (hallGo == null) { Debug.LogError("[TimeKiller Setup] CastleHall not found."); return; }
             var floor = Map(hallGo, "Floor"); var rug = Map(hallGo, "Rug");

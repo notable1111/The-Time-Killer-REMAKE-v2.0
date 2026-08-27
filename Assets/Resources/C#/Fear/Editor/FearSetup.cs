@@ -30,6 +30,8 @@ namespace TimeKiller.FearTools
         [MenuItem("TimeKiller/Setup/45 - Fear System")]
         public static void Run()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("45 - Fear System")) return;
+
             if (EditorApplication.isPlaying)
             {
                 Debug.LogError("[FearSetup] In play mode — setup scripts half-complete there. Stop play first.");

@@ -24,6 +24,8 @@ namespace TimeKiller.DirectorTools
         [MenuItem("TimeKiller/Setup/45 - Add the Maniac Director (two-brain AI)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("45 - Add the Maniac Director (two-brain AI)")) return;
+
             var config = AssetDatabase.LoadAssetAtPath<DirectorConfig>(ConfigPath);
             if (config == null)
             {

@@ -14,6 +14,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/10 - Setup Follow Camera")]
         public static void Setup()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("10 - Setup Follow Camera")) return;
+
             var config = AssetDatabase.LoadAssetAtPath<CameraConfig>(ConfigPath);
             if (config == null)
             {

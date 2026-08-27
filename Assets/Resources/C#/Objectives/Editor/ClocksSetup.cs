@@ -37,6 +37,8 @@ namespace TimeKiller.Objectives.EditorTools
         [MenuItem("TimeKiller/Setup/28 - Setup Clock Objectives (win loop)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("28 - Setup Clock Objectives (win loop)")) return;
+
             if (GameObject.Find("Clocks") != null)
             {
                 Debug.LogWarning("[TimeKiller Setup] 'Clocks' already exists — placement is HAND-TUNED, refusing to rebuild. Delete it manually to reseed.");

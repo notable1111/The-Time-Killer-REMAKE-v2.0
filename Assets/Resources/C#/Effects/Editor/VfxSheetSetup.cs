@@ -47,6 +47,8 @@ namespace TimeKiller.Effects.EditorTools
         [MenuItem("TimeKiller/Setup/38 - Build VFX Sheets (hand-drawn effects)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("38 - Build VFX Sheets (hand-drawn effects)")) return;
+
             if (!Directory.Exists(SheetFolder))
             {
                 Debug.LogError($"[TimeKiller Setup] No VFX folder at {SheetFolder}. Drop PixelLab strips there first.");

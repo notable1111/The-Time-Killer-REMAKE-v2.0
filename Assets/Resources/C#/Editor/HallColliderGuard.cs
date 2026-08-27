@@ -27,6 +27,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/17 - Hall Colliders: Export Snapshot")]
         public static void Export()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("17 - Hall Colliders: Export Snapshot")) return;
+
             var holder = FindHolder();
             if (holder == null) return;
 
@@ -48,6 +50,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/17 - Hall Colliders: Re-apply Snapshot")]
         public static void Reapply()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("17 - Hall Colliders: Re-apply Snapshot")) return;
+
             var holder = FindHolder();
             if (holder == null) return;
             if (!File.Exists(SnapshotPath))

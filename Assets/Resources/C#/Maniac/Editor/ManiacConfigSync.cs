@@ -21,6 +21,8 @@ namespace TimeKiller.Maniac.EditorTools
         [MenuItem("TimeKiller/Setup/35 - Sync Maniac Config (serialize every field)")]
         public static void Sync()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("35 - Sync Maniac Config (serialize every field)")) return;
+
             var config = AssetDatabase.LoadAssetAtPath<ManiacConfig>(ConfigPath);
             if (config == null)
             {

@@ -66,6 +66,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/33 - Generate Survivor Player Animations")]
         public static void Generate()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("33 - Generate Survivor Player Animations")) return;
+
             if (!Directory.Exists(ArtRoot))
             {
                 Debug.LogError($"[TimeKiller Setup] No art at {ArtRoot}. Run Tools/CharArt/build_sheets.py first.");

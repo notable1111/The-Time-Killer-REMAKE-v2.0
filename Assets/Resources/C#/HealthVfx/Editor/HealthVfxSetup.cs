@@ -48,6 +48,8 @@ namespace TimeKiller.HealthVfx.EditorTools
         [MenuItem("TimeKiller/Setup/22 - Add Health VFX (screen blood)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("22 - Add Health VFX (screen blood)")) return;
+
             var subtle = ImportOverlay($"{TextureFolder}/band_subtle.png");
             var subtleB = ImportOverlay($"{TextureFolder}/band_subtle_b.png");
             var critical = ImportOverlay($"{TextureFolder}/band_critical.png");

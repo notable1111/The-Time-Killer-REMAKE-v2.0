@@ -46,6 +46,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/18 - Build LDtk Wing Scene (side-by-side)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("18 - Build LDtk Wing Scene (side-by-side)")) return;
+
             if (!ConfigureImporter()) return;
 
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -98,6 +100,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/18 - Restyle LDtk Map (after reimport)")]
         public static void RestyleMenu()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("18 - Restyle LDtk Map (after reimport)")) return;
+
             var root = GameObject.Find("CastleWingLDtkMap");
             if (root == null) { Debug.LogError("[TimeKiller Setup] CastleWingLDtkMap not found — is the LDtk scene open?"); return; }
             Restyle(root);

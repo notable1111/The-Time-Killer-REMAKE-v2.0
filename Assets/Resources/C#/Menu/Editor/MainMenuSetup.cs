@@ -28,6 +28,8 @@ namespace TimeKiller.Menu.EditorTools
         [MenuItem("TimeKiller/Setup/41 - Build Main Menu Scene")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("41 - Build Main Menu Scene")) return;
+
             // Scene creation is illegal in play mode and throws part-way through,
             // which would leave a half-built menu scene open over your work.
             if (EditorApplication.isPlaying)

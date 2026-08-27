@@ -34,6 +34,8 @@ namespace TimeKiller.Hiding.EditorTools
         [MenuItem("TimeKiller/Setup/25 - Setup Hiding Spots (wardrobes)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("25 - Setup Hiding Spots (wardrobes)")) return;
+
             var closedA = ImportSprite($"{SpriteFolder}/wardrobeA_closed.png");
             var ajarA = ImportSprite($"{SpriteFolder}/wardrobeA_ajar.png");
             var closedB = ImportSprite($"{SpriteFolder}/wardrobeB_closed.png");

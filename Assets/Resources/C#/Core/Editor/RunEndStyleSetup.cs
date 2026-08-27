@@ -22,6 +22,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/39 - Style Run End Screen (carved stone & brass)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("39 - Style Run End Screen (carved stone & brass)")) return;
+
             var screen = Object.FindAnyObjectByType<RunEndScreen>(FindObjectsInactive.Include);
             if (screen == null)
             {

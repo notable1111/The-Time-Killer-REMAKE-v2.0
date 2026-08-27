@@ -44,6 +44,8 @@ namespace TimeKiller.Maniac.EditorTools
         [MenuItem("TimeKiller/Setup/20 - Create Maniac In Scene")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("20 - Create Maniac In Scene")) return;
+
             var standIn = FindPackSprite();
             if (standIn == null)
             {

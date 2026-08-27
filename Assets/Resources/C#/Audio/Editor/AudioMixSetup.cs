@@ -21,6 +21,8 @@ namespace TimeKiller.Audio.EditorTools
         [MenuItem("TimeKiller/Setup/40 - Create Audio Mix (one place for the balance)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("40 - Create Audio Mix (one place for the balance)")) return;
+
             var existing = AssetDatabase.LoadAssetAtPath<AudioMixConfig>(ConfigPath);
             if (existing != null)
             {
@@ -52,6 +54,8 @@ namespace TimeKiller.Audio.EditorTools
         [MenuItem("TimeKiller/Setup/40b - Attach Music EQ to the music sources")]
         public static void AttachMusicEq()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("40b - Attach Music EQ to the music sources")) return;
+
             var director = Object.FindAnyObjectByType<AudioDirector>();
             if (director == null)
             {

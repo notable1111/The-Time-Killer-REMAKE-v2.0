@@ -53,6 +53,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/31 - Place Catacombs Escape Loop")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("31 - Place Catacombs Escape Loop")) return;
+
             var scene = EditorSceneManager.GetActiveScene();
             if (scene.name != "Catacombs")
             {

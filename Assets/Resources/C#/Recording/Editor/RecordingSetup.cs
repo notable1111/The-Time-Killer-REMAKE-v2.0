@@ -17,6 +17,8 @@ namespace TimeKiller.RecordingTools
         [MenuItem("TimeKiller/Setup/46 - Session Recording")]
         public static void Run()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("46 - Session Recording")) return;
+
             if (EditorApplication.isPlaying)
             {
                 Debug.LogError("[RecordingSetup] In play mode — setup scripts half-complete there. Stop play first.");

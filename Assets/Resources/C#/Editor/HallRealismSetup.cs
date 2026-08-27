@@ -31,6 +31,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/11 - Hall Realism (Lighting + Depth + Shadows)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("11 - Hall Realism (Lighting + Depth + Shadows)")) return;
+
             var hall = GameObject.Find("CastleHall");
             if (hall == null)
             {

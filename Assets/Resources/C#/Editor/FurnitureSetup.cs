@@ -78,6 +78,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/26 - Map v2 Furniture (kitchen, armory, library)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("26 - Map v2 Furniture (kitchen, armory, library)")) return;
+
             // PROTECTED: same rule as HidingSpots — never clobber hand-tuned placement.
             if (GameObject.Find("Furniture") != null)
             {
@@ -165,6 +167,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/27 - Armory Wardrobe (additive hiding spot)")]
         public static void AddArmoryWardrobe()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("27 - Armory Wardrobe (additive hiding spot)")) return;
+
             var root = GameObject.Find("HidingSpots");
             if (root == null)
             {

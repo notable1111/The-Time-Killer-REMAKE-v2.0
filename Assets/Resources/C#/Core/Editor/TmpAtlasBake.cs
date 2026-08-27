@@ -55,6 +55,8 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/46 - Bake TMP fonts to a Static atlas")]
         public static void Bake()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("46 - Bake TMP fonts to a Static atlas")) return;
+
             var log = new List<string>();
             foreach (var guid in AssetDatabase.FindAssets("t:TMP_FontAsset", new[] { UiRoot }))
             {

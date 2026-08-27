@@ -26,6 +26,8 @@ namespace TimeKiller.Blood.EditorTools
         [MenuItem("TimeKiller/Setup/39 - Setup Blood Trail")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("39 - Setup Blood Trail")) return;
+
             var player = Object.FindAnyObjectByType<PlayerController>();
             if (player == null)
             {

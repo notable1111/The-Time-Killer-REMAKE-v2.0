@@ -43,6 +43,8 @@ namespace TimeKiller.Effects.EditorTools
         [MenuItem("TimeKiller/Setup/40 - Ambient Atmosphere (dust + torch embers)")]
         public static void Build()
         {
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("40 - Ambient Atmosphere (dust + torch embers)")) return;
+
             var config = AssetDatabase.LoadAssetAtPath<AmbienceConfig>(ConfigPath);
             if (config == null)
             {
