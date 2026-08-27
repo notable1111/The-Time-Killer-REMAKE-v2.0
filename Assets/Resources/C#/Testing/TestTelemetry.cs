@@ -16,7 +16,7 @@ namespace TimeKiller.Testing
     public class TestTelemetry : MonoBehaviour
     {
         public int Footsteps, Hits, Deaths, Hides, Unhides, Spotted, Heard;
-        public int HeardSound, HeardSuspicion;   // Heard, split by NoiseCause
+        public int HeardSound, HeardSuspicion, HeardBlood;   // Heard, split by NoiseCause
         public string ManiacState = "?";
         public float MinManiacDistance = float.MaxValue;
 
@@ -341,10 +341,18 @@ namespace TimeKiller.Testing
         // but they are also kept apart: "heard 50 noises" was one number
         // covering the player being audible AND his own sight meter twitching,
         // which are different phenomena with different fixes.
+        //
+        // BLOOD IS A THIRD CAUSE (2026-08-27) AND IT HAD TO BE SPLIT OUT BEFORE
+        // blood tracking could be measured at all. This used to read "if
+        // Suspicion, else Sound", so the moment the maniac started reading the
+        // floor, every lead he took off a blood trail would have been counted as
+        // him HEARING the player. The A/B that feature is waiting for compares
+        // exactly those numbers, so it would have measured its own miscount.
         void OnHeard(ManiacHeardNoiseEvent e)
         {
             Heard++;
             if (e.Cause == NoiseCause.Suspicion) HeardSuspicion++;
+            else if (e.Cause == NoiseCause.Blood) HeardBlood++;
             else HeardSound++;
         }
         void OnManiacState(ManiacStateChangedEvent e) => ManiacState = e.StateName;
@@ -649,6 +657,7 @@ namespace TimeKiller.Testing
             sb.Append(",\"heardNoise\":").Append(Heard);
             sb.Append(",\"heardSound\":").Append(HeardSound);
             sb.Append(",\"heardSuspicion\":").Append(HeardSuspicion);
+            sb.Append(",\"heardBlood\":").Append(HeardBlood);
             sb.Append(",\"maniacState\":\"").Append(ManiacState).Append('"');
             sb.Append(",\"clockFixTimes\":").Append(ClockFixTimesJson());
             sb.Append(",\"hideSpots\":").Append(HideSpotsJson());

@@ -45,6 +45,11 @@ Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 
 - 2026-08-27 — Sound: Setup/54, per-track music trims into AudioConfig (no scene).
+- 2026-08-27 — A: took the lock to fill in Catacombs, then released it WITHOUT
+  touching the Editor: opening a scene is blocked for this session by the
+  permission layer. Catacombs was not opened and nothing was saved. The nine
+  setup scripts were read first and all are find-or-create with zero destroy
+  calls, so the pass is safe to run whenever someone can open the scene.
 - 2026-08-27 — A: released. Two read-only Verify probes run (Feature Install
   Audit, Escalation Ladder) + 54/54 tests. Nothing opened, nothing saved. The
   audit found 23 systems present in CastleWing and absent from Catacombs.

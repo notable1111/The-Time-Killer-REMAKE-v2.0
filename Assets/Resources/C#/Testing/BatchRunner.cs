@@ -551,6 +551,7 @@ namespace TimeKiller.Testing
                 sb.Append(",\"heardNoise\":").Append(t.Heard);
                 sb.Append(",\"heardSound\":").Append(t.HeardSound);
                 sb.Append(",\"heardSuspicion\":").Append(t.HeardSuspicion);
+                sb.Append(",\"heardBlood\":").Append(t.HeardBlood);
                 sb.Append(",\"hides\":").Append(t.Hides);
                 // WHERE the bot hid. "9 hides" cannot distinguish one wardrobe
                 // used nine times from nine wardrobes used once, and those are
