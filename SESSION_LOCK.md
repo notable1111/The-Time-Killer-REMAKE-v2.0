@@ -50,6 +50,9 @@ spurious-unsaved look identical from git. A dirty scene you did not dirty is a
 stop-and-ask, and discarding is the destructive direction just as much as saving.
 
 
+- 2026-08-27 — B: swing VFX widened to 1.21% coverage. Lock read before claiming,
+  no scene opened or saved, Catacombs left exactly as found (clean, not dirty).
+
 Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 

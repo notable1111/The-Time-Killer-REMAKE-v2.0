@@ -177,9 +177,12 @@ def swing_frame(index):
     # 291 vs spotted's 167). Intense and small still reads as nothing. Widened
     # to fill more of the cell rather than scaled up in the recipe, because a
     # non-integer sheetScale on pixel art is how crisp edges turn to mush.
-    radius = CELL * 0.40
+    radius = CELL * 0.44
     # Brightest mid-stroke: a blade is fastest, and so brightest, in the middle.
-    energy = math.sin(math.pi * (0.18 + 0.82 * t)) ** 0.6
+    # Measured: the last frame rendered NOTHING (0.00% of screen) because this
+    # curve hit sin(pi) exactly at t=1. An eighth of a 0.62s effect spent on a
+    # blank frame. Stopping short of pi leaves the blade still dying as it ends.
+    energy = math.sin(math.pi * (0.18 + 0.70 * t)) ** 0.6
 
     # Trail: several fading copies BEHIND the leading edge.
     trail = 5
@@ -189,8 +192,8 @@ def swing_frame(index):
         strength = energy * (1.0 - f) ** 1.6
         if strength < 0.02:
             continue
-        half = math.radians(50) * (1.0 - 0.28 * f)
-        width = 4.4 + 3.4 * f                       # the trail smears as it ages
+        half = math.radians(58) * (1.0 - 0.26 * f)
+        width = 5.4 + 3.6 * f                       # the trail smears as it ages
         for y in range(CELL):
             dy = y - cy
             for x in range(CELL):
