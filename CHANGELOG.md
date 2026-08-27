@@ -43,6 +43,59 @@ one that stops 34 tools forcing an approval prompt on every call. Whether the
 "`read_console` returns 0 entries even when Unity has clearly logged" trap is actually
 cured is **not** verified here — that needs a session to reproduce the old case.
 
+## 2026-08-27 (later) — He can read the floor now, and the castle has less dead air
+
+**Blood pass 2, built and shipped OFF.** Approved in July and deliberately left
+unwired; the seam ARCHITECTURE promised turned out to be exactly right.
+`BloodTrail` publishes a Core `WorldTraceEvent` beside `BloodSpilledEvent`,
+`ManiacBloodTracker` listens for it, and `NoiseCause` gained a third member.
+Neither feature references the other in either direction.
+
+**The fairness rule is the whole design: a trail is a LEAD, never a detection.**
+All the tracker may do is call `ManiacPerception.NoticeTrace`, which writes the
+noise channel and nothing else — no awareness, no `LastSeenPosition`, no belief.
+Runtime-verified in play: a lead fired, `LastNoiseCause` read `Blood`, and
+**awareness stayed `Unaware` at raw 0**. He gets sent to a spot on the floor and
+still has to find the player there like anyone else, which is the same limit the
+Director works under and for the same reason.
+
+Three limits carry it: he must nearly walk over the stain (`noticeRadius` 2u,
+with line of sight, through his own `sightBlockers` mask so "can he see the
+floor" cannot drift from "can he see anything"); traces expire after 45s, because
+blood dries and a permanent trail turns the map into a record of everywhere you
+have ever been; and he follows the *freshest* trace within 4u, so he reads your
+direction of travel but gets the next few steps rather than the destination.
+
+**It ships disabled on purpose**, and both reasons are written on the config:
+bleeding starts at low HP by definition, so this presses hardest exactly when
+the player has least left — which is why the original note asked for a bot A/B
+first — and per-clock escalation is already in flight and unjudged, so turning
+both on at once would make either impossible to attribute. Setup/53 prints
+`noticeRadius` against his sight range and warns as it closes.
+
+⚠️ **Before that A/B:** `TestTelemetry` counts anything that is not `Suspicion`
+as `HeardSound`, so every blood lead would be filed under hearing. That split
+belongs to the playtest lane and is not done.
+
+**Escalation gains a fourth dial, aimed at dead air.** `hintQuietAtFull` 0.7
+scales the Director's `hintAfterQuietSeconds` and `minSecondsBetweenHints` by the
+same factor — 22s/15s become 15.4s/10.5s at the last clock. Scaling both
+preserves the ratio it was tuned with: he comes back *sooner*, not *more often*.
+The Director exists because a recorded session ran 80 seconds with zero
+detections; this shortens those stretches in the back half, which is the other
+half of "the curve has no middle".
+
+Two tests guard it, and the second is the one worth having: the wait at full
+escalation must stay above 10s, and **`hintError` must still exceed
+`sightRange`** — the Director's entire claim to honesty, which until now was only
+*printed* by Setup/45. A number checked only by a script nobody runs is not
+checked.
+
+**Verified:** compiles, `SmokeCheck ok:true`, **54/54 EditMode tests** (16 in the
+escalation suite now), plus the runtime probe above. The Editor lock was claimed
+before any of it this time, and released after; CastleWingLDtk left not dirty and
+the blood config restored to disabled.
+
 ## 2026-08-27 — The third clock was the same as the first
 
 **Three sessions now work in one tree, so the first delivery is a rulebook.**
