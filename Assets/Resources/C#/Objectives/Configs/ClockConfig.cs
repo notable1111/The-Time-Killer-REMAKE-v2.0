@@ -57,5 +57,7 @@ namespace TimeKiller.Objectives
         [Header("Fixed-clock light")]
         [Tooltip("Whether a fixed clock lights up (green Light2D) — the map visibly brightens as you win.")]
         public bool lightWhenFixed = true;
+        [Tooltip("Seconds the green light takes to climb to full when a clock is finished.\n\nUntil now the sprite swap and the light both landed in a SINGLE frame, so the biggest progress moment in the game had no duration at all — it read as a state change rather than as something you achieved. The light now surges in over this long (ease-out, so it settles rather than ramping like a dimmer).\n\n0 = exactly the old instant snap.")]
+        [Range(0f, 2f)] public float lightRiseSeconds = 0.45f;
     }
 }

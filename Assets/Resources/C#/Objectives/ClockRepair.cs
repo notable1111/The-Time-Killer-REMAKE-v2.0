@@ -127,6 +127,27 @@ namespace TimeKiller.Objectives
                 if (hit)
                 {
                     active.AddProgress(config.progressPerHit);
+
+                    // Announced so the press can be SEEN and HEARD. A miss has
+                    // had a ring and a noise since 2026-08-02; success had
+                    // nothing but a bar that moved, which is backwards — the
+                    // beat the mini-game rewards you for was the quietest one
+                    // in it.
+                    //
+                    // Skipped when THIS press finished the clock: AddProgress
+                    // above has already run Fix() and published ClockFixedEvent,
+                    // and firing both would stack the small burst underneath the
+                    // big one on the same frame.
+                    if (!active.IsFixed)
+                    {
+                        EventBus.Publish(new ClockHitEvent
+                        {
+                            Position = active.EffectPoint,
+                            Progress = active.Progress,
+                            Fear = FearFactor,
+                        });
+                    }
+
                     NewZone();
                 }
                 else
