@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41026f5ebbd43e444964728dfb13b486, type: 3}
+  m_Name: ClockFixed
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Effects.EffectRecipe
+  sheetClip: {fileID: 11400000, guid: 422d56d3a780f13429920735da362091, type: 2}
+  sheetScale: 1
+  sheetMaterial: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  sheetSortingLayer: Default
+  sheetSortingOrder: 5
+  randomFlip: 1
+  randomRotation: 0
+  particlePrefab: {fileID: 0}
+  particleScale: 1
+  clips:
+  - {fileID: 8300000, guid: 61e25037a7b687d488cdeed272572053, type: 3}
+  volume: 0.9
+  pitchJitter: 0.02
+  shakeStrength: 0.22
+  shakeDuration: 0.35
+  particleLifetime: 3

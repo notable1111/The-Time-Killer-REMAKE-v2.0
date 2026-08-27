@@ -94,23 +94,55 @@ namespace TimeKiller.Effects.EditorTools
             wake.shakeStrength = 0.22f;         // felt, not thrown — this is good news, not a hit
             wake.shakeDuration = 0.35f;
             EditorUtility.SetDirty(wake);
+
+            // ---- the gate unlocks ----
+            // The beat where the run changes shape: the question stops being
+            // "where are the clocks" and becomes "where is the door". Played at
+            // the door itself, so it is a direction as well as a celebration.
+            //
+            // NO SHEET AND NO CLIP YET, on purpose. There is no gate art drawn,
+            // and the SOUND is already taken: ExitDoor plays its own local creak
+            // and AudioDirector fires a deliberately non-positional unlock sting
+            // map-wide. A third sound on the same frame would be mud, so this
+            // recipe carries the one channel nothing else is using — a heavy,
+            // slow shake, which is what a stone gate grinding open feels like.
+            // Drop a sheet into sheetClip when the art exists and it gains its
+            // picture without a code change.
+            var gate = Recipe("GateOpened");
+            gate.sheetScale = 1.4f;             // a gate is bigger than a clock face
+            gate.sheetMaterial = unlit;
+            gate.sheetSortingOrder = 5;
+            gate.randomFlip = false;            // a landmark reads the same way every time
+            gate.randomRotation = false;
+            gate.particlePrefab = null;
+            gate.clips = null;
+            gate.shakeStrength = 0.30f;         // heavier and longer than the clock wake
+            gate.shakeDuration = 0.70f;
+            EditorUtility.SetDirty(gate);
+
             AssetDatabase.SaveAssets();
 
             // ---- the binder ----
-            var binderGo = GameObject.Find("ClockEffects");
-            if (binderGo == null)
+            // It used to be built here as a scene object, and that is exactly why
+            // the feature was never live: this script was never run, so no scene
+            // ever received it and the drawn art sat unused on disk. ClockEffects
+            // now installs itself from Resources, so it is present in CastleWing,
+            // Catacombs and any scene added later with nothing to remember.
+            //
+            // An existing scene object still wins (ClockEffects skips its own
+            // installer when one is present), so a hand-placed binder from before
+            // this change keeps working — it is just re-wired here rather than
+            // created, and only if it already exists. Nothing dirties a scene.
+            var existing = Object.FindAnyObjectByType<ClockEffects>();
+            if (existing != null)
             {
-                binderGo = new GameObject("ClockEffects");
-                Undo.RegisterCreatedObjectUndo(binderGo, "Clock Effects");
+                var so = new SerializedObject(existing);
+                so.FindProperty("hitRecipe").objectReferenceValue = hit;
+                so.FindProperty("fixedRecipe").objectReferenceValue = wake;
+                so.ApplyModifiedPropertiesWithoutUndo();
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(existing.gameObject.scene);
+                Debug.Log("[TimeKiller Setup] 50 - re-wired the ClockEffects object already in this scene.");
             }
-            var binder = binderGo.GetComponent<ClockEffects>();
-            if (binder == null) binder = binderGo.AddComponent<ClockEffects>();
-            var so = new SerializedObject(binder);
-            so.FindProperty("hitRecipe").objectReferenceValue = hit;
-            so.FindProperty("fixedRecipe").objectReferenceValue = wake;
-            so.ApplyModifiedPropertiesWithoutUndo();
-
-            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(binderGo.scene);
 
             string art = (hitClip == null || wakeClip == null)
                 ? $"  ART MISSING — drop clock_hit.png / clock_wake.png in {SheetFolder} and re-run; " +

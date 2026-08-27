@@ -52,7 +52,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -66,7 +66,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -90,7 +90,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -131,19 +131,19 @@ TextureImporter:
       name: clock_hit_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 3
-        width: 26
-        height: 25
+        x: 0
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 6e6f4b0e0b7d03c40800000000000000
+      spriteID: 339a4cba72c912c4aa99ba93396b75ad
       internalID: 5490125100448806630
       vertices: []
       indices: 
@@ -153,19 +153,19 @@ TextureImporter:
       name: clock_hit_1
       rect:
         serializedVersion: 2
-        x: 34
-        y: 2
-        width: 28
-        height: 27
+        x: 32
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: ae3cce6d99279cfc0800000000000000
+      spriteID: eebb38005844efe42bd97c9bcc7901b5
       internalID: -3474119632478223382
       vertices: []
       indices: 
@@ -175,19 +175,19 @@ TextureImporter:
       name: clock_hit_2
       rect:
         serializedVersion: 2
-        x: 65
+        x: 64
         y: 0
-        width: 29
-        height: 31
+        width: 32
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: bc01c352163c8fe00800000000000000
+      spriteID: 364a2980bb92c9f4bbe9517ee6c9461b
       internalID: 1078826932759171275
       vertices: []
       indices: 
@@ -197,19 +197,19 @@ TextureImporter:
       name: clock_hit_3
       rect:
         serializedVersion: 2
-        x: 98
-        y: 2
-        width: 27
-        height: 27
+        x: 96
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 3bca4a6ed2263fb70800000000000000
+      spriteID: e2830c50e922285459bbc6d448bf8441
       internalID: 8931590435288427699
       vertices: []
       indices: 
@@ -219,19 +219,19 @@ TextureImporter:
       name: clock_hit_4
       rect:
         serializedVersion: 2
-        x: 130
-        y: 4
-        width: 26
-        height: 25
+        x: 128
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: a872ed7a25484a1f0800000000000000
+      spriteID: c82565d5bf975a041b02e0ac6fe1f074
       internalID: -1034556523849832566
       vertices: []
       indices: 
@@ -241,20 +241,42 @@ TextureImporter:
       name: clock_hit_5
       rect:
         serializedVersion: 2
-        x: 163
-        y: 4
-        width: 25
-        height: 24
+        x: 160
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 273ddf79782794620800000000000000
+      spriteID: d9322a71816f0974cb166fc5cc719e4a
       internalID: 2758862173437285234
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clock_hit_6
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ea3e1671943f0745b2478b49ae32fd1
+      internalID: 799296652
       vertices: []
       indices: 
       edges: []
@@ -263,7 +285,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: e7c6c00e132df2042b3153e23cf0d620
     internalID: 0
     vertices: []
     indices: 
@@ -279,6 +301,7 @@ TextureImporter:
       clock_hit_3: 8931590435288427699
       clock_hit_4: -1034556523849832566
       clock_hit_5: 2758862173437285234
+      clock_hit_6: 799296652
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85738f08ff23ea640a9e0c32f69a7e87, type: 3}
+  m_Name: clock_hit
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Core.SpriteAnimationClip
+  frames:
+  - {fileID: 5490125100448806630, guid: 990a3facdc66b49418429273fcd319d5, type: 3}
+  - {fileID: -3474119632478223382, guid: 990a3facdc66b49418429273fcd319d5, type: 3}
+  - {fileID: 1078826932759171275, guid: 990a3facdc66b49418429273fcd319d5, type: 3}
+  - {fileID: 8931590435288427699, guid: 990a3facdc66b49418429273fcd319d5, type: 3}
+  - {fileID: -1034556523849832566, guid: 990a3facdc66b49418429273fcd319d5, type: 3}
+  - {fileID: 2758862173437285234, guid: 990a3facdc66b49418429273fcd319d5, type: 3}
+  - {fileID: 799296652, guid: 990a3facdc66b49418429273fcd319d5, type: 3}
+  framesPerSecond: 16
+  loop: 0
+  eventFrames: 
