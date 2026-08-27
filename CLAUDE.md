@@ -58,7 +58,10 @@ a measurement, because the reader cannot tell them apart.
 
 ## 3. Communication
 
-- **English**, always — code, comments, commits, and conversation.
+- **English**, always — code, comments, commits, and conversation. This includes
+  the end-of-response options block, even when a global or personal instruction
+  file writes it in another language: in this repo it is English. *(Re-stated
+  2026-08-27, after the options block came back in Uzbek.)*
 - **Session start:** a short status recap — done / in progress / blocked — then
   pick the task together.
 - **Interview before ANY new feature or improvement.** Ask design questions
@@ -220,6 +223,65 @@ Run after **any** C# edit or editor-script run:
   afterthought.
 - **Split large pushes into logical commits per feature** so a teammate can
   bisect or revert one thing without losing the rest.
+
+### Three sessions, one working tree (added 2026-08-27)
+
+Three Claude sessions build this game at the same time. Measured on 2026-08-27:
+they share **one working tree** (`D:\The Time Killer Remake`), **one branch**
+(`main`) and **one Unity Editor**. The `.claude/worktrees/*` entries are stale
+July branches and are not in use. So `git status` shows you **everyone's** work,
+not yours.
+
+**Lanes.** Each session owns folders and commits only those:
+
+| Lane | Owns |
+|---|---|
+| **Visual / design** | `C#/Lighting` `C#/Effects` `C#/Blood` `C#/HealthVfx` `C#/Environment` `C#/Camera`, the *look* of `C#/Menu` and the HUD; `Assets/Rendering` `Assets/Shadows` `Assets/Effects` `Assets/UI` `Assets/Characters` `Assets/Furniture`; URP + volume profiles; `Tools/ArtPipeline` `Tools/UIArt` `Tools/VfxPipeline` `Tools/CharArt`; PixelLab |
+| **(unassigned)** | — |
+| **(unassigned)** | — |
+
+A folder with no owner belongs to **nobody**: ask before committing it.
+
+**Committing.**
+
+1. **Never `git commit -a`, `git add .` or `git add -A`.** In a shared tree they
+   sweep two other lanes' unreviewed work into your commit. Stage explicit paths.
+2. **Prefix the subject with your lane** — `visual: ...`. Then
+   `git log --oneline --grep '^visual'` is one role's history, which is the point
+   of splitting.
+3. Run `git status --short` before and after staging. If a path you did not touch
+   is staged, unstage it.
+
+**The two exceptions — a lane-pure commit that does not compile is worse than a
+commit that crosses a lane.** Both were measured on 2026-08-27, not imagined:
+
+- **Shared foundation first.** `SetupGuard.cs` (Core) is called by six setup
+  scripts across all three lanes. Under a strict lane rule nobody would ever
+  commit it and every lane would break. A file every lane depends on is committed
+  **on its own, first**, prefixed `shared:`, whoever notices it.
+- **A feature that crosses lanes is committed across lanes.** `ClockEffects.cs`
+  (visual) subscribes to `ClockHitEvent`, introduced in `ObjectiveEvents.cs`
+  (objectives). Split by lane, one of the two commits will not compile. Commit the
+  pair together, name both lanes in the subject, and say so in the body.
+
+**Files nobody owns.**
+
+- `CHANGELOG.md`, `ARCHITECTURE.md` — **append-only**. Add your own dated
+  section; never rewrite another session's. A markdown conflict can be resolved by
+  hand. Scene YAML cannot, which is the whole reason for this rule.
+- `Assets/Scenes/*.unity`, `ProjectSettings/`, `.gitignore`, `CLAUDE.md` — shared.
+  Say what you changed and why in the commit body.
+
+**The Editor lock — `SESSION_LOCK.md` at the repo root.** There is one Editor, so
+two sessions running `Setup/NN` or saving a scene overwrite each other, and a
+lost scene is unrecoverable (§5). Before opening or saving a scene, or running
+**any** `TimeKiller/Setup/NN`:
+
+1. Read `SESSION_LOCK.md`.
+2. If free, claim it — lane, what you are doing, the time — then work, then
+   release it in the same session. Minutes, not hours.
+3. If another lane holds it, **do not touch the Editor**. Write the change as a
+   `Setup/NN` script, leave it unrun, and say plainly that it is queued.
 
 ## 8. Tools
 
