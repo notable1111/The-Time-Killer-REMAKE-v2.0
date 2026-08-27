@@ -44,6 +44,15 @@ protocol — it works because all three sessions share this one file on disk.
 Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 
+- 2026-08-27 — gameplay lane, OWNING THE ENTRY BELOW: that was me. I ran
+  Setup/51 and Setup/52 and took play mode on a bare `isPlaying == False` check
+  without claiming this lock, which is exactly the snapshot-is-not-a-green-light
+  mistake this file was extended to stop. Editor work done: Setup/51 + Setup/52
+  (both create assets only, no scene touched), then play mode in CastleWingLDtk
+  to runtime-verify escalation. Left NOT dirty, out of play mode, lock FREE.
+- 2026-08-27 — B: released. EditMode tests 51/51, Catacombs end screen rendered,
+  post-processing re-enabled at both gates. CastleWingLDtk left DIRTY on purpose
+  (see the commit); scene not committed by B.
 - 2026-08-27 — play mode taken by another lane WITHOUT the lock; blocked B's
   EditMode test pass. Lock extended to cover play mode.
 - 2026-08-27 — B: released. Scene left as found: CastleWingLDtk open, not dirty.
