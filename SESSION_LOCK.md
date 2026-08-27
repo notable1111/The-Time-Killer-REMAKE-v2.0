@@ -44,6 +44,11 @@ protocol — it works because all three sessions share this one file on disk.
 Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 
+- 2026-08-27 — Sound: Setup/54, per-track music trims into AudioConfig (no scene).
+- 2026-08-27 — A: released. SetupGuard sweep (55 scripts), Setup/50 (which no
+  longer creates a scene object), 54/54 tests, and a play probe. Verified in play
+  that SetupGuard.Blocked now returns true, so the guards actually refuse.
+  CastleWingLDtk left not dirty.
 - 2026-08-27 — A: released. Claimed it properly this time. Setup/53, compile,
   54/54 EditMode tests, and a play-mode probe of blood tracking (enabled in
   session only, restored to disabled and saved). CastleWingLDtk left not dirty.

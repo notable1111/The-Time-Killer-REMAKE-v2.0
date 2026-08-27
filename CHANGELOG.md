@@ -43,6 +43,67 @@ one that stops 34 tools forcing an approval prompt on every call. Whether the
 "`read_console` returns 0 entries even when Unity has clearly logged" trap is actually
 cured is **not** verified here — that needs a session to reproduce the old case.
 
+## 2026-08-27 (later still) — The clock effects were documented as shipped and had never run once
+
+**The find.** ClockEffects was written on 2026-08-04, described in ARCHITECTURE as
+part of the objective loop's presentation, and committed. It was also completely
+inert: it was a scene object placed by `Setup/50`, and **`Setup/50` had never been
+run**. No scene contained a `ClockEffects`. No `ClockHit` or `ClockFixed` recipe
+existed on disk. `clock_hit.png` and `clock_wake.png` had been imported on
+2026-08-04 and never referenced by anything. The docs said shipped; the game had
+nothing, in both levels.
+
+Found by checking rather than trusting: grepping both scenes for the binder
+returned zero, and the Recipes folder held only the player's.
+
+**The fix is the one the threat binder already uses.** ClockEffects now
+self-installs from Resources, so it is present in CastleWing, Catacombs and any
+scene added later with nothing to remember and no scene to dirty. A hand-placed
+instance still wins if one exists. `Setup/50` no longer creates a scene object at
+all — it builds assets and re-wires an existing binder if there is one.
+
+Verified in play: `[ClockEffects]` installs itself, the beats each fire once, and
+**two live `[VFX]` objects** spawn from the now-sliced 7-frame sheets. That is the
+first time the clock art has ever been on screen.
+
+**The gate now has a beat, and it is information rather than decoration.**
+`AllClocksFixedEvent` plays `GateOpened` **at the exit door**, not at the player,
+because that moment is when the run's question changes from "where are the clocks"
+to "where is the door". It ships with a heavy shake (0.30 / 0.70s) and
+deliberately **no sound** — `ExitDoor` already creaks locally and `AudioDirector`
+fires a map-wide unlock sting, and a third source on the same frame is mud — and
+no sheet until gate art exists.
+
+⚠️ **The escape itself is deliberately NOT an effect, and this is a measurement
+not a preference.** Winning publishes `RunEndedEvent`, `GameFlow` sets
+`timeScale = 0` on that beat, `SpriteAnimator` advances on `Time.deltaTime`, and
+`EffectPlayer` cleans up with a *scaled* delayed `Destroy`. A burst on
+`GameWonEvent` freezes on frame one and is never destroyed — a sprite stuck under
+the end screen. The escape flourish belongs on `RunEndScreen`, which already fades
+on `unscaledDeltaTime`, and that is UI work.
+
+**SetupGuard sweep: 11 of 69 guarded → 66 of 69.** 55 menu items gained the one
+line that stops them half-running in play mode. That hazard is not theoretical: it
+cost Setup/43 a whole rig on 2026-08-03, and it bit this project again today with
+three sessions sharing one Editor.
+
+Three are exempt on purpose, because for them play mode is not the error case:
+`BotPlaytestWindow.Open` (opening the window is how you start a bot run),
+`BatchGuard.ForceUnlock` (the escape hatch for a batch wedged mid-play — guarding
+it would disarm it exactly when it is needed), and `CatacombsAudit.Run` (read-only,
+and auditing the play-mode scene is a legitimate thing to want).
+
+⚠️ `BatchGuard` also *cannot* call the guard: it lives in the runtime folder under
+`#if UNITY_EDITOR`, so it compiles into `Assembly-CSharp`, which may not reference
+the Editor assembly `SetupGuard` lives in. A blanket sweep would have broken the
+build. Every inserted guard was checked to be inside an `Editor/` folder.
+
+**Verified in play mode that `SetupGuard.Blocked` actually returns true** — a
+guard nobody has watched refuse is a guard nobody has tested.
+
+**All of it:** compiles, `SmokeCheck ok:true`, **54/54 EditMode tests**, Editor
+lock claimed and released, `CastleWingLDtk` left not dirty.
+
 ## 2026-08-27 (later) — He can read the floor now, and the castle has less dead air
 
 **Blood pass 2, built and shipped OFF.** Approved in July and deliberately left
