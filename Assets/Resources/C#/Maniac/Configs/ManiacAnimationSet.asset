@@ -31,5 +31,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 71b8048074c315f4b90835cb51799572, type: 2}
   - {fileID: 11400000, guid: 0cd572e1087a0b149b2dbf2e7dbb56d1, type: 2}
   death: {fileID: 11400000, guid: 10e98472713e87c4b931849da01b9414, type: 2}
+  attack: {fileID: 11400000, guid: cd3e6d667171bb74aba07b3587ebf95f, type: 2}
   minAnimationSpeed: 0.4
   speedForNormalPlayback: 5.2
+  attackHoldSeconds: 0.35
+  bodyTint: {r: 0.52, g: 0.55, b: 0.62, a: 1}
+  suspiciousTint: {r: 1.04, g: 1.02, b: 1, a: 1}
+  detectedTint: {r: 1.18, g: 1.08, b: 1.02, a: 1}
+  toneBlendSeconds: 0.35
+  cadenceUnaware: 1
+  cadenceSuspicious: 0.82
+  cadenceDetected: 1.25
+  idleBreathFps: 0.9

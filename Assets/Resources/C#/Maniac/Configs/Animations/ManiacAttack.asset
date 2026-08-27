@@ -10,11 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 85738f08ff23ea640a9e0c32f69a7e87, type: 3}
-  m_Name: ManiacIdle_Up
+  m_Name: ManiacAttack
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Core.SpriteAnimationClip
   frames:
-  - {fileID: 445134994, guid: a955ef265d740c540a85762205c83b3f, type: 3}
-  - {fileID: -470794996, guid: a955ef265d740c540a85762205c83b3f, type: 3}
-  framesPerSecond: 1.6
-  loop: 1
+  - {fileID: 115809765, guid: 7583bd56c420341468d8562347f5d7cd, type: 3}
+  - {fileID: 283645990, guid: 7583bd56c420341468d8562347f5d7cd, type: 3}
+  - {fileID: -1031720167, guid: 7583bd56c420341468d8562347f5d7cd, type: 3}
+  framesPerSecond: 12
+  loop: 0
   eventFrames: 

@@ -1009,6 +1009,182 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: maniac_r0_lift
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.5, y: 0.46875}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bd1e5297e3d718f46be14d454b4d145d
+      internalID: -952659605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: maniac_r1_lift
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 224
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.5, y: 0.46875}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ae64811ee85e9b44488bc4d7408e7c5c
+      internalID: 1806717084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: maniac_r2_lift
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 192
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.5, y: 0.46875}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3186c9439d8e31147b4f8548f1913920
+      internalID: -1311184526
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: maniac_r3_lift
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 160
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.5, y: 0.46875}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af3bc1ba18a14c44980e703ee86de2cc
+      internalID: -363688312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: maniac_r4_lift
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 128
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.5, y: 0.46875}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2849788db41ab0e499a36df88b3c8028
+      internalID: -470794996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: maniac_r5_lift
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 96
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.5, y: 0.46875}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c2004ce6035b8fb4794d853013948326
+      internalID: -999900866
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: maniac_r6_lift
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 64
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.5, y: 0.46875}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af893389bc146d944940a46b114d8849
+      internalID: -1128631060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: maniac_r7_lift
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 32
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.5, y: 0.46875}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8556abd921461694197d5412d2fcd294
+      internalID: -1785772550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -1027,34 +1203,42 @@ TextureImporter:
       maniac_r0_1: -1483955184
       maniac_r0_2: -245836075
       maniac_r0_3: 219414142
+      maniac_r0_lift: -952659605
       maniac_r1_0: 1662495162
       maniac_r1_1: 2074524713
       maniac_r1_2: -1303352318
       maniac_r1_3: -626873612
+      maniac_r1_lift: 1806717084
       maniac_r2_0: 381485162
       maniac_r2_1: 1142650583
       maniac_r2_2: 1567340945
       maniac_r2_3: 153244310
+      maniac_r2_lift: -1311184526
       maniac_r3_0: 609041063
       maniac_r3_1: 242604790
       maniac_r3_2: 496701603
       maniac_r3_3: -573833727
+      maniac_r3_lift: -363688312
       maniac_r4_0: 445134994
       maniac_r4_1: -1907206106
       maniac_r4_2: -926277889
       maniac_r4_3: 35056224
+      maniac_r4_lift: -470794996
       maniac_r5_0: 1616472016
       maniac_r5_1: -1038761225
       maniac_r5_2: -323886086
       maniac_r5_3: -1521694660
+      maniac_r5_lift: -999900866
       maniac_r6_0: 987280236
       maniac_r6_1: -376653831
       maniac_r6_2: 1459255791
       maniac_r6_3: 133386316
+      maniac_r6_lift: -1128631060
       maniac_r7_0: -365954113
       maniac_r7_1: 81871241
       maniac_r7_2: -1118815352
       maniac_r7_3: -156299246
+      maniac_r7_lift: -1785772550
       maniac_r8_0: -74526295
       maniac_r8_1: 1843114530
       maniac_r8_2: 1511344235

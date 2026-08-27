@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Core.SpriteAnimationClip
   frames:
   - {fileID: -365954113, guid: a955ef265d740c540a85762205c83b3f, type: 3}
-  framesPerSecond: 1
+  - {fileID: -1785772550, guid: a955ef265d740c540a85762205c83b3f, type: 3}
+  framesPerSecond: 1.6
   loop: 1
   eventFrames: 
