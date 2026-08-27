@@ -58,6 +58,8 @@ ExportedObj/
 sysinfo.txt
 
 # Builds
+/Build/
+/Builds/
 *.apk
 *.aab
 *.unitypackage
@@ -121,3 +123,9 @@ __pycache__/
 
 # Playtest session recordings (frames, audio, state) — output, not content
 /Recordings/
+
+# Local scene safety copies. `push` takes the whole working tree, and a scene is
+# ~4 MB of YAML that does NOT go through LFS — one forgotten backup is in shared
+# history forever. Keep them here; they stay on your disk and out of the repo.
+/Assets/_Recovery/
+/Assets/_Recovery.meta

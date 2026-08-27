@@ -60,6 +60,12 @@ namespace TimeKiller.Core
 
         void OnDestroy() => watches.Clear();
 #else
+        // Release build: the overlay is stripped, but the ~65 call sites across the
+        // game must still compile. Without these no-op stubs the Player build fails
+        // with CS0117 while the Editor compiles perfectly fine.
+        public static void Watch(string label, Func<string> valueGetter) { }
+        public static void Unwatch(string label) { }
+
         public void Init(CoreConfig coreConfig) { }
 #endif
     }
