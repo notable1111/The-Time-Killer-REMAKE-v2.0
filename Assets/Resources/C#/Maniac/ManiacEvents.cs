@@ -13,7 +13,14 @@ namespace TimeKiller.Maniac
     /// the playtest telemetry counted them as ONE number it could not split.
     /// Sound is the player being audible; Suspicion is his own sight meter
     /// flickering. A run reporting "heard 50 noises" was unreadable without it.
-    public enum NoiseCause { Sound, Suspicion }
+    /// Blood is the third, and it is not a sound at all — it is something he
+    /// SEES on the floor by standing near it. It shares this channel because the
+    /// consequence is identical (go and look over there) and because a separate
+    /// channel would have meant a second copy of every investigate transition.
+    /// ⚠️ TestTelemetry currently counts anything that is not Suspicion as
+    /// HeardSound; that must be split before blood tracking is A/B'd, or the
+    /// measurement will attribute floor-reading to hearing.
+    public enum NoiseCause { Sound, Suspicion, Blood }
 
     /// Fired when a footstep was loud enough and close enough to be heard, or
     /// when sight-driven suspicion first flickers up. See NoiseCause. Default

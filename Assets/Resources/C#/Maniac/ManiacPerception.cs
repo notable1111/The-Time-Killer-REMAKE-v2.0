@@ -60,6 +60,11 @@ namespace TimeKiller.Maniac
         // can never end up sharing one list mid-iteration if that ever changes.
         readonly List<RaycastHit2D> hearingHits = new List<RaycastHit2D>(8);
 
+        /// Read-only view of his tuning. Exposed so a sibling component can reuse
+        /// the SAME sightBlockers mask his eyes use rather than declaring a second
+        /// one that drifts the first time a wall layer is added.
+        public ManiacConfig Config => config;
+
         /// True while the player is inside a hiding spot — sight can't find them.
         public bool PlayerHidden { get; private set; }
 
@@ -237,6 +242,24 @@ namespace TimeKiller.Maniac
             {
                 NoisePosition = position,
                 Cause = NoiseCause.Sound
+            });
+        }
+
+        /// He has found something on the floor and it gives him somewhere to look.
+        ///
+        /// The ONLY thing this writes is the noise channel — exactly what the
+        /// Director is forbidden from exceeding, and for the same reason. It does
+        /// not touch awareness, Level, LastSeenPosition or the belief map, so a
+        /// blood trail can never BE a detection: it can only ever send him to a
+        /// spot, where he still has to see or hear the player like anyone else.
+        /// Called by ManiacBloodTracker; nothing else should call it.
+        public void NoticeTrace(Vector2 position)
+        {
+            SetNoise(position, NoiseCause.Blood);
+            EventBus.Publish(new ManiacHeardNoiseEvent
+            {
+                NoisePosition = position,
+                Cause = NoiseCause.Blood
             });
         }
 

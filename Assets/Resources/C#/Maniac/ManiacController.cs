@@ -25,6 +25,7 @@ namespace TimeKiller.Maniac
         public ManiacBreadcrumbs Breadcrumbs { get; private set; }
         public ManiacNavigator Nav { get; private set; }
         public ManiacEscalation Escalation { get; private set; }
+        public ManiacBloodTracker BloodTracker { get; private set; }
 
         /// Multiplier the STATES apply to their patrol / investigate / search
         /// speeds, so a run gets tighter as its clocks get fixed. Lives here
@@ -100,6 +101,15 @@ namespace TimeKiller.Maniac
                 // protected, and currently shared by several sessions. This way
                 // the feature cannot write a single byte into a .unity file.
                 Escalation.hideFlags = HideFlags.DontSave;
+            }
+
+            // Same contract as Escalation. Inert unless its config exists AND is
+            // enabled, which it is not by default — see ManiacBloodTrackingConfig.
+            BloodTracker = GetComponent<ManiacBloodTracker>();
+            if (BloodTracker == null)
+            {
+                BloodTracker = gameObject.AddComponent<ManiacBloodTracker>();
+                BloodTracker.hideFlags = HideFlags.DontSave;
             }
             if (config == null) Debug.LogError("[ManiacController] ManiacConfig not assigned.");
             if (route == null) Debug.LogError("[ManiacController] Patrol route not assigned.");

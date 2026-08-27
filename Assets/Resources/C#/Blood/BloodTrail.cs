@@ -65,6 +65,10 @@ namespace TimeKiller.Blood
                 Spread = config.hitSpread,
                 Count = config.stainsPerHit,
             });
+            // The same spill said in a way nothing has to know about blood to
+            // read: a physical trace on the floor. Blood never learns that a
+            // maniac exists, and the maniac never learns that blood does.
+            EventBus.Publish(new WorldTraceEvent { Position = at, Strength = config.hitSizeBoost });
             // The wound resets the drip clock so the trail starts from the hit
             // rather than mid-interval.
             nextDripAt = Time.time + DripPeriod();
@@ -102,6 +106,7 @@ namespace TimeKiller.Blood
                 Spread = config.dripMinDistance * 0.35f,
                 Count = Mathf.Max(1, config.dripStains),
             });
+            EventBus.Publish(new WorldTraceEvent { Position = at, Strength = 1f });
 
             lastDripPosition = at;
             nextDripAt = Time.time + DripPeriod();
