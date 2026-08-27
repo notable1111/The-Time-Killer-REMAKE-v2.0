@@ -156,16 +156,39 @@ namespace TimeKiller.Maniac
             HearNoise(noise.Position);
         }
 
+        // Escalation, resolved lazily rather than in Awake: ManiacController adds
+        // the component in ITS Awake and the order between two components on one
+        // object is undefined, so caching here at startup could cache a null for
+        // the whole run. Null stays null forever if the feature was removed, and
+        // the scale is then a constant 1 — the hearing this shipped with.
+        ManiacEscalation escalation;
+        float HearingScale
+        {
+            get
+            {
+                if (escalation == null) escalation = GetComponent<ManiacEscalation>();
+                return escalation != null ? escalation.Hearing : 1f;
+            }
+        }
+
         /// Does a noise of this loudness, made here, actually get to him?
+        ///
+        /// The escalation scale is applied HERE and not inside HeardRadiusFor on
+        /// purpose: that static is pure, unit-tested and reads only the config, and
+        /// a component-dependent multiplier inside it would make the same call
+        /// return different answers in the same config — untestable by
+        /// construction. Both comparisons take the scale so the cheap early-out
+        /// can never reject a noise the real test would have accepted.
         bool Reaches(Vector2 position, float loudness)
         {
             float distance = Vector2.Distance(transform.position, position);
+            float scale = HearingScale;
             // Cheapest test first: even with nothing in the way, is it in range at
             // all? Walls can only ever shrink the radius, so this rejects the vast
             // majority of footsteps without paying for a physics query.
-            if (distance > config.hearingRadius * Mathf.Clamp01(loudness)) return false;
+            if (distance > config.hearingRadius * Mathf.Clamp01(loudness) * scale) return false;
             return distance <= HeardRadiusFor(config, loudness,
-                                              WallsBetween(transform.position, position));
+                                              WallsBetween(transform.position, position)) * scale;
         }
 
         /// How many solid bodies stand between him and a point.

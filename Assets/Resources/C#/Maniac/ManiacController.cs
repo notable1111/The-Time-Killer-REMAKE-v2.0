@@ -24,6 +24,16 @@ namespace TimeKiller.Maniac
         public ManiacPerception Perception { get; private set; }
         public ManiacBreadcrumbs Breadcrumbs { get; private set; }
         public ManiacNavigator Nav { get; private set; }
+        public ManiacEscalation Escalation { get; private set; }
+
+        /// Multiplier the STATES apply to their patrol / investigate / search
+        /// speeds, so a run gets tighter as its clocks get fixed. Lives here
+        /// rather than in each state because states are not components and
+        /// cannot GetComponent; 1 whenever the escalation component or its
+        /// config is missing, so removing either restores the authored speeds
+        /// exactly. Chase speed is deliberately not routed through this — see
+        /// ManiacEscalationConfig for why.
+        public float MoveSpeedScale => Escalation != null ? Escalation.MoveSpeed : 1f;
 
         public PatrolState Patrol { get; private set; }
         public InvestigateState Investigate { get; private set; }
@@ -76,6 +86,21 @@ namespace TimeKiller.Maniac
             Breadcrumbs = GetComponent<ManiacBreadcrumbs>();
             Nav = GetComponent<ManiacNavigator>();
             if (Nav == null) Nav = gameObject.AddComponent<ManiacNavigator>(); // existing scene maniac
+            // Auto-added for the same reason the navigator is: every maniac in
+            // every already-built scene gets the feature with no scene edit and
+            // nothing to re-run. Deleting the component by hand still works —
+            // every consumer null-guards — but nothing has to remember to add it.
+            Escalation = GetComponent<ManiacEscalation>();
+            if (Escalation == null)
+            {
+                Escalation = gameObject.AddComponent<ManiacEscalation>();
+                // DontSave for the reason PlayerController spells out on
+                // PlayerNavDebug: an un-flagged runtime AddComponent asks the
+                // editor to dirty the scene, and the scenes here are hand-tuned,
+                // protected, and currently shared by several sessions. This way
+                // the feature cannot write a single byte into a .unity file.
+                Escalation.hideFlags = HideFlags.DontSave;
+            }
             if (config == null) Debug.LogError("[ManiacController] ManiacConfig not assigned.");
             if (route == null) Debug.LogError("[ManiacController] Patrol route not assigned.");
 

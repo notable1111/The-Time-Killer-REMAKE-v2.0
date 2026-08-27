@@ -93,7 +93,7 @@ namespace TimeKiller.Maniac
             var hint = maniac.Hint;
             if (hint.HasValue)
             {
-                maniac.Nav.MoveTo(hint.Value, config.patrolSpeed);
+                maniac.Nav.MoveTo(hint.Value, config.patrolSpeed * maniac.MoveSpeedScale);
                 if (maniac.Nav.ReachedDestination(config.hintReachedTolerance))
                 {
                     // Swept it and found nothing. Drop it and resume the route
@@ -107,7 +107,11 @@ namespace TimeKiller.Maniac
                 return;
             }
 
-            maniac.Nav.MoveTo(maniac.Route.Waypoint(waypointIndex), config.patrolSpeed);
+            // Escalation rides on the patrol pace because a maniac who covers
+            // the castle faster is a maniac you MEET more often, and meeting him
+            // is the build-up band the tension curve is missing. x1 until a
+            // clock is fixed, and x1 forever without the escalation component.
+            maniac.Nav.MoveTo(maniac.Route.Waypoint(waypointIndex), config.patrolSpeed * maniac.MoveSpeedScale);
             // Advance when reached OR when he's spent too long trying — a waypoint
             // wedged against a pillar/corner must never freeze the whole patrol.
             if (maniac.Nav.ReachedDestination(config.waypointTolerance) || Time.time >= waypointDeadline)
@@ -165,7 +169,15 @@ namespace TimeKiller.Maniac
             }
 
             // Suspicion closes SLOWER than the player walks; a real noise does not.
-            float approachSpeed = suspicion ? config.suspiciousApproachSpeed : config.investigateSpeed;
+            //
+            // Escalation touches the noise approach and deliberately NOT the
+            // suspicious creep. That creep is the hesitation beat built on
+            // 2026-08-04 to stretch the moment of being caught, and it is only a
+            // beat because it is slow: speeding it up as the run goes on would
+            // spend the very thing escalation is supposed to be paying for.
+            float approachSpeed = suspicion
+                ? config.suspiciousApproachSpeed
+                : config.investigateSpeed * maniac.MoveSpeedScale;
 
             // A newer noise elsewhere restarts the approach — perception keeps
             // LastNoisePosition current, so he follows a player who keeps moving.
@@ -400,7 +412,7 @@ namespace TimeKiller.Maniac
                     target = spot.transform.position;
                 }
 
-                maniac.Nav.MoveTo(target, maniac.Config.searchSpeed);
+                maniac.Nav.MoveTo(target, maniac.Config.searchSpeed * maniac.MoveSpeedScale);
                 pointDeadline = Time.time + maniac.Config.searchTravelTimeout;
             }
             else
@@ -448,7 +460,12 @@ namespace TimeKiller.Maniac
             }
 
             if (rushing && Time.time >= rushUntil) rushing = false;
-            maniac.Nav.MoveTo(target, rushing ? maniac.Config.searchRushSpeed : maniac.Config.searchSpeed);
+            // The rush is exempt: searchRushSpeed already equals his chase speed
+            // (5.2 against the player's 4.5 run), so escalating it would make
+            // merely being searched for harsher than actually being chased.
+            maniac.Nav.MoveTo(target, rushing
+                ? maniac.Config.searchRushSpeed
+                : maniac.Config.searchSpeed * maniac.MoveSpeedScale);
             if (maniac.Nav.ReachedDestination(maniac.Config.waypointTolerance) || Time.time >= pointDeadline)
             {
                 // Arrived at a wardrobe he meant to check: hold at the door for

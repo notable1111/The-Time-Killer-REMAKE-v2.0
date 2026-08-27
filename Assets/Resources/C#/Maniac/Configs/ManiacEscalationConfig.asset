@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c101ddfa5f9422a4189f9cd1bf4c1979, type: 3}
+  m_Name: ManiacEscalationConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Maniac.ManiacEscalationConfig
+  enabled: 1
+  moveSpeedAtFull: 1.15
+  hearingAtFull: 1.25
+  wardrobeBonusAtFull: 0.18
+  maxWardrobeChance: 0.6
+  blendSeconds: 6

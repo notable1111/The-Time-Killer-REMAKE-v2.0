@@ -41,13 +41,46 @@ namespace TimeKiller.Maniac
         // is opt-in and the base chance is untouched without one.
         float learnedBonus;
 
-        /// The chance he opens wardrobes on THIS hunt: the authored base plus
-        /// whatever the player has taught him. Isolation unlocks behaviours from
-        /// player metrics for exactly this reason — a creature that starts
-        /// checking lockers only after you have used them reads as having noticed,
-        /// which is far more unsettling than one that always checked.
-        public float EffectiveCheckChance =>
-            config == null ? 0f : Mathf.Clamp01(config.checkChance + learnedBonus);
+        // Escalation, resolved lazily — see the same note in ManiacPerception:
+        // ManiacController adds the component in its own Awake and component
+        // order on one GameObject is undefined, so a cached null at startup
+        // would stay null for the whole run.
+        ManiacEscalation escalation;
+        ManiacEscalation Escalation
+        {
+            get
+            {
+                if (escalation == null) escalation = GetComponent<ManiacEscalation>();
+                return escalation;
+            }
+        }
+
+        /// The chance he opens wardrobes on THIS hunt: the authored base, plus
+        /// whatever the player has taught him, plus how far into the run he is.
+        /// Isolation unlocks behaviours from player metrics for exactly this
+        /// reason — a creature that starts checking lockers only after you have
+        /// used them reads as having noticed, which is far more unsettling than
+        /// one that always checked.
+        ///
+        /// TWO sources now stack here, which is why the sum goes through
+        /// ChanceWithCeiling rather than a bare Clamp01. The Director's promise
+        /// that hiding can never become useless was made about ITS bonus alone
+        /// (capped at 0.35); with escalation added on top, that promise has to be
+        /// re-made about the total or it quietly expires in the last third of the
+        /// run — exactly where a player leans on a wardrobe most. With no
+        /// escalation component present the ceiling is 1 and this is the same
+        /// arithmetic it always was.
+        public float EffectiveCheckChance
+        {
+            get
+            {
+                if (config == null) return 0f;
+                var esc = Escalation;
+                float bonus = learnedBonus + (esc != null ? esc.WardrobeBonus : 0f);
+                return ManiacEscalation.ChanceWithCeiling(
+                    esc != null ? esc.Config : null, config.checkChance, bonus);
+            }
+        }
 
         void OnLearned(ManiacLearnedEvent evt) => learnedBonus = evt.WardrobeBonus;
 
@@ -57,7 +90,8 @@ namespace TimeKiller.Maniac
             EventBus.Subscribe<ManiacLearnedEvent>(OnLearned);
             DebugOverlay.Watch("Wardrobe", () => config == null
                 ? "NO CONFIG"
-                : $"{lastSpotName} dist {lastDistance:0.0}/{config.maxDistanceFromLastSeen:0.0} " +
+                : $"chance {EffectiveCheckChance:0.00} (base {config.checkChance:0.00}) " +
+                  $"{lastSpotName} dist {lastDistance:0.0}/{config.maxDistanceFromLastSeen:0.0} " +
                   $"share {lastShare:0.00}/{config.openBeliefShare:0.00} ({spots?.Length ?? 0} spots)");
         }
 

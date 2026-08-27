@@ -38,7 +38,22 @@ namespace TimeKiller.Objectives
         void OnClockFixed(ClockObjective clock)
         {
             FixedCount++;
-            EventBus.Publish(new ClockFixedEvent { FixedCount = FixedCount, Total = Total });
+            // Position rides along so a listener can put something on screen
+            // where the clock actually is — the tally alone says a clock was
+            // fixed but not which one, and an effect needs a place to happen.
+            EventBus.Publish(new ClockFixedEvent
+            {
+                FixedCount = FixedCount,
+                Total = Total,
+                Position = clock != null ? clock.EffectPoint : (Vector2)transform.position,
+            });
+            // The same beat, said in a way nothing has to know about clocks to
+            // hear. The maniac escalates on this; Objectives never learns that he
+            // exists, and he never learns that clocks do. Published alongside
+            // rather than instead of ClockFixedEvent, because the two answer
+            // different questions: "which clock, and where" vs "how far through
+            // the run are we".
+            EventBus.Publish(new WorldProgressEvent { Step = FixedCount, Total = Total });
             if (AllFixed) EventBus.Publish(new AllClocksFixedEvent());
         }
 

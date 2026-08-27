@@ -36,6 +36,21 @@ namespace TimeKiller.Maniac
         public UnityEngine.Vector2 Position;
     }
 
+    /// He has just got worse — the run's objective moved on and he changed with
+    /// it. Announced rather than merely computed so audio, telemetry and the
+    /// session recorder can mark the beat, and so "did he actually escalate?" is
+    /// a line in a log instead of an impression of how the run felt.
+    public struct ManiacEscalatedEvent
+    {
+        /// Objectives done, and out of how many.
+        public int Step;
+        public int Total;
+        /// 0..1 — where he is heading. This is the TARGET, not the blended live
+        /// value: the event fires on the beat, and the change arrives over the
+        /// next few seconds (ManiacEscalationConfig.blendSeconds).
+        public float Intensity;
+    }
+
     // ---- Messages the maniac ACCEPTS. Everything above is something he says;
     // these two are things said to him. They are declared here rather than in the
     // Director feature that sends them so the Director stays deletable: with these
