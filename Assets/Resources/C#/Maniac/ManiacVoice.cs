@@ -99,15 +99,23 @@ namespace TimeKiller.Maniac
                 : $"{DistanceToListener:0.0}u vol {breath.volume:0.00} pitch {breath.pitch:0.00}");
         }
 
-        void OnDestroy()
+        /// Drop the standing mix claim the moment he stops being here.
+        ///
+        /// OnDisable rather than OnDestroy on purpose: Unity runs OnDisable on
+        /// destruction too, so this covers everything OnDestroy would AND the
+        /// case where he is merely switched off — a cutscene, a debug toggle, a
+        /// pooled spawn. A presence claim that outlives its claimant would duck
+        /// the music for the rest of the session, and "disabled" is a far more
+        /// likely way to strand one than "destroyed".
+        ///
+        /// Nothing re-arms it: Update sets the claim from `reach` every frame and
+        /// the call is idempotent, so switching him back on restores it by itself.
+        void OnDisable()
         {
-            // A scene reload destroys him. A presence claim with no claimant left
-            // would duck the music for the rest of the session.
             TimeKiller.Audio.AudioMix.SetPresence(TimeKiller.Audio.MixChannel.ManiacFootsteps, false);
-            OnDestroyInner();
         }
 
-        void OnDestroyInner()
+        void OnDestroy()
         {
             EventBus.Unsubscribe<ManiacStateChangedEvent>(OnStateChanged);
             EventBus.Unsubscribe<ManiacSpottedPlayerEvent>(OnSpotted);
