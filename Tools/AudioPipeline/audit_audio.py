@@ -28,9 +28,18 @@ import sys
 from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Every folder that can hold audio the game loads. This list was two entries
+# long until 2026-08-27, and the two it was missing held the ENTIRE music
+# library: all 22 tracks the AudioDirector plays live under "Horror Sounds",
+# so the audit had never once measured the music. A scan list that silently
+# omits a folder reports a clean bill of health for audio it never opened,
+# which is worse than not running at all. Add a folder here the moment audio
+# can appear in it.
 SCAN = [
     "Assets/Resources/Assets",
     "Assets/Resources/Outsource/Audio",
+    "Assets/Resources/Outsource/Horror Sounds",
+    "Assets/Resources/Outsource/KenneyRPGAudio",
 ]
 BASELINE = os.path.join(ROOT, "Tools", "AudioPipeline", "audio_baseline.json")
 
