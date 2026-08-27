@@ -276,9 +276,29 @@ choices that affect other features, not permission to act.
 - **`execute_code` succeeding does NOT mean the project compiles.** It compiles
   your snippet against the last successfully built assembly, so reflection finds
   your new type happily while Assembly-CSharp is red. Cost ~6 wasted round trips.
-- **`read_console` returns 0 entries even when Unity has clearly logged.** Do not
-  read silence as success. Verify via `execute_code` reflection + explicit
-  `isCompiling` / `scriptCompilationFailed` checks.
+- **`read_console` silently drops every info-level `Debug.Log`.** This is the real
+  shape of the old "returns 0 entries even when Unity has clearly logged" trap, and
+  it is **still present in MCP for Unity 10.1.2** — measured 2026-08-27 by logging
+  one line of each level with a unique marker:
+
+  | emitted | in `Editor.log` | returned by `read_console` |
+  |---|---|---|
+  | `Debug.Log` | yes | **no** |
+  | `Debug.LogWarning` | yes | yes |
+  | `Debug.LogError` | yes | yes |
+
+  `types: ["log"]` returns **0 entries for the whole console buffer**, not just for
+  the probe, and `types: ["all"]` does not bring them back either — so it is a type
+  filter, not a timing or flush problem. The failure is nasty because `Debug.Log`
+  is the natural thing to reach for when checking "did my code run?", and its
+  silence reads as "the code never ran" or "the console is broken".
+
+  **Do this instead:** probe with `Debug.LogWarning`, or read
+  `%LOCALAPPDATA%\Unity\Editor\Editor.log` with `grep -a` (it holds all three
+  levels and the call stack; it is not valid UTF-8 throughout, and it rotates, so
+  a missing line is not proof the event never happened). Never read silence as
+  success — confirm via `execute_code` return values plus explicit `isCompiling` /
+  `scriptCompilationFailed` checks.
 - **Check `EditorApplication.isPlaying` FIRST.** In play mode scripts don't
   compile and `execute_menu_item` on a setup script **half-completes** — it may
   have done only part of its job while reporting success. The MCP's own play
