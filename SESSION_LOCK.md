@@ -44,6 +44,9 @@ protocol — it works because all three sessions share this one file on disk.
 Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 
+- 2026-08-27 — A: released. Claimed it properly this time. Setup/53, compile,
+  54/54 EditMode tests, and a play-mode probe of blood tracking (enabled in
+  session only, restored to disabled and saved). CastleWingLDtk left not dirty.
 - 2026-08-27 — gameplay lane, OWNING THE ENTRY BELOW: that was me. I ran
   Setup/51 and Setup/52 and took play mode on a bare `isPlaying == False` check
   without claiming this lock, which is exactly the snapshot-is-not-a-green-light
@@ -58,5 +61,6 @@ for without reading the scene diff.
 - 2026-08-27 — play mode taken by another lane WITHOUT the lock; blocked B's
   EditMode test pass. Lock extended to cover play mode.
 - 2026-08-27 — B: released. Scene left as found: CastleWingLDtk open, not dirty.
+- 2026-08-27 — Sound: Setup/53, threat SFX onto the recipes (config assets only).
 - 2026-08-27 — B: Setup/44 on Catacombs (TMP migration for the end screen).
 - 2026-08-27 — lock created (visual lane). Editor not taken.
