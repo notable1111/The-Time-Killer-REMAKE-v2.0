@@ -45,6 +45,12 @@ Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 
 - 2026-08-27 — Sound: Setup/54, per-track music trims into AudioConfig (no scene).
+- 2026-08-27 — ⚠️ THE EDITOR IS NOT RUNNING. A: opened Catacombs.unity, and the
+  MCP bridge went dead before the first setup script executed; no Unity.exe in
+  the task list afterwards, only Unity Hub. Verified via git that NO scene file
+  is modified: Catacombs was opened and never saved, and none of the nine
+  scripts ran, so nothing is half-applied. Lock released. Whoever restarts the
+  Editor should expect CATACOMBS to be the scene it reopens, not CastleWing.
 - 2026-08-27 — A: took the lock to fill in Catacombs, then released it WITHOUT
   touching the Editor: opening a scene is blocked for this session by the
   permission layer. Catacombs was not opened and nothing was saved. The nine
