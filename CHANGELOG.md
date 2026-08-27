@@ -2,6 +2,313 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-08-27 — The MCP toolchain was half-upgraded, and the banner only knew about one half
+
+**MCP for Unity is two programs, and updating the one Unity shows you leaves the
+other one stale.** The editor package (`com.coplaydev.unity-mcp`, pinned by git URL)
+was v10.1.0 against a v10.1.2 release — that is the update the editor banner reports.
+The MCP *server* is a separate PyPI package (`mcpforunityserver`) launched through
+`uvx`, and it is not covered by that check at all. Both sat at 10.1.0.
+
+**Bumping the package does not restart the server.** After the package resolved to
+v10.1.2, the two server processes from 13:01 were still running out of the uv cache
+archive holding `mcpforunityserver-10.1.0.dist-info`. Nothing in the upgrade path
+touches them. `ServerManagementService.StartLocalHttpServer` is the restart (it stops
+the running server first), and it has to be called deliberately — scheduling it on
+`EditorApplication.delayCall` silently never fired, twice, so it was called
+synchronously and the tool response was allowed to die with the old process. The
+result was read back from a report file on disk, which is the only channel that
+survives a transport that is being restarted underneath it.
+
+**Verified, not assumed:**
+
+| check | result |
+|---|---|
+| `PackageInfo.version` inside Unity | `10.1.2` |
+| running server's uv archive | `mcpforunityserver-10.1.2.dist-info` |
+| package's own update checker, day-cache cleared | `UpdateAvailable=False, LatestVersion=10.1.2` |
+| `scriptCompilationFailed` | `False` |
+| `SmokeCheck.Report()` | `ok:true` |
+| EditMode tests | **38/38 passed** |
+
+The last row of that table is the banner's own code path, so the notice is genuinely
+resolved rather than inferred from a version string.
+
+**What teammates get.** `Packages/manifest.json` is `skip-worktree`'d and stays local,
+but **`Packages/packages-lock.json` is tracked** — so this bump ships, and everyone's
+MCP server restarts onto 10.1.2 on their next resolve. 10.1.2 carries fixes that touch
+traps written down in `CLAUDE.md` §9: a Windows stdin redirect, a `read_console`
+multi-line repair, `run_tests clear_stuck` for jobs orphaned by a domain reload, and
+one that stops 34 tools forcing an approval prompt on every call. Whether the
+"`read_console` returns 0 entries even when Unity has clearly logged" trap is actually
+cured is **not** verified here — that needs a session to reproduce the old case.
+
+## 2026-08-22 — The Editor compiling is not the game building
+
+**The project had never produced a Player build, and nothing in the Editor said so.**
+`EditorUtility.scriptCompilationFailed` reads `False` and `SmokeCheck.Report()` returns
+`ok:true` while the build fails outright — they only ever describe the *Editor*
+assembly. Two independent blockers were hiding behind that green light.
+
+**Blocker 1 — 65 compiler errors, one cause.** `DebugOverlay` puts `Watch`/`Unwatch`
+inside `#if UNITY_EDITOR || DEVELOPMENT_BUILD`, but the `#else` branch only stubbed
+`Init`. In a release build both methods vanish while ~65 call sites across
+`ManiacController`, `PlayerController`, `AudioDirector`, `FearConductor`,
+`ObjectiveManager` and the rest still call them → `CS0117` ×65. Verified as the sole
+cause: `grep -v DebugOverlay` over all 65 unique errors returned nothing. Fixed by
+adding the two missing no-op stubs, restoring the file header's stated intent. The
+overlay itself stays stripped from release.
+
+**Blocker 2 — `Failed to write file: resources.assets`.** With compilation passing the
+build got further and died writing `resources.assets`. `CFXR4 Rain Splashes` and
+`CFXR4 Rain Falling` carry a `CFXR_EmissionBySurface` whose `OnValidate` sets
+`hideFlags = DontSaveInBuild` — the vendor marking it editor-only. Both prefabs sat
+under `Assets/Resources/`, which force-ships everything, so Unity was told to include
+and exclude the same object. Clearing the flag does not hold; `OnValidate` re-applies
+it on every load. Moved the two prefabs to `Assets/OutsourceDemoOnly/` instead — the
+game never referenced them, only the vendor's own demo scene did, and GUID references
+survive the move. They were the only 2 offenders across all 66 Resources prefabs.
+
+**Result: 155s, 674.84 MB, 0 errors, 0 warnings**, all four scenes packed
+(`level0`–`level3`), `resources.assets` written at 13.8 MB. Output in
+`Build/Windows/`, which is now gitignored — it was not, and `push` takes the whole
+working tree, so a 676 MB build would have gone in as raw binaries.
+
+**Worth keeping in mind:** every asset under `Assets/Resources/` is force-built,
+third-party demo content included. That is what dragged an editor-only vendor
+component into the Player and is why `resources.assets` is as large as it is.
+
+## 2026-08-05 — A missing glyph doesn't look missing, it looks like another font
+
+**`RunEndScreen`'s prompt has been rendering in two typefaces.** Line 60 writes
+`"R — run it again        ESC — quit"`, and the em dash U+2014 was in neither TTF.
+The assumption was that TMP shows a box for that. It does not. Measured from
+`textInfo.characterInfo` on the probe `"A—A·A"`:
+
+| char | resolved from | advance |
+|---|---|---|
+| `A` U+0041 | TimeKiller_Body SDF | 44.0 |
+| `—` U+2014 | **LiberationSans SDF** | **86.0** |
+| `·` U+00B7 | TimeKiller_Body SDF | 20.0 |
+
+TMP falls through to `TMP_Settings.defaultFontAsset` even with every fallback table
+empty (`fallbackFontAssets` 0, `fallbackFontAssetTable` 0, `missingGlyphCharacter`
+0). So a smooth vector sans at double the advance width sat inside chunky pixel
+text, `isVisible` stayed `true`, and **every missing-glyph check reported zero**.
+That is why it survived: it reads as slightly off, not as broken. Scanning every
+string that reaches a TMP label, this was the only affected line in the project —
+`SliderPercentLabel` writes a bare number, and the `%` in `ManiacController` goes to
+`DebugOverlay`, which is IMGUI and uses Unity's own font.
+
+**Three glyphs authored, each placed against a measured shipped glyph.** The em
+dash sits in the hyphen's own band (Body: y 256..384, exactly; Display: 256..384
+against the hyphen's 224..384 — the closest the doubled grid allows). The ellipsis
+sits on the period's band with its dots on the period's advance, so `…` and `...`
+draw the same picture. Widths: em dash 10 px Body / 24 px Display, against hyphens
+of 6 and 18.
+
+**The percent was drawn twice, and the first one was not shippable.** Kept at digit
+width (20 px) there is no room for counters, so the rings became solid blocks — and
+rendered, `60%` read as `60/.` at 16 px. Widening Display to 26 px buys a 4 px wall
+plus a 2 px counter; Body drops to 1 px ring walls, lighter than its 2 px stem,
+because at 9 rows the counter is worth more to recognition than matching the stem.
+Caught by rendering it and looking, which is the only reason it was caught.
+
+**Verified end-to-end, not just "the font has it".** Both atlases now hold 80 glyphs
+(was 77), Static, one texture, outline 0.18 and sharpness 0.4 preserved. Re-running
+the fallback probe over the real `RunEndScreen` literal, the MainMenu tagline and
+`"loading… 60%"` in both weights: **`FOREIGN=none`, `noGlyph=0`** on all six.
+
+`Extras` gains `—` and `…` only — `%` is ASCII 0x25 and was already inside the
+bake's 32..126 sweep; it had simply never had a glyph to find. Rebake with
+**Setup/47**, not 46: 47 re-rasterises from the TTF at the on-grid point size, which
+is what picks up new outlines.
+
+Docs: `Tools/UIArt/README.md`'s "Not done yet" section was three claims and all
+three were stale — `ObjectiveHUD` became uGUI+TMP on 2026-07-28, `RunEndScreen`
+uses `TMP_Text`, and `InteractPrompt.cs` exists. Replaced with what is actually
+open, including the Catacombs end screen below.
+
+**Found, not fixed: the Catacombs end screen is blank.** `RunEndScreen`'s three
+fields are `TMP_Text`; Catacombs still holds legacy `UnityEngine.UI.Text`, so Unity
+type-checks them to null at load — confirmed by opening the scene and reading the
+fields (`headline`/`detail`/`prompt` all NULL, `group` survives because its type
+matches). The code null-guards every write, so it does not crash; you win or die in
+Catacombs and the panel fades in saying nothing. The YAML looks correctly wired —
+the fileIDs are non-zero — which is why no scan caught it. `Setup/44` only ever ran
+on CastleWing.
+
+EditMode tests were **not** run for this change: another session put the editor into
+play mode before they could start. Compile is clean and smoke is `ok:true`; the test
+pass is still owed.
+
+## 2026-08-04 — The core loop had no presentation layer at all
+
+**The audit that started this.** `EffectPlayer.Play` had exactly **two call sites
+in the whole game** — the player being hit and the player dying. Fixing a clock,
+the thing a run is *about*, published `ClockFixedEvent` to a single subscriber:
+`TestTelemetry`. A correct skill-check press called `AddProgress` and nothing
+else. And neither the working noise nor the miss noise is audible at all —
+`WorldNoiseEvent` and `PlayerFootstepEvent` have one gameplay subscriber each,
+`ManiacPerception`, so they feed the maniac's hearing model and play no clip.
+The only clock sound in the game was the sting for the **last** clock.
+
+So the repair loop was silent and, apart from the 2026-08-02 miss ring,
+invisible. This pass gives two beats a presentation layer: the **earned press**
+and the **clock waking up**.
+
+**`ClockHitEvent`, the mirror of `ClockMissEvent`.** A fumble had a ring and a
+noise; success had a bar that moved. Deliberately **not** published on the press
+that finishes a clock — that press belongs to `ClockFixedEvent`, and firing both
+would stack a small burst under a big one on the same frame.
+
+**The burst plays at the clock's face, and that needed measuring.** The sprite
+pivots at its base (0.5, 0.06) so the clock stands on the floor, which puts
+`transform.position` **1.03u below the clock's middle** — measured in the scene,
+all three clocks, bounds 2.33×2.33u. A burst played at the transform would have
+gone off at its feet. `ClockObjective.EffectPoint` reads renderer bounds rather
+than a hand-placed anchor child, so re-drawing the clock art cannot leave the
+effect aimed at the wrong spot.
+
+**The light now rises instead of snapping** (`lightRiseSeconds` 0.45, ease-out).
+The sprite swap and a full-strength green light used to land in the same frame.
+The target intensity (**1.10**, read from the scene) is captured in `Awake`,
+before anything animates it — sampling it at the moment of the rise would latch
+whatever an interrupted rise had reached and the clock would come back dimmer
+after every reload. `0` restores the old snap exactly.
+
+**Two art traps, both caught by measuring instead of looking.** The generated
+wake ring had an interior of `(56,25,22)` at **full alpha** — a dark brown disc
+that would have pasted over the clock face; 59% of that strip's pixels were
+erased by the new `clean_burst.py`, whose rule is that *for a light effect,
+alpha follows luminance* (a glow has no dark parts). And the ring **never faded
+out**: its last frame still carried **959 ink pixels at mean alpha 59.7**, 58%
+of opening strength, which does not end — it vanishes, because `EffectPlayer`
+destroys a one-shot exactly when its last frame has played. `--fade` applies the
+hold-then-drop envelope the BloodBurst particle already uses. PixelLab's final
+two frames also collapsed the ring *inward*, so the strip flickered back to 432
+ink after dropping to 2; trimmed to the monotonic part. Final strips:
+hit **225→333 peak→0**, wake **859→984 peak→0**, both ending empty.
+
+**A correction worth recording: the first eyeball read was wrong.** The spark
+frames looked like a pulsing sun in the thumbnails. The ink curve says otherwise
+— it swells to frame 2 and decays to 17 px. The thumbnails only showed the
+swell. This is the fourth entry in this file where a number disagreed with a
+glance and the number was right.
+
+**Also learned about the tooling:** `create_1_direction_object` draws *objects*,
+not effects — asked for "an old clock waking up" it returned 16 grandfather
+clocks. `create_image_pixflux` (1 generation) plus `animate_image` is the path
+for VFX. Both review packs were left undeleted rather than discarded unilaterally.
+
+**Sound is wired but unlistened-to, and that is a real caveat.** `metalClick`
+(0.45s) for the press and `metalLatch` (0.26s) for the wake, chosen by category
+and measured duration. There is **no bell or chime anywhere in the project's
+audio packs** — the PSX "event sounds" are 12–22s ambience beds. A synthesised
+clock chime, the way `gen_heartbeat.py` synthesised the heart, is the obvious
+upgrade for the wake and is a one-string change in `ClockEffectsSetup`.
+
+**Verified:** compile clean, smoke `ok:true`, **38/38 EditMode tests**. **Not
+verified:** anything about how this looks or sounds in play — `Setup/50` had not
+been run when this was written, because Unity was in play mode and `SetupGuard`
+correctly refuses to half-run a setup script there.
+
+## 2026-08-04 — The hesitation works. The tension curve still has no middle.
+
+**Measured, not assumed.** Every session on disk predated the `stalk`/`fade`/`susEps`
+fields, so the archive could not answer this — it took a fresh batch: 3 runs,
+`Bot_average`, **1x** (not accelerated, so the seconds compare to the old figures),
+seeds 3001-3003 on CastleWingLDtk.
+
+**Seconds of stalking per suspicion episode — the one number `awarenessCertaintyScale`
+actually moves:**
+
+| run | stalk | episodes | s/episode |
+|-----|-------|----------|-----------|
+| 1   | 5.54s | 6        | 0.92s     |
+| 2   | 4.71s | 2        | 2.35s     |
+| 3   | 4.03s | 4        | 1.01s     |
+
+**Pooled: 14.28s across 12 episodes = 1.19s per episode** (mean-of-runs 1.43s, pulled
+up by run 2's n=2). Against the pre-change figure of **under 0.25s**, that is a real
+**~5x stretch** — larger than the ~2.9x the config predicts, which makes sense: the
+band also holds time when he is suspicious at low exposure, not only the climb.
+Reported per EPISODE on purpose; a run that simply met the maniac more often would
+raise the total without stretching anything.
+
+**But the curve is still bimodal, and that is the finding that matters.** Over 407s:
+**Panic 44.3% · Safe 26.8% · Aftershock 20.5% · Unease 5.7% · Threat 2.7%.** The
+build-up band did not fill in. Stretching his certainty made the *moment of being
+caught* longer without giving the run a middle — which is the case for going ahead
+with **per-clock escalation**, not a reason to touch this number again.
+
+**Labelled honestly: this is not a controlled A/B.** The comparison baseline is a
+single older session (Threat 3.4%) that predates several other changes. Proving the
+hesitation moved the CURVE needs a matched-seed control arm at
+`awarenessCertaintyScale = 1`. What is measured here is that the mechanism does what
+it was built to do; what is inferred is what that did to the pacing.
+
+**Run 3 has no result row.** The recording shows three run segments (2 deaths, 2
+reloads, then 77s ending in `end`), but `results/*.jsonl` holds only two, and
+`Editor.log` has the batch's start line with no `Done:` and no `ABORTED:` — so the
+batch did not finish on its own; play mode ended under it. The hesitation numbers
+still stand on all three segments, because the recorder writes as it goes while a
+result row is only written when a run *finishes*. **Count runs from the recording.**
+
+**New in `mine_session.py`** — a `HESITATION` section reporting per-run stalk, fade,
+episodes and the derived s/episode, with the threshold it judges against printed
+alongside. It splits runs on a counter DROP (a cumulative counter that falls is a
+scene reload, not a bug) and says outright when a recording predates the fields
+instead of printing a confident zero.
+
+## 2026-08-04 — Shadow detail pass: penumbra, volume, breathing, and a tell
+
+The shadows read in Play, so this pass makes them *interesting* rather than
+merely present. Four details, all config-driven from `ShadowConfig`, all
+reversible with `Setup/49b`.
+
+**Penumbra — shadows soften as they stretch.** `shadowSoftnessFalloffIntensity`
+was sitting at URP's 0.50 default, untouched, so a shadow was exactly as sharp
+four units out as it was at the caster's foot. Now 0.80, with softness raised
+0.25 → 0.50. Costs no geometry and nothing at runtime; it is a per-light value
+URP already supported and we had simply never set.
+
+**Props have volume.** Every caster was `CastShadow`: props shaded the world but
+never themselves, so a barrel was lit identically on the torch side and the far
+side. Props are now `CastAndSelfShadow` (47 of 58 casters). Walls stay
+`CastShadow` deliberately — a wall self-shadowing its own face fights the torch
+that is meant to be lighting it — and characters stay honest too. Per-category,
+so any of the three can be changed without touching code.
+
+**Shadows breathe with the flame.** `FlickerLight2D` already wobbled each torch
+on layered Perlin noise, but `shadowSoftness` was static, so the shadow edge
+never moved even as the flame guttered. Softness now rides the **same noise
+value** as the intensity, ±0.18. That coupling is why it lives inside
+`FlickerLight2D` rather than in its own component: a separate flicker would
+compute its own noise and drift out of step with the flame it belongs to, which
+looks worse than not doing it at all. At amount 0 the component behaves exactly
+as it did before shadows existed.
+
+**The maniac's shadow arrives before he does.** Deliberately stylised, and the
+one change here that is a mechanic rather than a look: his caster moves to a
+scaled child so his shadow reads larger than his body, sweeping into view before
+he rounds a corner. Verified from the mesh vertices rather than assumed — his
+shadow footprint is **1.00u against the player's 0.45u**, from a body only 9%
+bigger (0.60u vs 0.55u). It hands the player real information, so he becomes
+slightly easier to avoid and considerably more frightening to be near.
+`maniacShadowScale` 1.0 makes it physically honest; 0 removes it.
+
+**Two traps caught while building.** A `ShadowConfig.asset` already on disk keeps
+its serialized `shadowSoftness` 0.25 and silently beats a new field default, so
+the penumbra work would have been a no-op — the value is now written explicitly.
+And `Remove()` built a pristine config to restore torch strength, whose
+`shadowBreathAmount` default is 0.18, so removing the shadows would have switched
+a shadow feature *on*; it now zeroes it.
+
+Verified: compile clean, smoke `ok:true`, 38/38 EditMode tests, scene saved.
+Contrast still has to be judged in Play — editor renders here cannot measure
+lighting, for the reasons in the previous entry.
+
 ## 2026-08-03 — "It looks cheap": nothing in the castle cast a shadow
 
 **The report was that the new ambience pass looked cheap.** It did, and the light
@@ -100,10 +407,6 @@ is flagged `session:truncated` ("treat every number below as a floor"), and a cl
 this bug was an investigation, not a byte of data, and that is exactly the cost the
 check now removes.
 
-**Note for the measurements queue:** the sessions on disk predate the
-`stalk`/`fade`/`susEps` fields, so **the hesitation still has no recorded evidence** —
-that needs a fresh run, not a re-read of the archive.
-
 ## 2026-08-03 — The fonts were blurred at bake time, and no setting could undo it
 
 **Both UI fonts are pixel fonts that were rasterised off their own grid.** Display
@@ -164,6 +467,30 @@ ppuScale 1 → true inner area x −320..320, y −262..252) rather than the num
 art README: title 156..252, rows at 90/0/−90, buttons at −224..−156, gaps a symmetric
 31/20/20/31. Verified by walking every RectTransform into panel-local boxes and
 pair-testing them — **6/6 inside the frame, 0 overlapping pairs**.
+
+**The pause panel got an interior, and the frame turned out not to be a frame.**
+The menu was transparent in the middle — you could read the player standing behind
+it. The obvious fix (a dark fill parented under `Panel`) would have been wrong:
+measuring `EndFrame.png`'s 9-slice **centre** shows it is only **79% transparent** —
+sprite rows y 56..72 are **100% opaque** and stretch into the stone ledge the buttons
+rest on, at canvas y −232..−172. A child of `Panel` draws *over* the frame sprite and
+would have erased that ledge. So `Interior` is a **sibling ordered ahead of the
+frame**, and the art always wins. Its colour is `rgb(19,18,31)` at alpha 0.94 — the
+darkest tone that actually occurs in the sprite (2964 px), taken from the art's own
+palette rather than invented. Draw order is now set explicitly (Blackout 0, Interior
+1, Panel 2) so a re-run cannot stack them wrongly.
+
+**New `SetupGuard`, because Setup/43 half-ran in play mode.** Invoked while the editor
+was playing, it built and re-anchored its entire rig and then threw at
+`MarkSceneDirty` — *"This cannot be used during play mode."* Everything it did was
+discarded when play stopped, so it looked like nothing happened while reporting an
+exception. The half-run is the hazard, not the exception. `SetupGuard.Blocked(label)`
+refuses in play mode **and** mid-compile, and says why (a `MenuItem` validate function
+would grey the item out with no explanation). Wired into Setup/43, 47 and 48.
+
+**Audited: 56 of the project's 65 menu scripts have no play-mode guard at all** — only
+9 check `isPlaying`. Every one of them can half-run the same way. The helper now
+exists so adding it is a one-line change per script; the sweep itself is not done.
 
 **Found on the way out: Catacombs was never TMP-migrated.** `Setup/44` only ever ran
 on CastleWing, so Catacombs still holds legacy `UnityEngine.UI.Text` while
