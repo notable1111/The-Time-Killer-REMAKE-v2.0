@@ -45,7 +45,17 @@ Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 
 - 2026-08-27 — Sound: Setup/54, per-track music trims into AudioConfig (no scene).
-- 2026-08-27 — ⚠️ EDITOR RUNNING BUT THE MCP BRIDGE IS DEAD. A: Unity.exe is in
+- 2026-08-27 — ⚠️ BRIDGE DIAGNOSED, AND THE FIX IS ONE MENU ITEM. Nothing is
+  listening on 127.0.0.1:8080, which is the endpoint .mcp.json configures. The
+  MCP server runs INSIDE the Editor, so this means it was never started for this
+  Editor session: open **Window > MCP for Unity** in the Editor and it comes
+  back. Ruled out on the way: it is not a second Unity instance stealing the
+  bridge (mcpforunity://instances is served by that same server, so it is
+  unreachable too - you cannot route to an instance when nothing is listening),
+  and it is not a busy Editor (Editor.log idle for minutes, and its last entries
+  are two successful sprite imports). Until someone clicks that, NO lane can run
+  Setup/NN, tests or a compile.
+- 2026-08-27 — (superseded by the line above) EDITOR RUNNING BUT THE MCP BRIDGE IS DEAD. A: Unity.exe is in
   the task list again, but every bridge call returns "Unable to connect" and
   Editor.log has not been written for 4+ minutes, so the Editor is idle rather
   than busy. Most likely a modal dialog is up, or Window > MCP for Unity has not
