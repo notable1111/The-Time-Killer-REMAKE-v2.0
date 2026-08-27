@@ -43,6 +43,59 @@ one that stops 34 tools forcing an approval prompt on every call. Whether the
 "`read_console` returns 0 entries even when Unity has clearly logged" trap is actually
 cured is **not** verified here — that needs a session to reproduce the old case.
 
+## 2026-08-27 — The third clock was the same as the first
+
+**Three sessions now work in one tree, so the first delivery is a rulebook.**
+[`SESSIONS.md`](SESSIONS.md) assigns lanes (programmer / artist / playtest-release)
+and, more usefully, names the four things that collide no matter how the folders
+are split: play mode blocks everyone's compiles, scenes are single-owner,
+`CHANGELOG`/`ARCHITECTURE` are the real conflict file, and only one session may
+run git because `push` takes the whole working tree. The three `claude/*` worktree
+branches were checked and are **stale** — 0 commits ahead of `main`, 33–39 behind.
+
+**Per-clock escalation, the queued half of the 2026-08-03 horror plan.** The
+measured problem: over 407s the curve was Panic 44.3% / Safe 26.8% / Aftershock
+20.5% / **Unease 5.7% / Threat 2.7%**. The hesitation pass stretched the moment of
+being caught ~5x and did not fill the build-up band. So he now changes as the run
+is won: patrol/investigate/search speed **x1.15**, hearing **x1.25**, wardrobe
+check **+0.18** at the last clock, blended over 6s.
+
+- **The seam is a Core event, not an Objectives one.** `WorldProgressEvent` says
+  "the objective moved on" and knows nothing about clocks, so Maniac still
+  compiles with the Objectives folder deleted — and any future objective
+  escalates him for free.
+- **Two fairness rails, both enforced by tests rather than by intention.**
+  `moveSpeedAtFull` has a hard ceiling of **x1.22**: patrol 1.8 vs the player's
+  walk 2.2, and above that, keeping distance requires *running*, which is the loud
+  choice — escalation would have deleted the endgame's stealth layer instead of
+  tightening it. And the wardrobe now has two bonus sources stacking, so the
+  Director's promise that hiding never becomes useless had to be re-made about the
+  **sum** (`ChanceWithCeiling`, capped 0.6).
+- **Deliberately not escalated:** chase speed (already 5.2 vs 4.5 — raising it
+  removes the escape, not the safety), sight range (the fairness dial), damage,
+  the suspicious creep (that IS the hesitation beat), and the search rush.
+- **Auto-added with `HideFlags.DontSave`** — no scene edit anywhere, which also
+  means `FindObjectsByType` cannot see it: reach it via `ManiacController.Escalation`
+  or subscribe to `ManiacEscalatedEvent`.
+
+**Being seen finally has somewhere to happen.** `ManiacSpottedPlayerEvent` and
+`ManiacAttackEvent` were the last threat beats with no visual — audio only, so a
+player with the sound down was never told. `ManiacThreatEffects` binds both.
+It **self-installs** from Resources instead of being a scene object, because
+Catacombs never got the pass that placed `ClockEffects` and a scene-object binder
+is silently absent from half the game's levels. It carries a **4s anti-strobe
+cooldown** because that event fires on every LOS re-acquire, which mid-chase is
+behind every pillar — measured: **3 published in one frame, 1 played**. The
+recipes ship **empty**: wired, counted, and silent until the art exists.
+
+**Verified, and labelled.** Both assemblies compile, `SmokeCheck ok:true`, **51/51
+EditMode tests** (13 new, 0 skipped — the shipped-config guards really ran).
+Runtime, in `CastleWingLDtk`: baseline identity (`MoveSpeed 1`), then
+`WorldProgressEvent{3,3}` → Intensity 0→1, patrol **1.8→2.070**, hearing
+**9→11.25u**, wardrobe **0.12→0.30**. Play mode was left with the scene
+**not dirty**. **Not playtested by ear** — this is a difficulty change and is not
+locked until the user rules on it.
+
 ## 2026-08-22 — The Editor compiling is not the game building
 
 **The project had never produced a Player build, and nothing in the Editor said so.**
