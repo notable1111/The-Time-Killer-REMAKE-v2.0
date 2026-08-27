@@ -55,7 +55,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -69,7 +69,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -93,7 +93,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -134,19 +134,19 @@ TextureImporter:
       name: maniac_swing_0
       rect:
         serializedVersion: 2
-        x: 1
-        y: 32
-        width: 42
-        height: 29
+        x: 0
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 9f8d5260ac55207b0800000000000000
+      spriteID: 9371e1e9c27a59844a6208c068b99e4c
       internalID: -5259547088640419591
       vertices: []
       indices: 
@@ -156,19 +156,19 @@ TextureImporter:
       name: maniac_swing_1
       rect:
         serializedVersion: 2
-        x: 68
-        y: 37
-        width: 47
-        height: 26
+        x: 64
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: b152b3fd26636d8b0800000000000000
+      spriteID: e24c414b694d15e428492b0c34fca6c2
       internalID: -5127851327434840805
       vertices: []
       indices: 
@@ -178,19 +178,19 @@ TextureImporter:
       name: maniac_swing_2
       rect:
         serializedVersion: 2
-        x: 139
-        y: 38
-        width: 46
-        height: 26
+        x: 128
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 326424458fcae9cb0800000000000000
+      spriteID: c99430d8cd728ca47b83071566bc2341
       internalID: -4855253165693319645
       vertices: []
       indices: 
@@ -200,19 +200,19 @@ TextureImporter:
       name: maniac_swing_3
       rect:
         serializedVersion: 2
-        x: 212
-        y: 32
-        width: 39
-        height: 32
+        x: 192
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 51fcbe12249259c70800000000000000
+      spriteID: 063e525abd5455b45a0341c1454d4148
       internalID: 8977126796246634261
       vertices: []
       indices: 
@@ -222,19 +222,19 @@ TextureImporter:
       name: maniac_swing_4
       rect:
         serializedVersion: 2
-        x: 286
-        y: 23
-        width: 31
-        height: 41
+        x: 256
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: ef8db4de585fb7420800000000000000
+      spriteID: 552c47c1a76923347bf5bd42e26500a2
       internalID: 2628964763061442814
       vertices: []
       indices: 
@@ -244,19 +244,19 @@ TextureImporter:
       name: maniac_swing_5
       rect:
         serializedVersion: 2
-        x: 356
-        y: 15
-        width: 27
-        height: 46
+        x: 320
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 66f83e5aa3418d550800000000000000
+      spriteID: a199fbfbff82f3544abb204255820a1f
       internalID: 6185716330317188966
       vertices: []
       indices: 
@@ -266,20 +266,42 @@ TextureImporter:
       name: maniac_swing_6
       rect:
         serializedVersion: 2
-        x: 424
-        y: 8
-        width: 24
-        height: 46
+        x: 384
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 1bacb197fc9ee8cc0800000000000000
+      spriteID: 0a3ac8faca91f7f43976b6bd32a8b21a
       internalID: -3706768365979972943
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: maniac_swing_7
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 12831cb5c30c00840a69e5c07df35957
+      internalID: 1935074994
       vertices: []
       indices: 
       edges: []
@@ -288,7 +310,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: a27272dec9c0c8f44a8af950c0fef11a
     internalID: 0
     vertices: []
     indices: 
@@ -305,6 +327,7 @@ TextureImporter:
       maniac_swing_4: 2628964763061442814
       maniac_swing_5: 6185716330317188966
       maniac_swing_6: -3706768365979972943
+      maniac_swing_7: 1935074994
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

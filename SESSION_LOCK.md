@@ -28,10 +28,10 @@ Release the lock in the same session you took it. Minutes, not hours.
 
 | Field | Value |
 |---|---|
-| Status | **FREE** |
-| Lane | — |
-| Doing | — |
-| Taken | — |
+| Status | **HELD** |
+| Lane | A — gameplay programmer |
+| Doing | ⚠️ HOLDING BECAUSE CASTLEWINGLDTK IS DIRTY AND I DID NOT SAVE IT. The active scene changed from Catacombs to CastleWing DURING my run of 9 setup scripts - none of which can open a scene, so another session switched it. I will not save and will not discard until an owner is identified. DO NOT CTRL+S. |
+| Taken | 2026-08-27 |
 
 ## How to claim
 
@@ -40,6 +40,15 @@ the date and time. Set it back to `FREE` when you are done. That is the whole
 protocol — it works because all three sessions share this one file on disk.
 
 ## History
+
+⚠️ 2026-08-27 — B claimed this lock WITHOUT re-reading it first and took it from a
+session that already held it, then opened CastleWing and discarded Catacombs'
+unsaved state — nine setup scripts' work, destroyed. The lock only works if it is
+READ and then written. "Unmodified on disk" does NOT mean "nothing in memory":
+setup scripts MarkSceneDirty without saving, so valuable-unsaved and
+spurious-unsaved look identical from git. A dirty scene you did not dirty is a
+stop-and-ask, and discarding is the destructive direction just as much as saving.
+
 
 Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.

@@ -73,7 +73,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -87,7 +87,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -111,7 +111,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -152,19 +152,19 @@ TextureImporter:
       name: maniac_spotted_0
       rect:
         serializedVersion: 2
-        x: 10
-        y: 10
-        width: 45
-        height: 45
+        x: 0
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 62eea1b377b9a9510800000000000000
+      spriteID: 6d6f8ba1b66ff08479a4b9fff27bbcb6
       internalID: 1556727557604961830
       vertices: []
       indices: 
@@ -174,19 +174,19 @@ TextureImporter:
       name: maniac_spotted_1
       rect:
         serializedVersion: 2
-        x: 68
-        y: 52
-        width: 12
-        height: 12
+        x: 64
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: d9b0db933433d52b0800000000000000
+      spriteID: ddcde27baf496b746a4efaa489a53cce
       internalID: -5594258798299772003
       vertices: []
       indices: 
@@ -196,19 +196,19 @@ TextureImporter:
       name: maniac_spotted_2
       rect:
         serializedVersion: 2
-        x: 73
-        y: 8
-        width: 47
-        height: 49
+        x: 128
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e158e6cdbb75af1c0800000000000000
+      spriteID: cd5237a3292e84f44ba7469083cec9c4
       internalID: -4469163215843064546
       vertices: []
       indices: 
@@ -218,19 +218,19 @@ TextureImporter:
       name: maniac_spotted_3
       rect:
         serializedVersion: 2
-        x: 133
-        y: 7
-        width: 60
-        height: 57
+        x: 192
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 1d86a5b7c3c7c6120800000000000000
+      spriteID: b4b8cc5a590790943ab803696d972fd5
       internalID: 2408436499945777361
       vertices: []
       indices: 
@@ -240,19 +240,19 @@ TextureImporter:
       name: maniac_spotted_4
       rect:
         serializedVersion: 2
-        x: 188
+        x: 256
         y: 0
-        width: 69
-        height: 61
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: a38ced3d1882f2980800000000000000
+      spriteID: 30bdd90f761a23d4293cec9ea0d67518
       internalID: -8561579828537538502
       vertices: []
       indices: 
@@ -262,19 +262,19 @@ TextureImporter:
       name: maniac_spotted_5
       rect:
         serializedVersion: 2
-        x: 191
-        y: 50
-        width: 13
-        height: 14
+        x: 320
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e00ffa58aa3e6b970800000000000000
+      spriteID: 8436ecbd9d2b6eb4d950e348ce0b223b
       internalID: 8770447645877465102
       vertices: []
       indices: 
@@ -284,19 +284,19 @@ TextureImporter:
       name: maniac_spotted_6
       rect:
         serializedVersion: 2
-        x: 238
-        y: 53
-        width: 12
-        height: 11
+        x: 384
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 3e26394825d3d1090800000000000000
+      spriteID: a01a26b09b74fed45a08b14747594e3e
       internalID: -8062220333302455581
       vertices: []
       indices: 
@@ -306,19 +306,19 @@ TextureImporter:
       name: maniac_spotted_7
       rect:
         serializedVersion: 2
-        x: 255
+        x: 448
         y: 0
-        width: 66
+        width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: ecf6f1b2dba0553e0800000000000000
+      spriteID: 05f66a740bc4b2045919413457ac143c
       internalID: -2065733046490927154
       vertices: []
       indices: 
@@ -328,19 +328,19 @@ TextureImporter:
       name: maniac_spotted_8
       rect:
         serializedVersion: 2
-        x: 322
+        x: 512
         y: 0
-        width: 61
+        width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 0575f39305f35df50800000000000000
+      spriteID: 4a1aabad7f575d9408b459508847d443
       internalID: 6905495217432909648
       vertices: []
       indices: 
@@ -350,19 +350,19 @@ TextureImporter:
       name: maniac_spotted_9
       rect:
         serializedVersion: 2
-        x: 385
+        x: 576
         y: 0
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: c1b8558622965d450800000000000000
+      spriteID: b877a5fc5ecaf564f9f509bc3e511f9c
       internalID: 6112907665725557532
       vertices: []
       indices: 
@@ -372,19 +372,19 @@ TextureImporter:
       name: maniac_spotted_10
       rect:
         serializedVersion: 2
-        x: 447
+        x: 640
         y: 0
-        width: 258
+        width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 0cc63c7b48924b360800000000000000
+      spriteID: 64590d48031c6d14ba0d58ea857aa9ed
       internalID: 7184412955558243520
       vertices: []
       indices: 
@@ -394,42 +394,20 @@ TextureImporter:
       name: maniac_spotted_11
       rect:
         serializedVersion: 2
-        x: 127
-        y: 23
-        width: 6
-        height: 6
+        x: 704
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 0d70fac698ee43220800000000000000
+      spriteID: ad7abf396cdfc4a4299f467918bae9ad
       internalID: 2464857170079844304
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: maniac_spotted_12
-      rect:
-        serializedVersion: 2
-        x: 119
-        y: 11
-        width: 10
-        height: 9
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 165ab09361073d430800000000000000
-      internalID: 3806509350806857057
       vertices: []
       indices: 
       edges: []
@@ -438,7 +416,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 743ee13e0c4afa8438df76b68108625a
     internalID: 0
     vertices: []
     indices: 
@@ -452,7 +430,6 @@ TextureImporter:
       maniac_spotted_1: -5594258798299772003
       maniac_spotted_10: 7184412955558243520
       maniac_spotted_11: 2464857170079844304
-      maniac_spotted_12: 3806509350806857057
       maniac_spotted_2: -4469163215843064546
       maniac_spotted_3: 2408436499945777361
       maniac_spotted_4: -8561579828537538502

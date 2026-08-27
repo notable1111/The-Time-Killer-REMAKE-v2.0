@@ -171,7 +171,13 @@ def swing_frame(index):
     sweep_start = math.radians(-105)
     sweep_end = math.radians(45)
     lead = sweep_start + (sweep_end - sweep_start) * t
-    radius = CELL * 0.34
+    # Measured 2026-08-27 in CastleWing: at radius 0.34 and half-angle 38 the
+    # swing peaked at 0.41% of screen - BELOW the 0.5% at which an effect is
+    # missed entirely, even though it was the brighter of the two (mean lift
+    # 291 vs spotted's 167). Intense and small still reads as nothing. Widened
+    # to fill more of the cell rather than scaled up in the recipe, because a
+    # non-integer sheetScale on pixel art is how crisp edges turn to mush.
+    radius = CELL * 0.40
     # Brightest mid-stroke: a blade is fastest, and so brightest, in the middle.
     energy = math.sin(math.pi * (0.18 + 0.82 * t)) ** 0.6
 
@@ -183,8 +189,8 @@ def swing_frame(index):
         strength = energy * (1.0 - f) ** 1.6
         if strength < 0.02:
             continue
-        half = math.radians(38) * (1.0 - 0.30 * f)
-        width = 2.5 + 3.0 * f                       # the trail smears as it ages
+        half = math.radians(50) * (1.0 - 0.28 * f)
+        width = 4.4 + 3.4 * f                       # the trail smears as it ages
         for y in range(CELL):
             dy = y - cy
             for x in range(CELL):
