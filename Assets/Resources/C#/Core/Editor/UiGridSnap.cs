@@ -49,17 +49,20 @@ namespace TimeKiller.EditorTools
             { "MenuCanvas",   0.5f },
         };
 
-        // Catacombs is deliberately ABSENT. Its UI was never migrated to TextMeshPro
-        // (Setup/44 only ever ran on CastleWing), so its RunEndCanvas holds legacy
-        // UnityEngine.UI.Text while RunEndScreen's headline/detail/prompt fields are
-        // now TMP_Text. Those references are therefore already dangling in memory the
-        // moment the scene loads, and merely opening and SAVING the scene writes the
-        // nulls into the file — a 9-line destructive diff for a canvas that contains
-        // no text to snap in the first place. Measured 2026-08-03 and reverted.
-        // Put it back here once Catacombs has been through Setup/44.
+        // Catacombs was deliberately ABSENT until 2026-08-27. Its UI had never been
+        // migrated to TextMeshPro (Setup/44 only ever ran on CastleWing), so its
+        // RunEndCanvas held legacy UnityEngine.UI.Text while RunEndScreen's
+        // headline/detail/prompt fields were TMP_Text. Those references were already
+        // dangling the moment the scene loaded, so merely opening and SAVING the
+        // scene wrote the nulls into the file — a 9-line destructive diff for a
+        // canvas with no text to snap. Measured 2026-08-03 and reverted then.
+        //
+        // Setup/44 has since run on Catacombs: 3 labels swapped, all three fields
+        // re-wired, 0 legacy Text left. The hazard is gone, so it is listed again.
         static readonly string[] Scenes =
         {
             "Assets/Scenes/CastleWingLDtk.unity",
+            "Assets/Scenes/Catacombs.unity",
             "Assets/Scenes/MainMenu.unity",
         };
 
