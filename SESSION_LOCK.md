@@ -50,6 +50,7 @@ spurious-unsaved look identical from git. A dirty scene you did not dirty is a
 stop-and-ask, and discarding is the destructive direction just as much as saving.
 
 
+- 2026-08-27 — Sound: Setup/57, hiding-muffle + escalation-cue configs (no scene).
 - 2026-08-27 — B: swing VFX widened to 1.21% coverage. Lock read before claiming,
   no scene opened or saved, Catacombs left exactly as found (clean, not dirty).
 
@@ -57,6 +58,10 @@ Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 
 - 2026-08-27 — Sound: Setup/54, per-track music trims into AudioConfig (no scene).
+- 2026-08-27 — A: released. Verified today's two fixes compile (by reflection,
+  not the compile flag). Ran Setup/40 on Catacombs: it created nothing, correctly
+  - that level has NO ObjectiveHudCanvas at all, so my "inactive canvas" theory
+  was wrong. Catacombs left NOT dirty and unsaved. Active scene is Catacombs.
 - 2026-08-27 — A: CATACOMBS SAVED. 9 setup scripts run against it, verified, and
   saved: 3758 insertions and ZERO DELETIONS, which is the signal that
   find-or-create did what it promised. Level gap 23 -> 8. CastleWingLDtk was
