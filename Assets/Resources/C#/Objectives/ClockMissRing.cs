@@ -25,6 +25,32 @@ namespace TimeKiller.Objectives
 {
     public class ClockMissRing : MonoBehaviour
     {
+        // SELF-INSTALLING (2026-08-27), because it had no installer at all and
+        // that is exactly how it went missing. It was hand-placed in CastleWing
+        // and no Setup script creates it, so Catacombs never got one: the Feature
+        // Install Audit found it as one of 23 components living in one level and
+        // absent from the other. Everything it needs it already loads itself (the
+        // config comes from Resources in Awake) and it draws its own ring, so
+        // there is nothing a scene has to provide.
+        //
+        // A hand-placed instance still wins - two rings would draw two circles on
+        // one miss - so the castle's existing object keeps working untouched.
+        static ClockMissRing instance;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() => instance = null;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Install()
+        {
+            if (instance != null) return;
+            if (FindAnyObjectByType<ClockMissRing>() != null) return;
+
+            var host = new GameObject("[ClockMissRing]");
+            DontDestroyOnLoad(host);
+            instance = host.AddComponent<ClockMissRing>();
+        }
+
         [SerializeField] ClockConfig config;
         [Tooltip("Points around the circle. 48 is smooth at any size the ring reaches.")]
         [SerializeField] int segments = 48;

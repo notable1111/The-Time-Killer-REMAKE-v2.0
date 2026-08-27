@@ -18,10 +18,18 @@ namespace TimeKiller.Interaction.EditorTools
         {
             if (TimeKiller.EditorTools.SetupGuard.Blocked("40 - Build Interact Prompt (E key cap)")) return;
 
-            var canvasGo = GameObject.Find("ObjectiveHudCanvas");
+            // GameObject.Find IGNORES INACTIVE OBJECTS, and that is why this
+            // script silently created nothing in Catacombs on 2026-08-27: the
+            // canvas was there, so "run Setup/38 first" was wrong advice, and the
+            // error message sent the reader to fix a thing that was not broken.
+            // Search the loaded scene instead, inactive included.
+            var canvasGo = FindHudCanvas();
             if (canvasGo == null)
             {
-                Debug.LogError("[TimeKiller Setup] No ObjectiveHudCanvas — run Setup/38 first. Nothing was created.");
+                Debug.LogError("[TimeKiller Setup] 40 - no ObjectiveHudCanvas in the OPEN SCENE (" +
+                               UnityEngine.SceneManagement.SceneManager.GetActiveScene().name +
+                               "), active or inactive. Run \"TimeKiller/Setup/38 - Build Objective HUD " +
+                               "(carved stone & brass)\" on this scene first. Nothing was created.");
                 return;
             }
 
@@ -84,6 +92,17 @@ namespace TimeKiller.Interaction.EditorTools
             UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(canvasGo.scene);
             Debug.Log("[TimeKiller Setup] Interact prompt ready: shows REPAIR near a broken clock, "
                       + "HIDE near a free wardrobe, GET OUT while hidden, and nothing while repairing.");
+        }
+
+        /// The HUD canvas, whether or not it happens to be enabled. Uses the
+        /// inactive-inclusive search rather than GameObject.Find for the reason
+        /// written at the call site.
+        static GameObject FindHudCanvas()
+        {
+            foreach (var c in Object.FindObjectsByType<Canvas>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (c.gameObject.name == "ObjectiveHudCanvas") return c.gameObject;
+            return null;
         }
 
         static GameObject FindOrCreate(string name, Transform parent)
