@@ -22,6 +22,18 @@ namespace TimeKiller.Effects.EditorTools
         const string RecipeFolder = "Assets/Resources/C#/Effects/Configs/Recipes";
         const string SpottedRecipe = RecipeFolder + "/ManiacSpotted.asset";
         const string AttackRecipe = RecipeFolder + "/ManiacSwing.asset";
+        const string ClipFolder = "Assets/Resources/C#/Effects/Configs/Clips";
+
+        // Playback rates that land each burst on the LENGTH OF ITS OWN SOUND:
+        // the sound lane measured spotted at 1.45s and swing at 0.62s, and the
+        // sheets are 12 and 8 frames. 12/1.45 = 8.28, 8/0.62 = 12.9. A visual
+        // that outlives its sound reads as two events rather than one.
+        const float SpottedFps = 8.28f;
+        const float SwingFps = 12.9f;
+
+        /// The slicer's default rate. Anything else means a human tuned it, and
+        /// a human's number wins over the arithmetic above.
+        const float SlicerDefaultFps = 16f;
 
         [MenuItem("TimeKiller/Setup/52 - Setup Maniac Threat Effects (seen + swing)")]
         public static void Build()
@@ -46,11 +58,48 @@ namespace TimeKiller.Effects.EditorTools
             if (config.attack == null) config.attack = attack;
             EditorUtility.SetDirty(config);
 
+            // Hang the sliced sheets on the recipes, if the art has arrived and
+            // the slots are still empty. FILL-EMPTY-ONLY, like everything else in
+            // this script: a re-run must never blank a clip someone chose, and
+            // must never revert an fps tuned by eye.
+            AttachSheet(spotted, "maniac_spotted", SpottedFps);
+            AttachSheet(attack, "maniac_swing", SwingFps);
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Selection.activeObject = config;
 
             Debug.Log(Brief(config));
+        }
+
+        static void AttachSheet(EffectRecipe recipe, string clipName, float fps)
+        {
+            if (recipe == null) return;
+            var clip = AssetDatabase.LoadAssetAtPath<SpriteAnimationClip>($"{ClipFolder}/{clipName}.asset");
+            if (clip == null)
+            {
+                Debug.Log($"[TimeKiller Setup] 52 - no sliced clip at {ClipFolder}/{clipName}.asset yet. " +
+                          "Drop the strip in Assets/Resources/Assets/Effects/Vfx and run " +
+                          "\"TimeKiller/Setup/38 - Build VFX Sheets (hand-drawn effects)\" first " +
+                          "(the FULL menu string - a truncated path fails silently).");
+                return;
+            }
+
+            if (recipe.sheetClip == null)
+            {
+                recipe.sheetClip = clip;
+                Debug.Log($"[TimeKiller Setup] 52 - {recipe.name}.sheetClip <- {clipName} " +
+                          $"({clip.frames?.Length ?? 0} frames)");
+            }
+
+            if (Mathf.Approximately(clip.framesPerSecond, SlicerDefaultFps))
+            {
+                clip.framesPerSecond = fps;
+                EditorUtility.SetDirty(clip);
+                Debug.Log($"[TimeKiller Setup] 52 - {clipName} fps {SlicerDefaultFps} -> {fps:0.00} " +
+                          $"({(clip.frames?.Length ?? 0) / fps:0.00}s, matching its sound)");
+            }
+            EditorUtility.SetDirty(recipe);
         }
 
         static EffectRecipe FindOrCreateRecipe(string path, int sortingOrder)

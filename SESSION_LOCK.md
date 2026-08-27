@@ -45,6 +45,12 @@ Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 
 - 2026-08-27 — Sound: Setup/54, per-track music trims into AudioConfig (no scene).
+- 2026-08-27 — ⚠️ EDITOR RUNNING BUT THE MCP BRIDGE IS DEAD. A: Unity.exe is in
+  the task list again, but every bridge call returns "Unable to connect" and
+  Editor.log has not been written for 4+ minutes, so the Editor is idle rather
+  than busy. Most likely a modal dialog is up, or Window > MCP for Unity has not
+  been started since the restart. Needs a human at the screen; no session can run
+  Setup/NN or tests until it answers. Lock released unused.
 - 2026-08-27 — ⚠️ THE EDITOR IS NOT RUNNING. A: opened Catacombs.unity, and the
   MCP bridge went dead before the first setup script executed; no Unity.exe in
   the task list afterwards, only Unity Hub. Verified via git that NO scene file
