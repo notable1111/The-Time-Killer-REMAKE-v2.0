@@ -19,8 +19,14 @@ MonoBehaviour:
   criticalVignette: 0.47
   subtleOverlayAlpha: 0.35
   criticalOverlayAlpha: 0.85
-  heartVignette: 0.22
-  heartFlashFade: 0.42
+  heartVignette: 0.1
+  heartVignetteAttack: 0.1
+  heartFlashFade: 0.55
+  dreadVignetteColor: {r: 0.04, g: 0.04, b: 0.07, a: 1}
+  vignetteSmoothnessBase: 0.85
+  vignetteSmoothnessPeak: 0.95
+  damageBeatLift: 0.12
+  fearBeatLift: 0.15
   subtleBpm: 74
   criticalBpm: 118
   subtlePulseDepth: 0.18

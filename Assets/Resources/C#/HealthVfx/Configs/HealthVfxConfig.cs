@@ -25,10 +25,30 @@ namespace TimeKiller.HealthVfx
         [Range(0f, 1f)] public float criticalOverlayAlpha = 0.85f;
 
         [Header("Dread vignette — the heartbeat you can SEE")]
-        [Tooltip("Extra vignette added on each heartbeat, scaled by the heart's own intensity. Works at ANY health, unlike the blood bands below, because a hunted player at full HP still needs to see the heart they can hear — otherwise the sound is a lone channel and reads as an audio cue rather than as their own body. 0 switches it off.")]
-        [Range(0f, 0.6f)] public float heartVignette = 0.22f;
-        [Tooltip("Seconds for one beat's vignette punch to fall away. Short — it must read as a pulse, not a fade.")]
-        [Range(0.05f, 1.5f)] public float heartFlashFade = 0.42f;
+        [Tooltip("Extra vignette added on each heartbeat, scaled by the heart's own intensity. Works at ANY health, unlike the blood bands below, because a hunted player at full HP still needs to see the heart they can hear — otherwise the sound is a lone channel and reads as an audio cue rather than as their own body. 0 switches it off. Lowered 0.22 -> 0.10 on 2026-08-27: the first time this was ever visible it read as an effect rather than as a body.")]
+        [Range(0f, 0.6f)] public float heartVignette = 0.10f;
+
+        [Tooltip("Seconds for the beat to SWELL IN. 0 is an instant snap, which is what made this read as a blinking light rather than a pulse — nothing in a body moves instantly. Keep it short enough to still land on the thump.")]
+        [Range(0f, 0.4f)] public float heartVignetteAttack = 0.10f;
+
+        [Tooltip("Seconds for one beat to fall away. The fall is EXPONENTIAL, not a straight line — a linear ramp is the single loudest 'cheap' tell in a pulsing effect.")]
+        [Range(0.05f, 1.5f)] public float heartFlashFade = 0.55f;
+
+        [Tooltip("Colour the edge darkens toward when the pulse is DREAD rather than injury. Near-black and slightly cool, so an unhurt but hunted player gets darkness closing in — not a red screen. Red is reserved for actually being hurt.")]
+        public Color dreadVignetteColor = new Color(0.04f, 0.04f, 0.07f);
+
+        [Header("Vignette edge — soft enough not to read as a ring")]
+        [Tooltip("Edge softness at rest. Low values draw a visible oval sitting on top of the picture; high values read as darkness gathering in the corners.")]
+        [Range(0.3f, 1f)] public float vignetteSmoothnessBase = 0.85f;
+
+        [Tooltip("Edge softness at full strength. Held HIGHER than the base so the ring never hardens as it deepens, which is when a vignette normally gives itself away.")]
+        [Range(0.3f, 1f)] public float vignetteSmoothnessPeak = 0.95f;
+
+        [Tooltip("How much the injury vignette swells on each beat. Small: the wound should breathe, not flash.")]
+        [Range(0f, 0.5f)] public float damageBeatLift = 0.12f;
+
+        [Tooltip("How much the fear vignette swells on each beat. Fear owns the quiet tightening at the frame edge; this is the only rhythm it is allowed to ride, so the edge never carries two competing beats at once.")]
+        [Range(0f, 0.5f)] public float fearBeatLift = 0.15f;
 
         [Header("Screen pulse (visual throb only — the SOUND lives in HeartbeatConfig)")]
         [Tooltip("Beats per minute at 2 HP. Note the heartbeat OVERRIDES this at runtime once a pulse arrives, so the screen and the chest stay in step; these remain the fallback when no heartbeat exists in the scene.")]

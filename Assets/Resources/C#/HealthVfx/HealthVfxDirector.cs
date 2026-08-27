@@ -59,7 +59,14 @@ namespace TimeKiller.HealthVfx
         // same instant is what makes a heartbeat FELT rather than merely heard
         // (James-Lange: the player attributes the racing heart to their own fear).
         float heartIntensity;
-        float heartFlash;      // decays from 1 on each beat
+        // Beat envelope. `beatAge` is seconds since the last thump; the envelope is
+        // an eased swell then an exponential fall, computed in Update. This replaced
+        // a `heartFlash` that snapped to 1 and fell in a STRAIGHT LINE — an instant
+        // attack plus a linear decay is a sawtooth, and a sawtooth is what made the
+        // whole effect read as a blinking light rather than a pulse (user, 2026-08-27,
+        // the first day this was ever visible: "it looks cheap").
+        float beatAge = 999f;
+        float beatStrength;    // 1, or more for a palpitation
 
         public void Init(HealthVfxConfig vfxConfig) => config = vfxConfig;
 
@@ -133,7 +140,8 @@ namespace TimeKiller.HealthVfx
         void OnHeartbeat(TimeKiller.Heartbeat.HeartbeatPulseEvent evt)
         {
             heartIntensity = evt.Intensity;
-            heartFlash = evt.Palpitation ? 1.35f : 1f;
+            beatAge = 0f;
+            beatStrength = evt.Palpitation ? 1.35f : 1f;
             // The visual systole sits at phase x.5 (see Beat below), so putting
             // the phase half a cycle back puts the peak ON the sound.
             pulsePhase = Mathf.Floor(pulsePhase) + 0.5f;
@@ -174,8 +182,14 @@ namespace TimeKiller.HealthVfx
             // reads as an audio cue rather than as their own body. Scaled by the
             // heart's own intensity and punched on each beat, so it is invisible
             // when calm and unmistakable when he is closing.
-            heartFlash = Mathf.MoveTowards(heartFlash, 0f, dt / Mathf.Max(0.02f, config.heartFlashFade));
-            float heartVig = config.heartVignette * heartIntensity * heartFlash;
+            // ONE rhythm owns the frame edge. Everything that pulses on it rides this
+            // single envelope. Before, THREE oscillators drove the same vignette at
+            // once — a |sin|^3 throb on the injury band, a sawtooth punch from the
+            // heart, and a third shape on fear — so the edge was asked to do three
+            // things on one beat and the result read as mush.
+            beatAge += dt;
+            float env = BeatEnvelope(beatAge) * beatStrength;
+            float heartVig = config.heartVignette * heartIntensity * env;
 
             // Heartbeat: sharp systole, slow diastole (|sin|^3), layer B counter-beats.
             pulsePhase += (bpm / 60f) * dt;
@@ -189,10 +203,33 @@ namespace TimeKiller.HealthVfx
             // there is nothing to honour here and no config of theirs to read —
             // with fear visuals off they are simply zero. Health owns the blood
             // bands; fear owns this quiet tightening at the edge of the frame.
-            float fearVig = fearVignette * (1f - fearPulse * (1f - beatA));
+            // Fear rides the SAME envelope as the heart rather than carrying a shape
+            // of its own. fearPulse still says how much of fear's vignette is allowed
+            // to breathe; it just breathes on the one beat now.
+            float fearVig = fearVignette * (1f + config.fearBeatLift * fearPulse * env);
             float fearDesat = -100f * fearDesaturation;   // saturation is -100..100
 
-            if (vignette != null) vignette.intensity.value = targetVignette * s * pulseA + heartVig + fearVig;
+            if (vignette != null)
+            {
+                float damageVig = targetVignette * s * (1f + config.damageBeatLift * env);
+                float totalVig = damageVig + heartVig + fearVig;
+                vignette.intensity.value = totalVig;
+
+                // Red belongs to being HURT. Dread and fear darken instead, so a hunted
+                // player at full health gets the corners closing in rather than a red
+                // screen for no reason they could name — which is what a shared colour
+                // was doing, and why an unhurt player saw a damage filter.
+                float redShare = totalVig > 0.0001f ? Mathf.Clamp01(damageVig / totalVig) : 0f;
+                vignette.color.overrideState = true;
+                vignette.color.value = Color.Lerp(config.dreadVignetteColor, config.vignetteColor, redShare);
+
+                // Soften as it deepens. A vignette gives itself away when the oval
+                // hardens at peak, so the edge gets softer exactly when it gets darker.
+                vignette.smoothness.overrideState = true;
+                vignette.smoothness.value = Mathf.Lerp(config.vignetteSmoothnessBase,
+                                                       config.vignetteSmoothnessPeak,
+                                                       Mathf.Clamp01(totalVig / 0.6f));
+            }
             if (chromatic != null) { chromatic.intensity.overrideState = true; chromatic.intensity.value = targetChromatic * s * pulseA; }
             if (grain != null) { grain.intensity.overrideState = true; grain.intensity.value = targetGrain * s; }
             if (colorAdjust != null)
@@ -236,6 +273,28 @@ namespace TimeKiller.HealthVfx
         {
             float w = Mathf.Abs(Mathf.Sin(phase * Mathf.PI));
             return w * w * w;
+        }
+
+        /// One beat's shape for the frame edge: an eased swell to full, then an
+        /// exponential fall.
+        ///
+        /// The swell matters as much as the fall. A body has no instant edges, and
+        /// the version this replaced jumped to full in a single frame and then fell
+        /// in a straight line — which is precisely what a blinking light does, and
+        /// why the effect read as cheap the first day it was ever visible.
+        ///
+        /// `heartFlashFade` stays the time to fall to roughly 5%, so the knob keeps
+        /// meaning what its name and tooltip say it means.
+        float BeatEnvelope(float age)
+        {
+            float attack = Mathf.Max(0.001f, config.heartVignetteAttack);
+            if (age < attack)
+            {
+                float t = age / attack;
+                return t * t * (3f - 2f * t);          // smoothstep: no corner at either end
+            }
+            float tau = Mathf.Max(0.02f, config.heartFlashFade) / 3f;
+            return Mathf.Exp(-(age - attack) / tau);
         }
     }
 }
