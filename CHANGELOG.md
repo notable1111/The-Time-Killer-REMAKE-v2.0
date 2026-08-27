@@ -43,6 +43,69 @@ one that stops 34 tools forcing an approval prompt on every call. Whether the
 "`read_console` returns 0 entries even when Unity has clearly logged" trap is actually
 cured is **not** verified here — that needs a session to reproduce the old case.
 
+## 2026-08-27 (last) — Catacombs is a map, not yet a level
+
+**The sweep for dead features found none — and found something bigger.**
+
+After ClockEffects turned out to have been inert for three weeks and been caught
+by accident, the obvious move was to stop looking by hand.
+`TimeKiller/Verify/Feature Install Audit` asks, for every gameplay
+MonoBehaviour: is there any path by which this reaches a running game? Three
+verdicts — in a scene/prefab, self-installing, or **DEAD**. It reads the `.unity`
+and `.prefab` files as TEXT and searches for the script's GUID, so it opens
+nothing and cannot disturb a hand-tuned scene.
+
+**Verdict: nothing dead.** Every gameplay component is now either placed or
+installs itself.
+
+**But the LEVEL GAP section is the real finding. 23 components are in
+`CastleWingLDtk` and absent from `Catacombs`:**
+
+| missing from Catacombs | what that means there |
+|---|---|
+| FearConductor, FearDrone, FearSting | **no tension system at all** — the one number every channel answers to |
+| PlayerHeartbeat, PlayerBreathing, PlayerVoice | the player has no body: no heartbeat, no panting, no pain |
+| ManiacVoice | **he is completely silent** — the counterplay that lets you place him through stone |
+| ManiacDirector | no second brain; lose him and the encounter is simply over |
+| ManiacWardrobeSearch | he never opens a wardrobe, so hiding is perfect safety |
+| BloodTrail, BloodStainField | you do not bleed |
+| PauseMenu | **you cannot pause** |
+| SessionRecorder, SessionAudioCapture | playtests there record nothing |
+| ClockMissRing, InteractPrompt, MusicZone, MusicEq, and 4 more | assorted feedback |
+
+Some of those are legitimately level-specific — a hand-placed `MusicZone`, a
+castle-only prop light. Most are not. **Catacombs is a playable map with the
+maniac, clocks, hiding and the run flow, and almost none of the systems that make
+the castle frightening.** Setup/31 placed gameplay there in July and the eight
+features built since have all landed in CastleWing only.
+
+Not fixed here, deliberately: filling it in means running many setup scripts
+against a protected scene, which is a decision and a lock, not a drive-by.
+
+**`TimeKiller/Verify/Escalation Ladder`** prints what escalation actually does,
+per clock, against the player's own numbers:
+
+```
+clocks |  patrol | search | earshot(run) | earshot(walk) | wardrobe | hint wait
+  0/3  |    1.80 |   2.60 |         7.65 |          2.70 |     0.12 |     22.0s
+  3/3  |    2.07 |   2.99 |         9.56 |          3.38 |     0.30 |     15.4s
+```
+
+with both ceilings re-checked in the output (patrol 2.07 stays under the player's
+walk 2.20; walking at the last clock still carries less than running does
+un-escalated). Difficulty is the thing this project has been burned tuning from a
+feeling, so the numbers get a table — and the report says outright that the ear
+test is still the user's.
+
+**The gate's art brief now prints from Setup/50**, the same way Setup/52's does:
+cell size, pivot, PPU, the visibility threshold to judge it against, and the two
+reasons it must stay silent. It also states, where whoever looks for it will
+find it, that winning cannot have a world effect while `timeScale` is 0.
+
+**Verified:** compiles, 54/54 EditMode tests, both probes run and their reports
+written to `Temp/`. Editor lock claimed and released; nothing opened, nothing
+saved.
+
 ## 2026-08-27 (later still) — The clock effects were documented as shipped and had never run once
 
 **The find.** ClockEffects was written on 2026-08-04, described in ARCHITECTURE as

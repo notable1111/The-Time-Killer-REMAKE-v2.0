@@ -45,6 +45,9 @@ Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 
 - 2026-08-27 — Sound: Setup/54, per-track music trims into AudioConfig (no scene).
+- 2026-08-27 — A: released. Two read-only Verify probes run (Feature Install
+  Audit, Escalation Ladder) + 54/54 tests. Nothing opened, nothing saved. The
+  audit found 23 systems present in CastleWing and absent from Catacombs.
 - 2026-08-27 — A: released. SetupGuard sweep (55 scripts), Setup/50 (which no
   longer creates a scene object), 54/54 tests, and a play probe. Verified in play
   that SetupGuard.Blocked now returns true, so the guards actually refuse.
