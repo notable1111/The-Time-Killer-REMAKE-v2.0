@@ -27,6 +27,9 @@ namespace TimeKiller.Audio
         static AudioMixConfig config;
         static readonly Dictionary<MixChannel, MixChannelSettings> settings = new();
         static float[] tierBusyUntil = new float[8];
+        // Standing claims: "something at this tier is HERE", as opposed to
+        // tierBusyUntil's "something at this tier is speaking until T".
+        static readonly bool[] tierPresent = new bool[8];
         static float[] smoothed;
         static float maniacBreath;      // 0..1, reported by ManiacVoice
         static int lastFrame = -1;
@@ -60,6 +63,39 @@ namespace TimeKiller.Audio
             // would otherwise set the music slider against a ducked level.
             float until = Time.unscaledTime + Mathf.Max(0.05f, seconds);
             if (until > tierBusyUntil[tier]) tierBusyUntil[tier] = until;
+        }
+
+        /// A claim that LASTS, for something that is present rather than speaking.
+        ///
+        /// WHY THIS IS NOT Announce. Announce marks a tier busy for a duration,
+        /// which is right for a growl or a sting — a thing with a beginning and an
+        /// end. It is wrong for the maniac's footsteps, and the measurement is why:
+        /// cadence is distance-driven at strideMeters 0.78, so at patrol speed he
+        /// steps every 0.433s and at chase speed every 0.15s, against ~0.43s clips.
+        /// Announcing per step would hold tier 3 busy CONTINUOUSLY, and with a
+        /// 0.55s release the music could never climb back between steps. The result
+        /// is not a duck, it is a permanent -9 dB on music for as long as he is
+        /// within earshot, on top of a chase layer already tuned by ear.
+        ///
+        /// So presence is a separate, weaker kind of claim: it says "something more
+        /// important is HERE", and the mix leans back by presenceDepthScale of the
+        /// full duck rather than all of it. Set it false and the mix returns.
+        ///
+        /// Idempotent, so a caller can set it every frame from a distance test
+        /// without thinking about edges.
+        public static void SetPresence(MixChannel channel, bool present)
+        {
+            if (!Active || !settings.TryGetValue(channel, out var s)) return;
+            int tier = Mathf.Clamp(s.tier, 0, tierPresent.Length - 1);
+            tierPresent[tier] = present;
+        }
+
+        /// Drop every standing presence claim. Called when the thing holding one
+        /// goes away — a scene reload destroys the maniac, and a claim with no
+        /// claimant would duck the music forever.
+        public static void ClearPresence()
+        {
+            for (int i = 0; i < tierPresent.Length; i++) tierPresent[i] = false;
         }
 
         // --- Player-facing volume, the settings menu's half of the mix ---
@@ -149,11 +185,20 @@ namespace TimeKiller.Audio
                 // Ducked only by something strictly MORE important. Equal tiers
                 // never duck each other — two things of the same rank fighting
                 // would flip-flop the mix on whichever arrived last.
-                bool outranked = false;
+                // Two kinds of claim, and a spoken one always wins over a merely
+                // present one — so a growl still gets the full duck even while
+                // the maniac is standing next to you holding a presence claim.
+                bool spokenOver = false, presentOver = false;
                 for (int tier = 0; tier < s.tier && tier < tierBusyUntil.Length; tier++)
-                    if (Time.unscaledTime < tierBusyUntil[tier]) { outranked = true; break; }
+                {
+                    if (Time.unscaledTime < tierBusyUntil[tier]) { spokenOver = true; break; }
+                    if (tierPresent[tier]) presentOver = true;
+                }
 
-                float target = outranked ? s.duckDepth : 1f;
+                float depth = spokenOver
+                    ? s.duckDepth
+                    : Mathf.Lerp(1f, s.duckDepth, config.presenceDepthScale);
+                float target = (spokenOver || presentOver) ? depth : 1f;
                 float seconds = target < smoothed[index] ? config.duckAttackSeconds : config.duckReleaseSeconds;
                 smoothed[index] = Mathf.MoveTowards(smoothed[index], target, dt / Mathf.Max(0.01f, seconds));
             }
@@ -180,6 +225,7 @@ namespace TimeKiller.Audio
         static void Reset()
         {
             tierBusyUntil = new float[8];
+            ClearPresence();   // a claim whose claimant died with the domain
             smoothed = null;
             maniacBreath = 0f;
             lastFrame = -1;

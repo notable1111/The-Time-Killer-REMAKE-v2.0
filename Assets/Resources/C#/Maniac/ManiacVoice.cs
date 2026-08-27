@@ -101,6 +101,14 @@ namespace TimeKiller.Maniac
 
         void OnDestroy()
         {
+            // A scene reload destroys him. A presence claim with no claimant left
+            // would duck the music for the rest of the session.
+            TimeKiller.Audio.AudioMix.SetPresence(TimeKiller.Audio.MixChannel.ManiacFootsteps, false);
+            OnDestroyInner();
+        }
+
+        void OnDestroyInner()
+        {
             EventBus.Unsubscribe<ManiacStateChangedEvent>(OnStateChanged);
             EventBus.Unsubscribe<ManiacSpottedPlayerEvent>(OnSpotted);
             EventBus.Unsubscribe<ManiacAttackEvent>(OnAttack);
@@ -124,6 +132,19 @@ namespace TimeKiller.Maniac
             DriveBreath(dt, reach);
             DriveFootsteps(dt, reach);
             DriveMutters(reach);
+
+            // "He is HERE" — a standing claim on the mix, not a per-step one.
+            // His footsteps are the primary where-is-he signal in a hide-and-run
+            // game, and until now they never claimed the mix at all: the channel
+            // outranks Music and Ambience on paper, but a channel only makes
+            // others step back if it announces, and announcing every step would
+            // park the music permanently (he steps every 0.433s at patrol against
+            // ~0.43s clips). Presence is the shape that fits: it holds while he is
+            // close and releases when he leaves. reach is already the linear
+            // distance curve the rest of this component runs on, so "near" costs
+            // nothing extra to compute and moves with the same radii.
+            TimeKiller.Audio.AudioMix.SetPresence(
+                TimeKiller.Audio.MixChannel.ManiacFootsteps, reach >= config.presenceReach);
         }
 
         /// Linear in amplitude between the two radii. Real sound falls off with

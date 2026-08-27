@@ -72,6 +72,8 @@ namespace TimeKiller.Maniac
         [Tooltip("World units travelled per step. Driven by DISTANCE, not animation frames, so the cadence stays correct at every speed and does not depend on event frames being authored on his clips.")]
         public float strideMeters = 0.78f;
         [Range(0f, 1f)] public float footstepVolume = 0.7f;
+        [Tooltip("How close he must be, on the same 0..1 reach curve his footsteps already use, before the mix leans back for his PRESENCE. 0.45 is roughly half the hearing radius. 0 = the mix leans back the instant he is audible at all; 1 = effectively never.")]
+        [Range(0f, 1f)] public float presenceReach = 0.45f;
         [Tooltip("Random pitch spread per step, so a walk down a corridor never sounds looped.")]
         [Range(0f, 0.5f)] public float pitchJitter = 0.08f;
 

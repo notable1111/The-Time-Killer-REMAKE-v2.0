@@ -52,6 +52,9 @@ namespace TimeKiller.Audio
         [Tooltip("Seconds to come back UP. Slow, so the mix breathes instead of pumping.")]
         public float duckReleaseSeconds = 0.55f;
 
+        [Tooltip("How much of a channel's full duck a PRESENCE claim applies, versus a spoken one. 0 = presence changes nothing; 1 = being near is as loud a claim as shouting. The default leans the mix back without parking it: the maniac walking past should cost the music some room, not all of it, because he can be near for a long time and a duck that never releases stops being a duck and becomes a second mix.")]
+        [Range(0f, 1f)] public float presenceDepthScale = 0.5f;
+
         [Header("The low-band rule")]
         [Tooltip("The heartbeat and the maniac's breath both live below ~300Hz and measured 2.75 combined — they cannot both own that band. When his breath is audible, the heart is multiplied by this. Information beats emotion: you need to hear WHERE HE IS to act, and the heart's RATE still tells you how close he is even when its level drops, so nothing is actually lost.")]
         [Range(0f, 1f)] public float heartUnderManiacBreath = 0.4f;
