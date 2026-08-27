@@ -70,6 +70,79 @@ def spans(rows, predicate):
     return out
 
 
+def per_run_totals(rows, field):
+    """Last value of a cumulative counter in each run.
+
+    stalk/fade/susEps live on ManiacPerception, which is rebuilt by every scene
+    reload — so across a multi-run recording they saw-tooth rather than climb.
+    A counter that DROPS is a run boundary, not a bug, and summing the column
+    would count every run's total once per sample. Take the peak before each
+    reset instead.
+    """
+    runs, last = [], None
+    for r in rows:
+        v = r.get(field)
+        if v is None:
+            continue
+        if last is not None and v < last:
+            runs.append(last)
+        last = v
+    if last is not None:
+        runs.append(last)
+    return runs
+
+
+def hesitation(rows):
+    """Did the moment of being caught actually stretch out?
+
+    awarenessCertaintyScale slows the fill ONLY above suspicionThreshold, so the
+    number it moves is seconds-of-stalking per suspicion episode. Reported per
+    episode rather than as a total because a run that simply met the maniac more
+    often would raise the total without stretching anything.
+
+    stalk is accumulated per FRAME by the game, not sampled here: at 4 Hz a
+    0.25s crossing lands between samples and gets confidently reported as 0.
+    """
+    if not any("stalk" in r for r in rows):
+        print("  no stalk/susEps fields — this recording predates the "
+              "instrumentation. Re-run; the archive cannot answer this.")
+        return
+
+    stalk = per_run_totals(rows, "stalk")
+    fade = per_run_totals(rows, "fade")
+    eps = per_run_totals(rows, "susEps")
+    n = min(len(stalk), len(fade), len(eps))
+    if not n:
+        print("  no completed runs in this file")
+        return
+
+    print(f"  {'run':>4}  {'stalk':>7}  {'fade':>7}  {'episodes':>8}  {'s/episode':>9}")
+    per_ep = []
+    for i in range(n):
+        rate = stalk[i] / eps[i] if eps[i] else 0.0
+        if eps[i]:
+            per_ep.append(rate)
+        print(f"  {i+1:>4}  {stalk[i]:6.2f}s  {fade[i]:6.2f}s  {eps[i]:>8}  "
+              f"{rate:8.2f}s")
+
+    if per_ep:
+        mean = sum(per_ep) / len(per_ep)
+        # The threshold is stated so the judgement is inspectable. The climb from
+        # suspicionThreshold to certain took under 0.25s before the change, and
+        # awarenessCertaintyScale 0.35 predicts ~2.9x that. Anything at or under
+        # 0.25s means the beat still is not playing, whatever the config says.
+        print(f"\n  mean {mean:.2f}s of stalking per suspicion episode "
+              f"(n={len(per_ep)} runs)")
+        if mean <= 0.25:
+            print("  -> NOT stretched: still at or under the pre-change 0.25s. "
+                  "The hesitation is not reaching the player.")
+        elif mean < 0.6:
+            print("  -> partly stretched: longer than 0.25s but under the ~0.7s "
+                  "the config predicts. Worth a look at exposure, not the scale.")
+        else:
+            print("  -> stretched: the beat has room to play.")
+
+
 def main():
     session = Path(sys.argv[1]) if len(sys.argv) > 1 else newest_session()
     rows = load(session)
@@ -87,6 +160,9 @@ def main():
     print("\nMANIAC — share of the run in each state")
     for state, n in Counter(r.get("mstate") for r in rows).most_common():
         print(f"  {str(state):18} {n*DT:6.1f}s  {100*n/len(rows):5.1f}%")
+
+    print("\nHESITATION — the climb from suspicious to certain")
+    hesitation(rows)
 
     # ---- damage, and whether it was fair ----------------------------------
     print("\nDAMAGE EVENTS")

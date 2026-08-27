@@ -87,6 +87,31 @@ the catalogue costs nothing.
   stopping at the moment of death is the harness working, not the recorder
   failing. Check the batch size before calling it a bug.
 
+### Recording / instrumentation
+- **`Editor.log` is the durable console.** `read_console` returns 0 entries even
+  when Unity has plainly logged. `C:\Users\<you>\AppData\Local\Unity\Editor\Editor.log`
+  has everything and carries the call stack — which is how "who started this
+  recording?" got answered (`MCPDynamicCode:Execute`) and what ended it
+  (`[BatchRunner] 1/1 ... death`). `grep -a` it; it is not valid UTF-8 throughout.
+  It **rotates**, so a missing line is not proof the event never happened —
+  check the line count before reading absence as evidence.
+- **One label for two events will cost you a day.** `SessionRecorder.OnDestroy`
+  marked BOTH "a scene is reloading, more is coming" and "play mode stopped, this
+  is the end" as `"reload"`. Every complete session therefore looked truncated,
+  and four were investigated as data loss before the resume was shown to work
+  perfectly. If a mark can mean two things it is not evidence, it is a coin flip.
+  Marks now split into `reload` and `end`.
+- **A one-run batch ends play mode at the first death.** `BatchRunner` sets
+  `EditorApplication.isPlaying = false` when its batch completes, so a recording
+  that stops at a death is the harness working. Check the batch size first.
+- **Count runs from the recording, not from the results file.** Deaths and
+  `reload` marks in `state.jsonl` are written as they happen; a result row is
+  written only when a run *finishes*. A batch stopped early leaves the two
+  disagreeing, and the recording is the one that saw everything.
+- **Cumulative per-run counters saw-tooth.** `stalk` / `fade` / `susEps` live on
+  `ManiacPerception`, which every scene reload rebuilds. A value that DROPS is a
+  run boundary. Summing the column counts each run's total once per sample.
+
 ## The rule
 
 "I think the problem is..." is worth less than one F3 screenshot or one console
