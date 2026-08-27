@@ -16,11 +16,25 @@
 //
 //   moment    existing              free band          this clip lands
 //   ------    --------------------  -----------------  ---------------------
-//   seen      sting  (460-2k: 31%)  2k-20k             70.9% in 2k-20k
+//   seen      sting  (460-2k: 31%)  2k-20k             70.6% in 2k-20k
 //             growl  (<460:  52%)   (sting 11%, growl 0%)   0.0% below 460
-//   swing     roar   (<460:  60%)   460-2k             32.7% in 460-2k
-//                    (460-2k: 6%)                      -14.8 dB under the roar
-//                                                      in the roar's own band
+//   swing     roar   (<460:  60%)   460-2k AND 2k-20k  54.6% in 460-2k
+//                    (460-2k: 6%)   (roar has 0.1% up   19.0% in 2k-20k
+//                    (2k-20k: 0.1%)  there)              0.4% below 460
+//
+// THE SWING WAS RE-CUT ONCE, and what the second pass taught is worth keeping.
+// Version 1 put 32.7% in 460-2k but ALSO left 26.9% sitting at 150-460 — inside
+// the roar's dominant band. Mixed at real gains and played in a real session it
+// could not be heard, and the user confirmed it. The fix was not more level (a
+// limiter could only buy ~4 dB before the sound squashed); it was getting OUT of
+// the roar's band. High-passed at 800 Hz in three stages, the same clip now
+// lifts the 2-20 kHz band of that moment by 14.9 dB, because the roar puts
+// essentially nothing up there. Masking was the problem, not loudness.
+//
+// A second lesson, about measuring: the first "+0.6 dB, inaudible" verdict was
+// partly an artifact of averaging over the WHOLE audition file when the clip
+// only occupies its first 0.62s. Measure the window a sound occupies, not the
+// file it sits in.
 //
 // Both are peak-normalised to -3 dBFS, the project's layering headroom ruling of
 // 2026-08-02 — these play ON TOP of sounds that are already going, which is the
@@ -28,9 +42,11 @@
 //
 // SOURCE. Both are processed from EchoChambers vendor one-shots rather than
 // used raw: the "Hush" was high-passed off the sting's mid-band, and the whoosh
-// was pitch-shifted UP into 460-2k because measurement showed the raw file was
-// bottom-heavy and would have fought the roar it is supposed to sit beside.
-// The vendor originals are untouched, per add_headroom.py's scope rule.
+// was pitch-shifted up 3.5x and then high-passed at 800 Hz, because measurement
+// showed the raw file was bottom-heavy and would have fought the roar it is
+// supposed to sit beside. Each re-cut starts from the VENDOR file, never from a
+// previously processed one — reprocessing compounds the limiter artifacts. The
+// vendor originals themselves are untouched, per add_headroom.py's scope rule.
 using TimeKiller.EditorTools;
 using TimeKiller.Effects;
 using UnityEditor;
@@ -94,6 +110,27 @@ namespace TimeKiller.Audio
                 report.AppendLine($"   imported {System.IO.Path.GetFileName(path)} (DecompressOnLoad, Vorbis)");
             }
             else report.AppendLine($"   {System.IO.Path.GetFileName(path)} already imported correctly");
+        }
+
+        /// The undo. These two layers are additions to moments that already had
+        /// sound — a sting plus a growl when he sees you, a roar when he swings —
+        /// so "remove them again" has to be one click, not an archaeology
+        /// exercise. Clears only `clips`; the visual half of each recipe stays.
+        [MenuItem("TimeKiller/Setup/53b - Remove maniac threat SFX")]
+        public static void Clear()
+        {
+            if (SetupGuard.Blocked("53b - Remove maniac threat SFX")) return;
+            foreach (var path in new[] { SpottedRecipe, SwingRecipe })
+            {
+                var recipe = AssetDatabase.LoadAssetAtPath<EffectRecipe>(path);
+                if (recipe == null) continue;
+                var so = new SerializedObject(recipe);
+                so.FindProperty("clips").arraySize = 0;
+                so.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(recipe);
+            }
+            AssetDatabase.SaveAssets();
+            Debug.LogWarning("[TimeKiller Setup] 53b - threat SFX removed; both moments are back to voice and sting only.");
         }
 
         /// Fill ONLY the clips array, and only when it does not already hold this
