@@ -1,4 +1,10 @@
-// Menu: TimeKiller/Setup/53 - Create Maniac Blood Tracking Config.
+// Menu: TimeKiller/Setup/56 - Create Maniac Blood Tracking Config.
+//
+// Numbered 56 and not 53: the sound lane also claimed 53 ("Assign maniac
+// threat SFX"). Unity allows both, since the full menu strings differ, which
+// is exactly what makes it dangerous - two lanes say "run Setup/53" and mean
+// different scripts. Mine moved because it is the newer of the two and
+// nothing outside this repo references it yet.
 //
 // Touches no scene — ManiacBloodTracker is auto-added by ManiacController and
 // self-loads this asset from Resources. Never overwrites an existing config.
@@ -20,15 +26,15 @@ namespace TimeKiller.Maniac.EditorTools
         const string ManiacConfigPath = "Assets/Resources/C#/Maniac/Configs/ManiacConfig.asset";
         const string BloodConfigPath = "Assets/Resources/C#/Blood/Configs/BloodConfig.asset";
 
-        [MenuItem("TimeKiller/Setup/53 - Create Maniac Blood Tracking Config")]
+        [MenuItem("TimeKiller/Setup/56 - Create Maniac Blood Tracking Config")]
         public static void Run()
         {
-            if (SetupGuard.Blocked("53 - Create Maniac Blood Tracking Config")) return;
+            if (SetupGuard.Blocked("56 - Create Maniac Blood Tracking Config")) return;
 
             var config = AssetDatabase.LoadAssetAtPath<ManiacBloodTrackingConfig>(ConfigPath);
             if (config != null)
             {
-                Debug.Log($"[TimeKiller Setup] 53 - Blood tracking: config already exists at {ConfigPath} — " +
+                Debug.Log($"[TimeKiller Setup] 56 - Blood tracking: config already exists at {ConfigPath} — " +
                           "left untouched.");
             }
             else
@@ -38,7 +44,7 @@ namespace TimeKiller.Maniac.EditorTools
                 AssetDatabase.CreateAsset(config, ConfigPath);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
-                Debug.Log($"[TimeKiller Setup] 53 - Blood tracking: created {ConfigPath} (DISABLED).");
+                Debug.Log($"[TimeKiller Setup] 56 - Blood tracking: created {ConfigPath} (DISABLED).");
             }
 
             Selection.activeObject = config;
@@ -51,7 +57,7 @@ namespace TimeKiller.Maniac.EditorTools
             var blood = AssetDatabase.LoadAssetAtPath<TimeKiller.Blood.BloodConfig>(BloodConfigPath);
 
             var r = new System.Text.StringBuilder();
-            r.AppendLine("[TimeKiller Setup] 53 - Blood tracking");
+            r.AppendLine("[TimeKiller Setup] 56 - Blood tracking");
             r.AppendLine($"  enabled: {config.enabled}" + (config.enabled ? "" : "   <- OFF, as shipped"));
             r.AppendLine($"  notice {config.noticeRadius:0.0}u (LOS required: {config.requireLineOfSight})" +
                          $"  follow {config.followRadius:0.0}u  traces live {config.traceLifetime:0}s");
@@ -78,9 +84,9 @@ namespace TimeKiller.Maniac.EditorTools
             r.AppendLine("       low HP by definition. ARCHITECTURE asked for a bot A/B before it goes live.");
             r.AppendLine("    2. Turn it on ALONE. Per-clock escalation is already in flight and unjudged;");
             r.AppendLine("       two difficulty changes at once cannot be attributed to either.");
-            r.AppendLine("    3. Split TestTelemetry's NoiseCause counter first — it currently counts");
-            r.AppendLine("       anything that is not Suspicion as HeardSound, so the A/B would file every");
-            r.AppendLine("       blood lead under hearing.");
+            r.AppendLine("    3. DONE 2026-08-27: TestTelemetry now counts HeardBlood separately and the");
+            r.AppendLine("       batch row emits it, so an A/B can tell 'he found the trail' from 'he heard");
+            r.AppendLine("       you'. That was the last blocker; what is left is running the batch.");
             r.Append("  F1 line 'BloodTrack' shows traces held and leads taken.");
             return r.ToString();
         }

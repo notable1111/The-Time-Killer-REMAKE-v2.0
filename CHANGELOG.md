@@ -194,7 +194,7 @@ direction of travel but gets the next few steps rather than the destination.
 bleeding starts at low HP by definition, so this presses hardest exactly when
 the player has least left — which is why the original note asked for a bot A/B
 first — and per-clock escalation is already in flight and unjudged, so turning
-both on at once would make either impossible to attribute. Setup/53 prints
+both on at once would make either impossible to attribute. Setup/56 prints
 `noticeRadius` against his sight range and warns as it closes.
 
 ⚠️ **Before that A/B:** `TestTelemetry` counts anything that is not `Suspicion`
