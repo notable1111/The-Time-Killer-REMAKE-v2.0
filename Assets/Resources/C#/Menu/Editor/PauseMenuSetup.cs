@@ -23,9 +23,25 @@ namespace TimeKiller.MenuTools
         const string UiRoot = "Assets/Resources/Assets/UI";
         const string CanvasName = "PauseCanvas";
 
+        // EndFrame's 9-slice border, MEASURED off the sprite rather than taken from the
+        // art README: border (60,48,60,58) at spritePPU 100 against the canvas's
+        // referencePixelsPerUnit 100, so ppuScale is 1 and these are canvas units 1:1.
+        static readonly Vector2 PanelSize = new Vector2(760f, 620f);
+        const float BorderL = 60f, BorderB = 48f, BorderR = 60f, BorderT = 58f;
+
+        // The frame's own deepest shadow tone, rgb(19,18,31) — the darkest colour that
+        // occurs in EndFrame.png in any quantity (2964 px). Picked from the art's
+        // palette instead of invented, so the fill reads as part of the frame rather
+        // than a black hole punched behind it. Alpha 0.94 leaves a trace of the room.
+        static readonly Color InteriorColor = new Color(0.075f, 0.071f, 0.122f, 0.94f);
+
         [MenuItem("TimeKiller/Setup/43 - Build Pause Menu (Esc + audio sliders)")]
         public static void Build()
         {
+            // Without this the script builds its whole rig and then throws at
+            // MarkSceneDirty below — a half-run that play mode silently discards.
+            if (EditorTools.SetupGuard.Blocked("43 - Build Pause Menu")) return;
+
             // TMP font assets, built by Setup/44. Null is survivable — TMP falls
             // back to its own default rather than rendering nothing.
             var display = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>($"{UiRoot}/TimeKiller_Display SDF.asset");
@@ -61,8 +77,25 @@ namespace TimeKiller.MenuTools
             var blackout = Panel(root.transform, "Blackout", null, new Color(0f, 0f, 0f, 0.72f));
             Stretch(blackout.rectTransform);
 
+            // Fills the frame's transparent middle so the room (and the player standing
+            // in it) stops showing through the menu. It sits BEHIND the frame, not
+            // inside it: EndFrame's 9-slice CENTRE is only 79% transparent — sprite rows
+            // y 56..72 are fully opaque and stretch into the stone ledge the buttons
+            // rest on, at canvas y -232..-172. A fill parented under Panel would draw
+            // over the frame and erase that ledge, so Interior is a sibling ordered
+            // ahead of it and the art always wins.
+            var interior = Panel(root.transform, "Interior", null, InteriorColor);
+            Anchor(interior.rectTransform, new Vector2(0.5f, 0.5f),
+                   new Vector2((BorderL - BorderR) * 0.5f, (BorderB - BorderT) * 0.5f),
+                   new Vector2(PanelSize.x - BorderL - BorderR, PanelSize.y - BorderT - BorderB));
+
             var panel = Panel(root.transform, "Panel", frame, Color.white);
-            Center(panel.rectTransform, new Vector2(760f, 620f));
+            Center(panel.rectTransform, PanelSize);
+
+            // Explicit draw order, so a re-run cannot leave these stacked wrongly.
+            blackout.transform.SetSiblingIndex(0);
+            interior.transform.SetSiblingIndex(1);
+            panel.transform.SetSiblingIndex(2);
 
             // 64, not 78: Display's native em is 32px, so it is only crisp at 32/64/96.
             var title = Label(panel.transform, "Title", "PAUSED", display, 64, TextAlignmentOptions.Center);
@@ -86,8 +119,8 @@ namespace TimeKiller.MenuTools
             var music = Row(panel.transform, "Music", "MUSIC", body, bar, 0f);
             var sfx = Row(panel.transform, "Sfx", "SOUND", body, bar, -90f);
 
-            var resume = Btn(panel.transform, "ResumeButton", "RESUME", body, new Vector2(-150f, 120f));
-            var quit = Btn(panel.transform, "QuitButton", "QUIT", body, new Vector2(150f, 120f));
+            var resume = Btn(panel.transform, "ResumeButton", "RESUME", body, bar, new Vector2(-150f, 120f));
+            var quit = Btn(panel.transform, "QuitButton", "QUIT", body, bar, new Vector2(150f, 120f));
 
             var menu = root.GetComponent<PauseMenu>();
             if (menu == null) menu = Undo.AddComponent<PauseMenu>(root);
@@ -164,8 +197,13 @@ namespace TimeKiller.MenuTools
             var bg = Panel(sliderGo.transform, "Background", bar, new Color(0.18f, 0.16f, 0.14f, 0.95f));
             Stretch(bg.rectTransform);
 
+            // Inset, NOT stretched. Stretched, the fill covers the track exactly, so
+            // at 100% the brass plaque completely hides the dark one behind it and
+            // the two read as a single flat shape. Insetting leaves the track visible
+            // as a channel around the fill, which is what gives the widget any depth
+            // at all without new art.
             var fillArea = Find(sliderGo.transform, "Fill Area");
-            Stretch(Rect(fillArea));
+            Inset(Rect(fillArea), 7f, 5f, 7f, 5f);
             var fill = Panel(fillArea.transform, "Fill", bar, new Color(0.78f, 0.62f, 0.32f));   // brass
             Stretch(fill.rectTransform);
 
@@ -188,16 +226,27 @@ namespace TimeKiller.MenuTools
             return slider;
         }
 
-        static Button Btn(Transform parent, string name, string caption, TMP_FontAsset font, Vector2 offsetFromBottom)
+        static Button Btn(Transform parent, string name, string caption, TMP_FontAsset font, Sprite bar, Vector2 offsetFromBottom)
         {
             var go = Find(parent, name);
             var img = go.GetComponent<Image>() ?? Undo.AddComponent<Image>(go);
-            img.color = new Color(0.22f, 0.19f, 0.16f, 0.95f);
+            // These were untextured flat rectangles — the loudest "programmer UI"
+            // element on a screen otherwise made of painted stone. Bar.png was
+            // imported for exactly this ("9-slice for buttons later" per the art
+            // README) and its border is already authored at (22,4,22,4); MainMenu's
+            // buttons have been using it all along. Tint stays white so the art
+            // reads rather than a colour painted over it.
+            img.sprite = bar;
+            img.type = bar != null ? Image.Type.Sliced : Image.Type.Simple;
+            img.color = bar != null ? Color.white : new Color(0.22f, 0.19f, 0.16f, 0.95f);
             var btn = go.GetComponent<Button>() ?? Undo.AddComponent<Button>(go);
             btn.targetGraphic = img;
             var colors = btn.colors;
-            colors.highlightedColor = new Color(0.78f, 0.62f, 0.32f);   // brass on hover
-            colors.pressedColor = new Color(0.55f, 0.42f, 0.2f);
+            // Deliberately the same values MainMenuSetup uses: >1 brightens the art
+            // instead of washing a flat brass over it, so both menus respond alike.
+            colors.highlightedColor = new Color(1.15f, 1.10f, 0.95f, 1f);
+            colors.pressedColor = new Color(0.75f, 0.70f, 0.60f, 1f);
+            colors.fadeDuration = 0.08f;
             btn.colors = colors;
             Anchor(Rect(go), new Vector2(0.5f, 0f), offsetFromBottom, new Vector2(240f, 68f));
             var t = Label(go.transform, "Text", caption, font, 32, TextAlignmentOptions.Center);
@@ -224,6 +273,14 @@ namespace TimeKiller.MenuTools
         {
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
             rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
+        }
+
+        /// Stretch to the parent but hold a margin on each edge.
+        static void Inset(RectTransform rt, float left, float bottom, float right, float top)
+        {
+            rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
+            rt.offsetMin = new Vector2(left, bottom);
+            rt.offsetMax = new Vector2(-right, -top);
         }
 
         static void Center(RectTransform rt, Vector2 size)
