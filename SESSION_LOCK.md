@@ -53,6 +53,9 @@ for without reading the scene diff.
   mistake this file was extended to stop. Editor work done: Setup/51 + Setup/52
   (both create assets only, no scene touched), then play mode in CastleWingLDtk
   to runtime-verify escalation. Left NOT dirty, out of play mode, lock FREE.
+- 2026-08-27 — B: released. POST-PROCESSING CONFIRMED WORKING via render-to-texture
+  (corner luminance 15.36 -> 4.22 at full vignette, centre unchanged). Supersedes
+  the note below, which was measured with a broken instrument.
 - 2026-08-27 — B: released. Post-processing proven STILL not applying by reading
   the back buffer directly; a third blocker remains beyond the two now fixed.
 - 2026-08-27 — B: released. EditMode tests 51/51, Catacombs end screen rendered,
