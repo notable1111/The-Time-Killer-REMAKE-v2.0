@@ -148,7 +148,8 @@ namespace TimeKiller.Effects.EditorTools
                 ? $"  ART MISSING — drop clock_hit.png / clock_wake.png in {SheetFolder} and re-run; " +
                   "the recipes are wired and will play sound and shake without them."
                 : $"  Sheets: {hitClip.frames.Length}f hit, {wakeClip.frames.Length}f wake.";
-            Debug.Log("[TimeKiller Setup] Clock effects ready: ClockHit (earned press) + ClockFixed (the clock wakes)." + art);
+            Debug.Log("[TimeKiller Setup] Clock effects ready: ClockHit (earned press) + ClockFixed (the clock wakes)."
+                      + art + "\n" + GateBrief(gate));
         }
 
         /// Slices a strip into a clip, or returns null and says so. Missing art
@@ -174,6 +175,35 @@ namespace TimeKiller.Effects.EditorTools
                 return new AudioClip[0];
             }
             return new[] { clip };
+        }
+
+        /// What the gate beat still needs, printed every run so the art side does
+        /// not have to read three documents to find the world's scale contract.
+        /// The same shape as Setup/52's brief, and for the same reason: a recipe
+        /// with no sheet is a valid shipping state, not a bug, and the person who
+        /// can fix it is not the person who wrote it.
+        static string GateBrief(EffectRecipe gate)
+        {
+            if (gate != null && gate.sheetClip != null)
+                return "  Gate: HAS ART (" + gate.sheetClip.frames.Length + "f).";
+
+            return
+                "  GATE BEAT: shake only, no picture yet. AllClocksFixedEvent plays it AT THE EXIT DOOR,\n" +
+                "  because that is the moment the run's question changes from 'where are the clocks' to\n" +
+                "  'where is the door' - so this burst is a direction, not a celebration.\n" +
+                "    - One strip, 32px square cells (the world is 32 px/unit, so a 32px cell at scale 1\n" +
+                "      is 1:1; anything else resamples and reads as mush). CENTRE-pivoted. 32 PPU, Point.\n" +
+                "    - It reads against STONE and it is bigger than a clock face - the recipe scales it\n" +
+                "      to 1.4. Think dust and a shaft of night through the arch, not sparks.\n" +
+                "    - Deliberately SILENT: ExitDoor already creaks locally and AudioDirector fires a\n" +
+                "      map-wide unlock sting. Do not add a third sound on that frame.\n" +
+                "    - Drop the strip in " + SheetFolder + ", re-run this, assign it to GateOpened.sheetClip.\n" +
+                "    - Judge it with TimeKiller/Verify/VFX Visibility in the REAL scene: under ~0.5% peak\n" +
+                "      screen coverage on a dark floor is missed entirely, ~1.2%+ reads.\n" +
+                "  SEPARATELY, AND NOT A RECIPE: winning itself has no visual and cannot have one here.\n" +
+                "  GameFlow sets timeScale = 0 on the win, and both SpriteAnimator and EffectPlayer's\n" +
+                "  cleanup are scaled - a burst would freeze on frame one and never be destroyed. The\n" +
+                "  escape flourish belongs on RunEndScreen, which already fades on unscaledDeltaTime.";
         }
 
         static EffectRecipe Recipe(string name)
