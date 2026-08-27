@@ -129,6 +129,19 @@ waiting on each other. Use them instead of inventing coordination.
 - **A → C, verification:** every feature A ships carries a cheap repeatable
   check — a pure static with an EditMode test, an F1 overlay line, or a field in
   `state.jsonl`. C measures it; A never says "play it and look".
+- **Feature effects → the feature's lane, not B's.** `C#/Effects/` holds two
+  different things. The **framework** is B's: `EffectPlayer`, the recipe format,
+  the VFX sprite pipeline, and the *content* of a recipe — timings, colours,
+  sprites. A **binding** — the script that turns one feature's events into recipe
+  plays — belongs to the lane that owns that feature, because every change to it
+  follows a change in that feature's states, not in how effects are drawn.
+  Measured 2026-08-27: `ManiacThreatEffects.cs`, its config and the
+  `ManiacSpotted` / `ManiacSwing` recipes appeared in `C#/Effects/` from the
+  maniac lane while B held the folder. So the maniac lane owns
+  `ManiacThreatEffects*`; B owns the recipes those files play and the framework
+  underneath. Same shape as the B→A art seam above: one lane delivers the
+  content, the other points a config field at it.
+
 - **A ↔ A, features:** systems talk through the Core `EventBus` only. A feature
   that subscribes to another feature's event type cannot be deleted
   independently — put the shared event in `Core/` instead (see
