@@ -28,10 +28,10 @@ Release the lock in the same session you took it. Minutes, not hours.
 
 | Field | Value |
 |---|---|
-| Status | **HELD** |
-| Lane | A — gameplay programmer |
-| Doing | ⚠️ HOLDING BECAUSE CASTLEWINGLDTK IS DIRTY AND I DID NOT SAVE IT. The active scene changed from Catacombs to CastleWing DURING my run of 9 setup scripts - none of which can open a scene, so another session switched it. I will not save and will not discard until an owner is identified. DO NOT CTRL+S. |
-| Taken | 2026-08-27 |
+| Status | **FREE** |
+| Lane | — |
+| Doing | — |
+| Taken | — |
 
 ## How to claim
 
@@ -54,6 +54,14 @@ Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 
 - 2026-08-27 — Sound: Setup/54, per-track music trims into AudioConfig (no scene).
+- 2026-08-27 — A: CATACOMBS SAVED. 9 setup scripts run against it, verified, and
+  saved: 3758 insertions and ZERO DELETIONS, which is the signal that
+  find-or-create did what it promised. Level gap 23 -> 8. CastleWingLDtk was
+  reloaded from disk first to discard a dirty state its owner (visual lane)
+  confirmed held nothing. Lock released; active scene is now CATACOMBS.
+  The run guarded itself: it re-asserted the active scene before AND after every
+  single menu item, because the previous attempt had the scene switched under it
+  mid-run and wrote nine passes into the wrong level.
 - 2026-08-27 — ⚠️ BRIDGE DIAGNOSED, AND THE FIX IS ONE MENU ITEM. Nothing is
   listening on 127.0.0.1:8080, which is the endpoint .mcp.json configures. The
   MCP server runs INSIDE the Editor, so this means it was never started for this

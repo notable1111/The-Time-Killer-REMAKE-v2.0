@@ -10,6 +10,7 @@
 // hand as the art arrives, one field at a time. A re-run that blanked
 // `sheetClip` would delete exactly the work this script exists to enable.
 using System.IO;
+using TimeKiller.Core;          // SpriteAnimationClip
 using TimeKiller.EditorTools;
 using UnityEditor;
 using UnityEngine;
