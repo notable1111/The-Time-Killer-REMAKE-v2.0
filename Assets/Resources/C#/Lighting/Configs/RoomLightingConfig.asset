@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3388b7d9595b37c4e98985dbb8a85ac9, type: 3}
+  m_Name: RoomLightingConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Lighting.RoomLightingConfig
+  lamps:
+  - name: KitchenLamp_A
+    position: {x: 32.6, y: -8.4}
+    outerRadiusOverride: 0
+    flicker: 1
+    why: kitchen_table and kitchen_bench
+  - name: KitchenLamp_B
+    position: {x: 36.8, y: -11}
+    outerRadiusOverride: 0
+    flicker: 1
+    why: kitchen_crates, too far from A to share
+  - name: ArmoryLamp_A
+    position: {x: 43.4, y: 2.6}
+    outerRadiusOverride: 0
+    flicker: 1
+    why: armory_dummy, armory_anvil, armory_grindstone
+  - name: ArmoryLamp_B
+    position: {x: 48, y: 5.6}
+    outerRadiusOverride: 0
+    flicker: 1
+    why: armory_chest, in the corner past A
+  templateLightName: TorchLight
+  widenNearMissLights: 1
+  nearMissThreshold: 2
+  nearMissMargin: 0.3
+  maxWidenedRadius: 7
+  parentName: RoomLights

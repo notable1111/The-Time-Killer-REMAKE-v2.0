@@ -61,6 +61,7 @@ for without reading the scene diff.
   mistake this file was extended to stop. Editor work done: Setup/51 + Setup/52
   (both create assets only, no scene touched), then play mode in CastleWingLDtk
   to runtime-verify escalation. Left NOT dirty, out of play mode, lock FREE.
+- 2026-08-27 — B: released. Setup/55 lit the kitchen and armory; dark casters 22 -> 12.
 - 2026-08-27 — B: released. POST-PROCESSING CONFIRMED WORKING via render-to-texture
   (corner luminance 15.36 -> 4.22 at full vignette, centre unchanged). Supersedes
   the note below, which was measured with a broken instrument.
