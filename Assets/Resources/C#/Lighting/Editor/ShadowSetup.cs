@@ -50,11 +50,7 @@ namespace TimeKiller.Lighting.EditorTools
         [MenuItem("TimeKiller/Setup/49 - Cast 2D Shadows (walls, props, characters)")]
         public static void Build()
         {
-            if (EditorApplication.isPlaying)
-            {
-                Debug.LogError("[TimeKiller Setup] In Play Mode a setup script half-completes. Exit Play and re-run.");
-                return;
-            }
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("49 - Cast 2D Shadows")) return;
 
             var config = LoadOrCreateConfig();
 
@@ -82,7 +78,7 @@ namespace TimeKiller.Lighting.EditorTools
                 if (kind == Kind.Wall) walls++; else if (kind == Kind.Prop) props++; else chars++;
             }
 
-            int extras = 0;
+            int extras = 0, scaled = 0;
             foreach (var host in hosts)
             {
                 // GetComponents order is stable, unlike FindObjectsByType, so which
@@ -93,10 +89,42 @@ namespace TimeKiller.Lighting.EditorTools
                     if (Classify(col, config) != Kind.Skip) eligible.Add(col);
                 if (eligible.Count == 0) continue;
 
-                Wire(host, eligible[0], config, shapeProvider, providerType);
+                // A character's shadow may be deliberately larger than its body —
+                // see maniacShadowScale. The caster then lives on a scaled child,
+                // because ShapeProvider reads the collider but the CASTER's own
+                // transform places the shape.
+                bool isCharacter = host.name == "Maniac" || host.name == "Player";
+                float scale = CharacterShadowScale(host, config);
+
+                if (!isCharacter)
+                {
+                    Wire(host, eligible[0], config, shapeProvider, providerType);
+                }
+                else if (scale <= 0f)
+                {
+                    // Config says this character casts nothing. Clear both branches.
+                    StripCaster(host); StripChild(host, BodyChild);
+                    continue;
+                }
+                else if (Mathf.Approximately(scale, 1f))
+                {
+                    // Honest size: the caster belongs on the body. Only the child is
+                    // cleared — the body's own caster is found and updated in place.
+                    StripChild(host, BodyChild);
+                    Wire(host, eligible[0], config, shapeProvider, providerType);
+                }
+                else
+                {
+                    // Larger than life: the caster moves to a scaled child, so the
+                    // body must not keep an honest-size one casting underneath it.
+                    StripCaster(host);
+                    Wire(ShadowChild(host, BodyChild, scale), eligible[0], config, shapeProvider, providerType);
+                    scaled++;
+                }
+
                 for (int i = 1; i < eligible.Count; i++)
                 {
-                    Wire(ShadowChild(host, i), eligible[i], config, shapeProvider, providerType);
+                    Wire(ShadowChild(host, ChildPrefix + i, 1f), eligible[i], config, shapeProvider, providerType);
                     extras++;
                 }
             }
@@ -112,6 +140,15 @@ namespace TimeKiller.Lighting.EditorTools
               .Append(", characters ").Append(chars).Append("   (skipped ").Append(skipped).Append(")\n");
             sb.Append("  of those, ").Append(extras)
               .Append(" needed a '").Append(ChildPrefix).Append("N' child, because their object already hosts a caster\n");
+            sb.Append("  larger-than-life character shadows: ").Append(scaled)
+              .Append("   (maniac x").Append(config.maniacShadowScale.ToString("0.0"))
+              .Append(", player x").Append(config.playerShadowScale.ToString("0.0")).Append(")\n");
+            sb.Append("  softness ").Append(config.shadowSoftness.ToString("0.00"))
+              .Append(", penumbra falloff ").Append(config.shadowSoftnessFalloff.ToString("0.00"))
+              .Append(", breathing ±").Append(config.shadowBreathAmount.ToString("0.00")).Append('\n');
+            sb.Append("  self-shadowing — props ").Append(config.propCasting)
+              .Append(", walls ").Append(config.wallCasting)
+              .Append(", characters ").Append(config.characterCasting).Append('\n');
             sb.Append("  point lights casting: ").Append(lit)
               .Append("   intensity ").Append(config.shadowIntensity.ToString("0.00"))
               .Append(", softness ").Append(config.shadowSoftness.ToString("0.00")).Append('\n');
@@ -129,11 +166,7 @@ namespace TimeKiller.Lighting.EditorTools
         [MenuItem("TimeKiller/Setup/49b - Remove 2D Shadows")]
         public static void Remove()
         {
-            if (EditorApplication.isPlaying)
-            {
-                Debug.LogError("[TimeKiller Setup] Exit Play Mode first.");
-                return;
-            }
+            if (TimeKiller.EditorTools.SetupGuard.Blocked("49b - Remove 2D Shadows")) return;
 
             int removed = 0, children = 0;
             foreach (var caster in Object.FindObjectsByType<ShadowCaster2D>(FindObjectsInactive.Include, FindObjectsSortMode.None))
@@ -162,6 +195,7 @@ namespace TimeKiller.Lighting.EditorTools
                 if (!light.shadowsEnabled) continue;
                 Undo.RecordObject(light, "Remove 2D Shadows");
                 light.shadowsEnabled = false;
+                light.shadowSoftnessFalloffIntensity = 0.5f;   // URP's own default
                 EditorUtility.SetDirty(light);
                 off++;
             }
@@ -176,6 +210,9 @@ namespace TimeKiller.Lighting.EditorTools
                 restore.torchBoost = 1f;
                 restore.torchLightIntensity = config.torchLightIntensity;
                 restore.torchFlickerBase = config.torchFlickerBase;
+                // A fresh config defaults breathing ON, which would have Remove()
+                // switch a shadow feature on while removing the shadows.
+                restore.shadowBreathAmount = 0f;
                 torches = ApplyTorchStrength(restore);
                 Object.DestroyImmediate(restore);
             }
@@ -249,20 +286,42 @@ namespace TimeKiller.Lighting.EditorTools
         /// rebuilt, and pinned to the parent's transform so the collider's shape
         /// lands in exactly the same place it would on the parent itself.
         const string ChildPrefix = "__Shadow_";
+        const string BodyChild = "__Shadow_Body";
 
-        static GameObject ShadowChild(GameObject host, int index)
+        static GameObject ShadowChild(GameObject host, string name, float scale)
         {
-            string name = ChildPrefix + index;
             var existing = host.transform.Find(name);
-            if (existing != null) return existing.gameObject;
-
-            var child = new GameObject(name);
-            Undo.RegisterCreatedObjectUndo(child, "Cast 2D Shadows");
-            child.transform.SetParent(host.transform, false);
+            var child = existing != null ? existing.gameObject : new GameObject(name);
+            if (existing == null)
+            {
+                Undo.RegisterCreatedObjectUndo(child, "Cast 2D Shadows");
+                child.transform.SetParent(host.transform, false);
+            }
             child.transform.localPosition = Vector3.zero;
             child.transform.localRotation = Quaternion.identity;
-            child.transform.localScale = Vector3.one;
+            // Z stays 1: scaling it would skew the shadow matrix, not the shape.
+            child.transform.localScale = new Vector3(scale, scale, 1f);
             return child;
+        }
+
+        /// How much larger than life a character's shadow reads. 1 = honest.
+        static float CharacterShadowScale(GameObject host, ShadowConfig config)
+        {
+            if (host.name == "Maniac") return config.maniacShadowScale;
+            if (host.name == "Player") return config.playerShadowScale;
+            return 1f;
+        }
+
+        static void StripCaster(GameObject host)
+        {
+            var existing = host.GetComponent<ShadowCaster2D>();
+            if (existing != null) Undo.DestroyObjectImmediate(existing);
+        }
+
+        static void StripChild(GameObject host, string name)
+        {
+            var existing = host.transform.Find(name);
+            if (existing != null) Undo.DestroyObjectImmediate(existing.gameObject);
         }
 
         /// Find-or-add the caster on `host` and point it at `col`. Never destroys.
@@ -275,8 +334,20 @@ namespace TimeKiller.Lighting.EditorTools
             so.FindProperty("m_ShadowCastingSource").intValue = shapeProvider;
             so.FindProperty("m_ShadowShape2DComponent").objectReferenceValue = col;
             so.FindProperty("m_ShadowShape2DProvider").managedReferenceValue = System.Activator.CreateInstance(providerType);
-            so.FindProperty("m_CastingOption").intValue = (int)ShadowCaster2D.ShadowCastingOptions.CastShadow;
-            so.FindProperty("m_CastsShadows").boolValue = true;
+            // Walls, props and characters want different answers to "does this
+            // shade itself?" — a prop needs a dark side to have volume, a wall
+            // self-shadowing its own face fights the torch that is lighting it.
+            var kind = Classify(col, config);
+            var option = kind == Kind.Wall ? config.wallCasting
+                       : kind == Kind.Character ? config.characterCasting
+                       : config.propCasting;
+            so.FindProperty("m_CastingOption").intValue = (int)option;
+            so.FindProperty("m_CastsShadows").boolValue =
+                option == ShadowCaster2D.ShadowCastingOptions.CastShadow ||
+                option == ShadowCaster2D.ShadowCastingOptions.CastAndSelfShadow;
+            so.FindProperty("m_SelfShadows").boolValue =
+                option == ShadowCaster2D.ShadowCastingOptions.SelfShadow ||
+                option == ShadowCaster2D.ShadowCastingOptions.CastAndSelfShadow;
 
             // Apply to every sorting layer the project defines, so a caster keeps
             // working if art later moves to a new layer.
@@ -302,6 +373,10 @@ namespace TimeKiller.Lighting.EditorTools
                 light.shadowsEnabled = true;
                 light.shadowIntensity = config.shadowIntensity;
                 light.shadowSoftness = config.shadowSoftness;
+                // Penumbra. URP leaves this at 0.5 and the project had never
+                // touched it, so a shadow was as sharp four units out as it was
+                // at the caster's foot.
+                light.shadowSoftnessFalloffIntensity = config.shadowSoftnessFalloff;
                 EditorUtility.SetDirty(light);
                 count++;
             }
@@ -328,6 +403,10 @@ namespace TimeKiller.Lighting.EditorTools
 
                 var so = new SerializedObject(flicker);
                 so.FindProperty("baseIntensity").floatValue = flickerValue;
+                // Shadow breathing rides the SAME noise as the intensity above, so
+                // the shadow edge softens on exactly the beat the flame dips.
+                so.FindProperty("shadowBreathAmount").floatValue = config.shadowBreathAmount;
+                so.FindProperty("baseShadowSoftness").floatValue = config.shadowSoftness;
                 so.ApplyModifiedProperties();
                 count++;
             }

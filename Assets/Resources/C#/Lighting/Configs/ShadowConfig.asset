@@ -18,10 +18,17 @@ MonoBehaviour:
   neverCast:
   - CameraBounds
   shadowIntensity: 1
-  shadowSoftness: 0.25
+  shadowSoftness: 0.5
+  shadowSoftnessFalloff: 0.8
   torchBoost: 1
   torchLightIntensity: 1
   torchFlickerBase: 1.1
+  propCasting: 2
+  wallCasting: 1
+  characterCasting: 1
+  shadowBreathAmount: 0.18
+  maniacShadowScale: 1.8
+  playerShadowScale: 1
   castingLightNames:
   - TorchLight
   - CandleLight

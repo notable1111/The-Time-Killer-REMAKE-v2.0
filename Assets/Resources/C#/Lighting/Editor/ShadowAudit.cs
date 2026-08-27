@@ -96,6 +96,51 @@ namespace TimeKiller.Lighting.EditorTools
                   .Append("        saturates and extra intensity stops doing anything. Whether that is\n")
                   .Append("        wrong for this art style is a judgement to make in Play, not here.\n");
 
+            // --- the detail pass: volume, penumbra, breathing ----------------
+            var options = new Dictionary<string, int>();
+            foreach (var c in casters)
+            {
+                string k = c.castingOption.ToString();
+                options[k] = options.ContainsKey(k) ? options[k] + 1 : 1;
+            }
+            sb.Append("  casting options .......... ");
+            foreach (var kv in options) sb.Append(kv.Value).Append("x ").Append(kv.Key).Append("  ");
+            sb.Append('\n');
+
+            foreach (var l in lights)
+            {
+                if (l.gameObject.name != "TorchLight") continue;
+                sb.Append("  torch softness ........... ").Append(l.shadowSoftness.ToString("0.00"))
+                  .Append(", penumbra falloff ").Append(l.shadowSoftnessFalloffIntensity.ToString("0.00"))
+                  .Append("   (URP default 0.50 = no penumbra work done)\n");
+                var f = l.GetComponent<FlickerLight2D>();
+                if (f != null)
+                {
+                    var fso = new SerializedObject(f);
+                    float breath = fso.FindProperty("shadowBreathAmount").floatValue;
+                    sb.Append("  shadow breathing ......... ").Append(breath > 0f ? "+/-" + breath.ToString("0.00") : "off")
+                      .Append(breath > 0f ? "  (rides the flame's own noise)\n" : "\n");
+                }
+                break;
+            }
+
+            // Does a scaled character caster actually produce a bigger shadow?
+            // Measured from the built mesh, not assumed from the transform.
+            foreach (var c in casters)
+            {
+                var owner = c.transform;
+                while (owner.parent != null && owner.name.StartsWith("__Shadow_")) owner = owner.parent;
+                if (owner.name != "Maniac" && owner.name != "Player") continue;
+                var col = new SerializedObject(c).FindProperty("m_ShadowShape2DComponent").objectReferenceValue as Collider2D;
+                string body = col != null ? col.bounds.size.x.ToString("0.00") + "u body" : "no collider";
+                // Measured from VERTICES, not mesh.bounds — URP leaves the bounds
+                // on a ShadowMesh2D degenerate, so bounds would report 0.00 for a
+                // perfectly working caster.
+                sb.Append("  ").Append(owner.name).Append(" shadow ".PadRight(owner.name.Length > 6 ? 12 : 13, '.'))
+                  .Append(" ").Append(body).Append(" -> ").Append(ShapeWidth(c))
+                  .Append("   (casterScale ").Append(c.transform.lossyScale.x.ToString("0.0")).Append(")\n");
+            }
+
             // --- can a shadow appear at all? ---------------------------------
             int reachable = 0;
             foreach (var c in casters)
@@ -120,6 +165,19 @@ namespace TimeKiller.Lighting.EditorTools
             sb.Append("\n  Contrast is NOT measured here — see the header. Enter Play, stand beside a\n")
               .Append("  torch with a pillar or wardrobe between you and it, and judge it there.");
             return sb.ToString();
+        }
+
+        /// World-space width of a caster's actual shadow shape. Read from the mesh
+        /// vertices because ShadowMesh2D.bounds comes back degenerate — using it
+        /// would print 0.00 for a caster that is working perfectly.
+        static string ShapeWidth(ShadowCaster2D caster)
+        {
+            if (caster.mesh == null) return "mesh not built yet (renders lazily)";
+            var verts = caster.mesh.vertices;
+            if (verts == null || verts.Length == 0) return "mesh not built yet (renders lazily)";
+            float min = float.MaxValue, max = float.MinValue;
+            foreach (var v in verts) { if (v.x < min) min = v.x; if (v.x > max) max = v.x; }
+            return ((max - min) * caster.transform.lossyScale.x).ToString("0.00") + "u shadow";
         }
 
         static string BlendName(int i)
