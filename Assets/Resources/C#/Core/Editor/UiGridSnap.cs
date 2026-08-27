@@ -66,12 +66,7 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/48 - Snap UI text to the font grid")]
         public static void Snap()
         {
-            if (EditorApplication.isPlaying)
-            {
-                Debug.LogWarning("[TimeKiller Setup] 48 - refusing to run in play mode: " +
-                                 "scene edits made now are thrown away when play stops.");
-                return;
-            }
+            if (SetupGuard.Blocked("48 - Snap UI text to the font grid")) return;
 
             var log = new List<string>();
 

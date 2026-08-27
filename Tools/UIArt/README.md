@@ -68,15 +68,36 @@ contains only:
 
 No `0-9`, no `/`, no `·` — exactly the characters this HUD is made of
 (`CLOCKS 2 / 3`, `survived 3:45`). Regenerating cannot fix this; the layout is
-bundled, not prompted. So `add_glyphs.py` authors the 12 missing glyphs as ASCII
+bundled, not prompted. So `add_glyphs.py` authors the missing glyphs as ASCII
 art in each weight's own pixel skeleton and injects them as real outlines,
 matched to the shipped glyphs' rectangle-per-run structure, stem width, cap
 height and advance rule (`advance = (width + 1) * unit`).
 
+**15 glyphs now: `0-9 / · — … %`** (added 2026-08-04: em dash, ellipsis, percent).
+Each new one is placed against a *measured* shipped glyph, not an eyeball — the em
+dash sits in the hyphen's own vertical band, the ellipsis on the period's, and its
+dots land on the period's advance so `…` and `...` draw identically.
+
+The percent was **redrawn once before it shipped**. The first version kept it at
+digit width (20 px), which left no room for counters, so the rings became solid
+blocks and `60%` rendered as `60/.` at 16 px. Widening to 26 px is what buys the
+counters, and the counters are what make it read as a percent. Look at a render
+before trusting a glyph — `add_glyphs.py`'s header lists the reference metrics.
+
 Re-run it against freshly downloaded PixelLab TTFs if the fonts are ever
-regenerated. Known cosmetic gap: the authored digits lack the small weathering
-chips the AI put in the letters, so they read very slightly cleaner at large
-sizes.
+regenerated, then re-run **Setup/47** in Unity to rebake the SDF atlases (not
+Setup/46 — 47 re-rasterises from the TTF at the on-grid point size, which is what
+picks up new outlines). Known cosmetic gap: the authored glyphs lack the small
+weathering chips the AI put in the letters, so they read very slightly cleaner at
+large sizes.
+
+### A missing glyph does not look missing
+
+Measured 2026-08-04: a character absent from the baked atlas does **not** render as
+a box. TMP substitutes `LiberationSans` at roughly double the advance width, and
+`isVisible` stays true, so every missing-glyph check reports zero. The em dash in
+`RunEndScreen`'s prompt shipped that way and nobody noticed the line was set in two
+typefaces. **Verify against `characterTable`, never by looking at the text.**
 
 ## Title screen
 
@@ -106,7 +127,21 @@ level-pick state. Notes for whoever wires it:
 - Level pick exists so **Catacombs is reachable** — it is finished and audited
   but currently needs the scene opened by hand in the editor.
 
-## Not done yet
+## Status
 
-Nothing is wired. `ObjectiveHUD` is still IMGUI, `RunEndScreen` still uses
-`LegacyRuntime.ttf`, and the interact prompt does not exist as a component.
+**Wired.** Verified 2026-08-04 by resolving each sprite's GUID against the scene
+files: all nine are referenced by `CastleWingLDtk` and/or `MainMenu`. The three
+claims that used to sit here are all obsolete — `ObjectiveHUD` became uGUI+TMP on
+2026-07-28, `RunEndScreen` uses `TMP_Text`, no scene references `LegacyRuntime`,
+and `InteractPrompt.cs` exists.
+
+Still open:
+
+- **Catacombs was never TMP-migrated.** Its `RunEndScreen` still points at three
+  legacy `UnityEngine.UI.Text` components while the fields are `TMP_Text`, so Unity
+  nulls them at load and the end screen renders no text at all. `Setup/44` only ever
+  ran on CastleWing. The YAML *looks* wired — the fileIDs are non-zero — so this
+  does not show up in a scene scan.
+- **SETTINGS and CREDITS** from the 2026-07-25 menu plan were never built. The level
+  pick did ship, so Catacombs is reachable from the main menu.
+- Unauthored glyphs, if UI copy ever needs them: `– ‘ ’ “ ” & @ ° ×`.

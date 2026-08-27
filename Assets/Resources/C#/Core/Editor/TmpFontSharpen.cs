@@ -69,6 +69,10 @@ namespace TimeKiller.EditorTools
         [MenuItem("TimeKiller/Setup/47 - Sharpen the TMP fonts (on-grid bake, desktop shader)")]
         public static void Sharpen()
         {
+            // This one writes ASSETS, not scene objects, so a play-mode half-run would
+            // persist rather than be discarded — worth refusing outright.
+            if (SetupGuard.Blocked("47 - Sharpen the TMP fonts")) return;
+
             var log = new List<string>();
             var warnings = new List<string>();
 

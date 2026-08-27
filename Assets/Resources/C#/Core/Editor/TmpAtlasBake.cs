@@ -27,11 +27,30 @@ namespace TimeKiller.EditorTools
     {
         const string UiRoot = "Assets/Resources/Assets/UI";
 
-        // Curly quotes and the dashes we use in UI copy; without these a baked
-        // Static atlas silently drops them and the label shows a gap.
+        // The non-ASCII characters the fonts ACTUALLY contain, all hand-authored in
+        // Tools/UIArt/add_glyphs.py: middle dot U+00B7, em dash U+2014, ellipsis
+        // U+2026. The percent sign is NOT here on purpose — it is ASCII 0x25 and so
+        // already inside the 32..126 sweep below; it simply had no glyph until now.
+        //
+        // This list used to read "—–‘’“”…•©" and every one of those was wrong.
+        // None exist in the TTFs, so the bake logged "could not add" nine times a
+        // run until nobody read the warning any more — and worse, it asked for the
+        // BULLET U+2022 while MainMenu's tagline uses the MIDDLE DOT U+00B7. The
+        // font had the character the game needed; the bake simply never requested
+        // it, so the tagline rendered "fix the clocks  ?  reach the gate".
+        //
+        // The em dash is the reverse failure and the reason to be strict here: it was
+        // in RunEndScreen's prompt with no glyph anywhere, and TMP did NOT show a box.
+        // It silently substituted LiberationSans at double the advance width, so the
+        // line rendered in two typefaces and every missing-glyph check still read
+        // zero. A character absent from this atlas does not announce itself.
+        //
+        // Add to this only after the glyph is drawn in add_glyphs.py. Still wanted
+        // and still unauthored: – ‘ ’ “ ” & @ ° ×
+        //
         // Public because Setup/47 rebakes the same fonts and the two character sets
         // must not drift apart.
-        public const string Extras = "—–‘’“”…•©";
+        public const string Extras = "·—…";
 
         [MenuItem("TimeKiller/Setup/46 - Bake TMP fonts to a Static atlas")]
         public static void Bake()
