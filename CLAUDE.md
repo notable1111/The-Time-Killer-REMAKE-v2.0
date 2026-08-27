@@ -10,6 +10,8 @@ a rule with a reason attached survives and a bare rule gets rationalised away.
 **Related docs:** [`ARCHITECTURE.md`](ARCHITECTURE.md) — how the systems connect
 and why. [`CHANGELOG.md`](CHANGELOG.md) — what changed, newest on top, updated
 every push. [`TEAM_SETUP.md`](TEAM_SETUP.md) — per-machine setup for teammates.
+[`SESSIONS.md`](SESSIONS.md) — **read this if more than one session is working:**
+who owns which files, and the four resources they share.
 
 ---
 
@@ -213,7 +215,11 @@ Run after **any** C# edit or editor-script run:
      ordinary scene change.
   2. **`Packages/manifest.json` must never appear.** It is `skip-worktree`'d
      because `com.coplaydev.unity-mcp` is local-only. If it shows up, something
-     un-skipped it — stop and ask.
+     un-skipped it — stop and ask. **`Packages/packages-lock.json` is the same
+     trap wearing a different name** and is *not* skipped: on 2026-08-27 it was
+     dirty with `unity-mcp` v10.1.0 → v10.1.2, i.e. it was recording exactly the
+     local-only dependency the skip exists to hide. Committing it hands teammates
+     a package they do not have. Check it by name before every push.
   3. **Binaries must go through LFS.** `.gitattributes` routes `*.png *.wav
      *.fbx` and friends. Confirm with `git lfs status`; a raw-committed binary
      bloats the repo permanently.
@@ -226,62 +232,20 @@ Run after **any** C# edit or editor-script run:
 
 ### Three sessions, one working tree (added 2026-08-27)
 
-Three Claude sessions build this game at the same time. Measured on 2026-08-27:
-they share **one working tree** (`D:\The Time Killer Remake`), **one branch**
-(`main`) and **one Unity Editor**. The `.claude/worktrees/*` entries are stale
-July branches and are not in use. So `git status` shows you **everyone's** work,
-not yours.
+**The rules live in [`SESSIONS.md`](SESSIONS.md)** — lane ownership, the four
+shared resources, and the commit/push split. Read it at the start of every
+session. Do not restate its rules here; two rulebooks is how they drift apart.
 
-**Lanes.** Each session owns folders and commits only those:
+Only the measured facts belong in this file, because they change what the rules
+have to defend against. Measured 2026-08-27: the three sessions share **one
+working tree**, **one branch** (`main`) and **one Unity Editor**. The
+`.claude/worktrees/*` entries are stale July branches and are **not** in use. So
+`git status` shows you every other lane's work, `git commit -a` would commit it,
+and two sessions driving the Editor overwrite each other.
 
-| Lane | Owns |
-|---|---|
-| **Visual / design** | `C#/Lighting` `C#/Effects` `C#/Blood` `C#/HealthVfx` `C#/Environment` `C#/Camera`, the *look* of `C#/Menu` and the HUD; `Assets/Rendering` `Assets/Shadows` `Assets/Effects` `Assets/UI` `Assets/Characters` `Assets/Furniture`; URP + volume profiles; `Tools/ArtPipeline` `Tools/UIArt` `Tools/VfxPipeline` `Tools/CharArt`; PixelLab |
-| **(unassigned)** | — |
-| **(unassigned)** | — |
-
-A folder with no owner belongs to **nobody**: ask before committing it.
-
-**Committing.**
-
-1. **Never `git commit -a`, `git add .` or `git add -A`.** In a shared tree they
-   sweep two other lanes' unreviewed work into your commit. Stage explicit paths.
-2. **Prefix the subject with your lane** — `visual: ...`. Then
-   `git log --oneline --grep '^visual'` is one role's history, which is the point
-   of splitting.
-3. Run `git status --short` before and after staging. If a path you did not touch
-   is staged, unstage it.
-
-**The two exceptions — a lane-pure commit that does not compile is worse than a
-commit that crosses a lane.** Both were measured on 2026-08-27, not imagined:
-
-- **Shared foundation first.** `SetupGuard.cs` (Core) is called by six setup
-  scripts across all three lanes. Under a strict lane rule nobody would ever
-  commit it and every lane would break. A file every lane depends on is committed
-  **on its own, first**, prefixed `shared:`, whoever notices it.
-- **A feature that crosses lanes is committed across lanes.** `ClockEffects.cs`
-  (visual) subscribes to `ClockHitEvent`, introduced in `ObjectiveEvents.cs`
-  (objectives). Split by lane, one of the two commits will not compile. Commit the
-  pair together, name both lanes in the subject, and say so in the body.
-
-**Files nobody owns.**
-
-- `CHANGELOG.md`, `ARCHITECTURE.md` — **append-only**. Add your own dated
-  section; never rewrite another session's. A markdown conflict can be resolved by
-  hand. Scene YAML cannot, which is the whole reason for this rule.
-- `Assets/Scenes/*.unity`, `ProjectSettings/`, `.gitignore`, `CLAUDE.md` — shared.
-  Say what you changed and why in the commit body.
-
-**The Editor lock — `SESSION_LOCK.md` at the repo root.** There is one Editor, so
-two sessions running `Setup/NN` or saving a scene overwrite each other, and a
-lost scene is unrecoverable (§5). Before opening or saving a scene, or running
-**any** `TimeKiller/Setup/NN`:
-
-1. Read `SESSION_LOCK.md`.
-2. If free, claim it — lane, what you are doing, the time — then work, then
-   release it in the same session. Minutes, not hours.
-3. If another lane holds it, **do not touch the Editor**. Write the change as a
-   `Setup/NN` script, leave it unrun, and say plainly that it is queued.
+The live Editor claim is [`SESSION_LOCK.md`](SESSION_LOCK.md): take it before
+saving a scene or running any `TimeKiller/Setup/NN`, release it in the same
+session.
 
 ## 8. Tools
 
