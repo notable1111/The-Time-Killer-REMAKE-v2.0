@@ -249,11 +249,23 @@ session.
 
 ## 8. Tools
 
-- **PixelLab** (MCP) — generates concept art *and* real game assets. Tier 1 sub,
-  **2000 generations/month**, so art is effectively free — iterate rather than
-  agonise. Call `get_balance` if you need the current figure instead of quoting
-  one from memory. Check `get_character` / `get_object` **before** regenerating
-  something you may already own.
+- **PixelLab** (MCP) — generates concept art *and* real game assets.
+  **⚠️ THE SUBSCRIPTION EXPIRED 2026-08-25.** Measured that day:
+  `generations_remaining: 0`, all 2000 frozen, $0.94 credits left. Every
+  generation tool fails until it is renewed, which only the user can do. This
+  file previously promised "art is effectively free — iterate rather than
+  agonise", and planning around a budget that no longer exists is how a session
+  gets three quarters into a task before finding out. Call `get_balance` FIRST
+  rather than quoting any figure, this one included.
+  Check `get_character` / `get_object` **before** regenerating something you may
+  already own.
+- **Procedural VFX generators** in `Tools/VfxPipeline/` are the right tool when
+  an effect is geometry and light rather than a picture — and not merely a
+  fallback while PixelLab is down. `gen_light_shaft.py` states the test: "a shaft
+  is a gradient, not a drawing". Generating buys exact frame counts, alpha that
+  follows luminance (no dark interior to key out), and a palette sampled from the
+  game's own art. `gen_threat_vfx.py` is the worked example, including the three
+  shapes it rejected and why.
 - **Unity MCP** — Claude drives the Editor directly (setup scripts, tests,
   offscreen renders).
 - **Blender** for 3D environments, **Daz** for character sprite sheets.
