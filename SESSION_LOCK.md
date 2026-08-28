@@ -54,6 +54,10 @@ stop-and-ask, and discarding is the destructive direction just as much as saving
 - 2026-08-27 — B: swing VFX widened to 1.21% coverage. Lock read before claiming,
   no scene opened or saved, Catacombs left exactly as found (clean, not dirty).
 
+- 2026-08-28 — B: gate VFX built, sliced, wired, measured 2.61% in CastleWing.
+  No scene saved. NOTE: another session drove play mode and scene loads while
+  this lock was held by B - the Editor bounced to MainMenu mid-measurement.
+
 Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 

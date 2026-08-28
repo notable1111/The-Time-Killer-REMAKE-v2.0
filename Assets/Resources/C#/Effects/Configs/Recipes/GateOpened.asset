@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41026f5ebbd43e444964728dfb13b486, type: 3}
   m_Name: GateOpened
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Effects.EffectRecipe
-  sheetClip: {fileID: 0}
-  sheetScale: 1.4
+  sheetClip: {fileID: 11400000, guid: dee7bc2931622a249ae7cd78ae68bb39, type: 2}
+  sheetScale: 1
   sheetMaterial: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
   sheetSortingLayer: Default
   sheetSortingOrder: 5
