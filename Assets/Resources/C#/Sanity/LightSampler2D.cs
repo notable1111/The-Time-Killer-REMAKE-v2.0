@@ -31,6 +31,7 @@ namespace TimeKiller.Sanity
     {
         static readonly List<Light2D> cache = new List<Light2D>();
         static float cachedAt = float.NegativeInfinity;
+        // Rebuilt whenever it goes stale, not only on a timer - see Stale().
 
         /// Lights change rarely (a torch is destroyed when a room is), so the
         /// list is rebuilt on an interval rather than per sample. FindObjects is
@@ -57,6 +58,26 @@ namespace TimeKiller.Sanity
             return total;
         }
 
+        /// Is the cache still pointing at live lights?
+        ///
+        /// ⚠️ THE BUG THIS EXISTS FOR (found 2026-08-28, and it was live). A scene
+        /// reload destroys every Light2D and builds new ones, but the cached
+        /// references survive as Unity's fake-null. Every contribution was then
+        /// skipped, LevelAt returned 0, and the player read as being in TOTAL
+        /// DARKNESS wherever they were standing - for up to RefreshSeconds. And
+        /// GameFlow reloads the scene on every restart, so EVERY run began with a
+        /// false dark reading that drained composure for nothing.
+        ///
+        /// It hid because a stale cache and a genuinely unlit room produce exactly
+        /// the same number. Caught only by sampling a spot measured at 0.97 a few
+        /// minutes earlier and getting 0.00.
+        static bool Stale()
+        {
+            for (int i = 0; i < cache.Count; i++)
+                if (cache[i] == null) return true;
+            return false;
+        }
+
         /// One light's contribution. Global lights apply everywhere; point
         /// lights fall off linearly between their inner and outer radius.
         static float Contribution(Light2D light, Vector2 at)
@@ -78,8 +99,14 @@ namespace TimeKiller.Sanity
 
         static void Refresh()
         {
-            if (Time.time - cachedAt < RefreshSeconds && cache.Count > 0) return;
-            cachedAt = Time.time;
+            // realtimeSinceStartup, not Time.time: Time.time does not advance in
+            // EDIT mode, so an editor-side probe would hold the first cache it
+            // ever built forever - which is how the stale-reference bug above was
+            // first observed. It is also immune to timeScale, and GameFlow sets
+            // timeScale to 0 on the ending beat.
+            float now = Time.realtimeSinceStartup;
+            if (now - cachedAt < RefreshSeconds && cache.Count > 0 && !Stale()) return;
+            cachedAt = now;
             cache.Clear();
             cache.AddRange(Object.FindObjectsByType<Light2D>(
                 FindObjectsInactive.Exclude, FindObjectsSortMode.None));

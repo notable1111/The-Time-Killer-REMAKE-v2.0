@@ -339,6 +339,23 @@ namespace TimeKiller.Recording
             line.Append(",\"bright\":").Append(TimeKiller.Settings.BrightnessSettings.Brightness.ToString("0.00", ci));
 
             line.Append(",\"world\":").Append(AudioDucking.World.ToString("0.00", ci));
+
+            // Composure, and the two numbers that explain it. Added 2026-08-28
+            // because the user recorded a session to check Sanity and the log
+            // could not answer: the feature was live and completely absent from
+            // the instrument built to study it. Reconstructing it afterwards
+            // meant replaying his positions through the light rig by hand.
+            // "light" is why composure moved and "loud" is what it cost him, so
+            // a reader never has to re-derive either.
+            var composure = Object.FindAnyObjectByType<TimeKiller.Sanity.PlayerComposure>();
+            if (composure != null)
+            {
+                line.Append(",\"comp\":").Append(composure.Composure.ToString("0.000", ci));
+                line.Append(",\"light\":").Append(composure.LightLevel.ToString("0.00", ci));
+                line.Append(",\"dark\":").Append(composure.InDarkness ? "true" : "false");
+                line.Append(",\"loud\":").Append(
+                    TimeKiller.Core.PlayerNoiseDial.Multiplier.ToString("0.00", ci));
+            }
             line.Append(",\"frame\":").Append(FramesSaved);
             line.Append('}');
 
