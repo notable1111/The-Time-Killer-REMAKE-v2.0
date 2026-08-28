@@ -96,6 +96,18 @@ namespace TimeKiller.Sanity
             EventBus.Subscribe<TimeKiller.Hiding.PlayerUnhidEvent>(OnUnhid);
             EventBus.Subscribe<WorldProgressEvent>(OnProgress);
 
+            // F8 spends composure instantly. Without it, checking this feature
+            // means standing in a dark corner for a minute watching a number
+            // crawl - which is exactly why the user reported it as "not working".
+            // A feature that takes 60 seconds to observe is a feature nobody
+            // observes. Dev-only; CheatHotkeys compiles to nothing in a release.
+            CheatHotkeys.RegisterCheat(UnityEngine.InputSystem.Key.F8,
+                "Spend composure", () => {
+                    Composure = config != null ? Mathf.Clamp01(config.floor) : 0f;
+                    PlayerNoiseDial.Set(LoudnessFor(config, Composure));
+                    Publish();
+                });
+
             DebugOverlay.Watch("Composure", () => !Active ? "off"
                 : $"{Composure:0.00} {(InDarkness ? "DARK" : "lit ")} " +
                   $"light {LightLevel:0.00}/{config.darkAtOrBelow:0.00}  " +

@@ -36,8 +36,14 @@ namespace TimeKiller.Sanity
         //
         //   the map has a GLOBAL light - the MINIMUM level anywhere is 0.32, so
         //   there is no total darkness in this castle at all;
-        //   the distribution is bimodal - a 0.30 threshold calls 0% of the map
-        //   dark and 0.40 calls 77.7% of it dark, with nothing in between.
+        //   CORRECTED 2026-08-28: that 77.7% counted WALLS AND VOID. Re-measured
+        //   over WALKABLE ground only, using the maniac's own walkability grid:
+        //   3610 samples, median light 0.32, and 55.1% of walkable ground is dark
+        //   at the 0.40 threshold. Still over half the castle, but the inflated
+        //   figure is what pushed the drain to 75s, which made a 10-second stay in
+        //   the dark cost 0.13 - invisible on a debug line and unfeelable in play.
+        //   The user's verdict was 'sanity is not working'. It was working; it was
+        //   imperceptible, which for a player is the same thing.
         //
         // So an "only total darkness" threshold under 0.32 makes this feature
         // COMPLETELY INERT, which is the installed-but-does-nothing trap this
@@ -52,7 +58,7 @@ namespace TimeKiller.Sanity
         [Range(0f, 1f)] public float darkAtOrBelow = 0.40f;
 
         [Tooltip("Seconds of continuous darkness before composure is fully spent, ignoring the floor. Not a per-second rate, because the number people reason about is how long they can stand in the dark. 75s because 77.7% of the map is out of torch reach: at 25s the player would sit at the floor permanently and this would be a flat difficulty change rather than a mechanic.")]
-        [Range(2f, 300f)] public float secondsToSpendInDark = 75f;
+        [Range(2f, 300f)] public float secondsToSpendInDark = 40f;
 
         [Tooltip("Seconds hiding in a wardrobe before composure is fully spent.\n\nA wardrobe IS darkness, so this is conceptually the same drain - but it is its own number because sitting in a box should be gentler than standing in a black corridor. It exists to stop 'wait him out' being free: hiding measured as INERT in the bot playtests, and turtling costs nothing today.\n\n110s and not 70s because raising the darkness drain to 75s (see the measurement above) INVERTED the relationship and made a wardrobe harsher than a dark corridor. ComposureTests.HidingCostsLessThanTheDark caught that; the two numbers have to move together.")]
         [Range(5f, 400f)] public float secondsToSpendHiding = 110f;

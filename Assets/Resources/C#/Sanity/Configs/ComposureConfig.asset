@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TimeKiller.Sanity.ComposureConfig
   enabled: 1
   darkAtOrBelow: 0.4
-  secondsToSpendInDark: 75
+  secondsToSpendInDark: 40
   secondsToSpendHiding: 110
   secondsToRecoverInLight: 16
   clockRestore: 0.35

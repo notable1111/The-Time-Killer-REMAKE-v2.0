@@ -28,10 +28,10 @@ Release the lock in the same session you took it. Minutes, not hours.
 
 | Field | Value |
 |---|---|
-| Status | **HELD** |
-| Lane | A — gameplay programmer |
-| Doing | User reports Sanity "not working". Diagnosing in play mode on CastleWing. No scene will be saved. |
-| Taken | 2026-08-28 |
+| Status | **FREE** |
+| Lane | — |
+| Doing | — |
+| Taken | — |
 
 ## How to claim
 
