@@ -47,11 +47,185 @@
   "rms": -15.921027,
   "seconds": 10.73
  },
+ "Assets/Resources/Assets/Effects/Sfx/clock_working.wav": {
+  "lowShare": -18.9,
+  "peak": -2.998974,
+  "rms": -23.204741,
+  "seconds": 0.6
+ },
+ "Assets/Resources/Assets/Effects/Sfx/maniac_escalate_far.wav": {
+  "lowShare": -2.6,
+  "peak": -2.998974,
+  "rms": -10.485236,
+  "seconds": 1.65
+ },
+ "Assets/Resources/Assets/Effects/Sfx/maniac_spotted_hiss.wav": {
+  "lowShare": -43.0,
+  "peak": -2.998974,
+  "rms": -21.668738,
+  "seconds": 1.45
+ },
+ "Assets/Resources/Assets/Effects/Sfx/maniac_swing_air.wav": {
+  "lowShare": -28.6,
+  "peak": -2.998974,
+  "rms": -19.914865,
+  "seconds": 0.62
+ },
  "Assets/Resources/Assets/HealthVfx/heartbeat.wav": {
   "lowShare": -0.1,
   "peak": -1.514503,
   "rms": -16.924342,
   "seconds": 0.45
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_exhale_0.wav": {
+  "lowShare": -16.8,
+  "peak": -1.012388,
+  "rms": -10.406533,
+  "seconds": 0.18
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_exhale_1.wav": {
+  "lowShare": -17.3,
+  "peak": -1.012388,
+  "rms": -10.421126,
+  "seconds": 0.3
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_exhale_2.wav": {
+  "lowShare": -18.2,
+  "peak": -1.012388,
+  "rms": -10.449828,
+  "seconds": 0.3
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_exhale_3.wav": {
+  "lowShare": -18.5,
+  "peak": -1.012388,
+  "rms": -10.719561,
+  "seconds": 0.18
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_exhale_4.wav": {
+  "lowShare": -19.0,
+  "peak": -1.012388,
+  "rms": -10.405408,
+  "seconds": 0.3
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_exhale_5.wav": {
+  "lowShare": -20.3,
+  "peak": -1.012388,
+  "rms": -10.394905,
+  "seconds": 0.3
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_exhale_6.wav": {
+  "lowShare": -18.9,
+  "peak": -1.012388,
+  "rms": -10.383853,
+  "seconds": 0.3
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_exhale_7.wav": {
+  "lowShare": -20.1,
+  "peak": -1.012388,
+  "rms": -10.395968,
+  "seconds": 0.27
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_exhale_8.wav": {
+  "lowShare": -19.2,
+  "peak": -1.012388,
+  "rms": -10.490964,
+  "seconds": 0.3
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_inhale_0.wav": {
+  "lowShare": -19.4,
+  "peak": -1.012388,
+  "rms": -10.386327,
+  "seconds": 0.3
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_inhale_1.wav": {
+  "lowShare": -20.0,
+  "peak": -1.012388,
+  "rms": -10.442141,
+  "seconds": 0.33
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_inhale_2.wav": {
+  "lowShare": -19.5,
+  "peak": -1.012388,
+  "rms": -10.366432,
+  "seconds": 0.39
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_inhale_3.wav": {
+  "lowShare": -19.9,
+  "peak": -1.012388,
+  "rms": -10.506187,
+  "seconds": 0.3
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_inhale_4.wav": {
+  "lowShare": -18.9,
+  "peak": -1.012388,
+  "rms": -10.406684,
+  "seconds": 0.24
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_inhale_5.wav": {
+  "lowShare": -19.8,
+  "peak": -1.012388,
+  "rms": -10.516549,
+  "seconds": 0.27
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_inhale_6.wav": {
+  "lowShare": -20.3,
+  "peak": -1.012388,
+  "rms": -10.360582,
+  "seconds": 0.24
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_inhale_7.wav": {
+  "lowShare": -18.9,
+  "peak": -1.012388,
+  "rms": -10.528656,
+  "seconds": 0.33
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/sleeping_inhale_8.wav": {
+  "lowShare": -20.2,
+  "peak": -1.012388,
+  "rms": -10.343541,
+  "seconds": 0.27
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/strong_exhale_0.wav": {
+  "lowShare": -2.3,
+  "peak": -1.012388,
+  "rms": -13.625026,
+  "seconds": 0.6
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/strong_exhale_1.wav": {
+  "lowShare": -2.3,
+  "peak": -1.012388,
+  "rms": -11.606192,
+  "seconds": 0.18
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/strong_exhale_2.wav": {
+  "lowShare": -2.5,
+  "peak": -1.012388,
+  "rms": -14.808096,
+  "seconds": 0.57
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/strong_inhale_0.wav": {
+  "lowShare": -9.1,
+  "peak": -1.012388,
+  "rms": -14.515743,
+  "seconds": 0.42
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/strong_inhale_1.wav": {
+  "lowShare": -10.0,
+  "peak": -1.012388,
+  "rms": -14.898455,
+  "seconds": 0.42
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/strong_inhale_2.wav": {
+  "lowShare": -10.6,
+  "peak": -1.012388,
+  "rms": -13.558246,
+  "seconds": 0.6
+ },
+ "Assets/Resources/Assets/Heartbeat/Breaths/strong_inhale_3.wav": {
+  "lowShare": -10.6,
+  "peak": -1.012388,
+  "rms": -14.662588,
+  "seconds": 0.39
  },
  "Assets/Resources/Assets/Heartbeat/breath_recovery.wav": {
   "lowShare": -25.1,
@@ -940,5 +1114,563 @@
   "peak": -3.171779,
   "rms": -37.985361,
   "seconds": 8.14
+ },
+ "Assets/Resources/Outsource/Horror Sounds/AWakingDream_I.wav": {
+  "lowShare": -2.4,
+  "peak": -7.559884,
+  "rms": -22.388687,
+  "seconds": 300.97
+ },
+ "Assets/Resources/Outsource/Horror Sounds/AWakingDream_II.wav": {
+  "lowShare": -2.3,
+  "peak": -8.022989,
+  "rms": -22.269186,
+  "seconds": 302.22
+ },
+ "Assets/Resources/Outsource/Horror Sounds/AWakingDream_III.wav": {
+  "lowShare": -2.5,
+  "peak": -7.181177,
+  "rms": -22.192169,
+  "seconds": 300.7
+ },
+ "Assets/Resources/Outsource/Horror Sounds/AWakingDream_IV.wav": {
+  "lowShare": -2.7,
+  "peak": -7.61715,
+  "rms": -22.920925,
+  "seconds": 300.64
+ },
+ "Assets/Resources/Outsource/Horror Sounds/AWakingDream_V.wav": {
+  "lowShare": -1.6,
+  "peak": -7.769617,
+  "rms": -21.506517,
+  "seconds": 300.7
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Horror_Music_Pack_Starter_Kit/WAV_AMBIENCE_LOOP_Invoking_the_Man_Beast.wav": {
+  "lowShare": -5.1,
+  "peak": -2.675243,
+  "rms": -18.632285,
+  "seconds": 192.0
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Horror_Music_Pack_Starter_Kit/WAV_AMBIENCE_LOOP_Mirrored_Reflections.wav": {
+  "lowShare": -4.8,
+  "peak": -2.596251,
+  "rms": -18.707045,
+  "seconds": 127.0
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Horror_Music_Pack_Starter_Kit/WAV_AMBIENCE_LOOP_Tectonic_Shudders.wav": {
+  "lowShare": -0.1,
+  "peak": -2.871129,
+  "rms": -14.672271,
+  "seconds": 128.0
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Horror_Music_Pack_Starter_Kit/WAV_ATMOSPHERIC_LOOP_Death_Threat_in Daylight.wav": {
+  "lowShare": -1.4,
+  "peak": -2.757509,
+  "rms": -17.07347,
+  "seconds": 196.0
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Horror_Music_Pack_Starter_Kit/WAV_ATMOSPHERIC_LOOP_Metastic_Embryo.wav": {
+  "lowShare": -7.1,
+  "peak": -2.586963,
+  "rms": -18.906287,
+  "seconds": 228.98
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Horror_Music_Pack_Starter_Kit/WAV_ATMOSPHERIC_LOOP_Phosphoric_Synesthesia.wav": {
+  "lowShare": -4.1,
+  "peak": -3.029353,
+  "rms": -17.748982,
+  "seconds": 144.0
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Horror_Music_Pack_Starter_Kit/WAV_LIGHT_TENSION_LOOP_The_Urge_to_Kill.wav": {
+  "lowShare": -0.8,
+  "peak": -0.799087,
+  "rms": -14.956757,
+  "seconds": 96.0
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Horror_Music_Pack_Starter_Kit/WAV_MENU_FULL_Systolic_Menace.wav": {
+  "lowShare": -4.0,
+  "peak": -2.888855,
+  "rms": -16.120377,
+  "seconds": 104.0
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Horror_Music_Pack_Starter_Kit/WAV_MENU_FULL_The_Sacrilegious.wav": {
+  "lowShare": -4.6,
+  "peak": -0.639555,
+  "rms": -16.360277,
+  "seconds": 96.0
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Horror_Music_Pack_Starter_Kit/WAV_TENSION_LOOP_The_Wood_Monster.wav": {
+  "lowShare": -0.9,
+  "peak": -3.045147,
+  "rms": -14.860992,
+  "seconds": 82.28999999999999
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Abyssal Depths.wav": {
+  "lowShare": -1.8,
+  "peak": -2.642123,
+  "rms": -14.704901,
+  "seconds": 131.0
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Blood Moon Ritual.wav": {
+  "lowShare": -0.8,
+  "peak": -3.715489,
+  "rms": -14.145343,
+  "seconds": 244.96
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Breathing Walls.wav": {
+  "lowShare": -1.0,
+  "peak": -2.417949,
+  "rms": -17.420299,
+  "seconds": 159.76
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Containment Breach.wav": {
+  "lowShare": -1.8,
+  "peak": -2.782305,
+  "rms": -14.420067,
+  "seconds": 142.52
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Cursed Forest 2.wav": {
+  "lowShare": -0.3,
+  "peak": -2.533215,
+  "rms": -14.276087,
+  "seconds": 188.32
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Cursed Forest.wav": {
+  "lowShare": -0.3,
+  "peak": -3.012088,
+  "rms": -13.571201,
+  "seconds": 138.88
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Deep Creeping Horror.wav": {
+  "lowShare": -2.4,
+  "peak": -4.643614,
+  "rms": -20.098186,
+  "seconds": 133.36
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Depths.wav": {
+  "lowShare": -0.3,
+  "peak": -3.091566,
+  "rms": -14.370027,
+  "seconds": 127.76
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Desolate Wasteland.wav": {
+  "lowShare": -0.3,
+  "peak": -3.337185,
+  "rms": -10.097167,
+  "seconds": 94.96000000000001
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Entity Behind Glass.wav": {
+  "lowShare": -1.4,
+  "peak": -2.79473,
+  "rms": -16.520052,
+  "seconds": 118.92
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Eternal Nightmare.wav": {
+  "lowShare": -1.5,
+  "peak": -2.857858,
+  "rms": -16.228877,
+  "seconds": 147.92000000000002
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Forgotten Asylum.wav": {
+  "lowShare": -0.5,
+  "peak": -2.596608,
+  "rms": -16.656552,
+  "seconds": 179.6
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Haunted Manor.wav": {
+  "lowShare": -3.7,
+  "peak": -4.127634,
+  "rms": -20.086651,
+  "seconds": 150.4
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Insidious Fog.wav": {
+  "lowShare": -1.3,
+  "peak": -4.257786,
+  "rms": -16.042463,
+  "seconds": 94.96000000000001
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/It's in the Blood.wav": {
+  "lowShare": -0.8,
+  "peak": -2.421101,
+  "rms": -17.053824,
+  "seconds": 194.96
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Mutation Chamber.wav": {
+  "lowShare": -0.2,
+  "peak": -2.479798,
+  "rms": -13.659768,
+  "seconds": 123.84
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Mutation Process.wav": {
+  "lowShare": -0.9,
+  "peak": -2.4085,
+  "rms": -14.128325,
+  "seconds": 168.0
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Necrotic Decay.wav": {
+  "lowShare": -0.4,
+  "peak": -3.718335,
+  "rms": -14.82798,
+  "seconds": 212.4
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Phantom Echoes.wav": {
+  "lowShare": -0.4,
+  "peak": -3.240027,
+  "rms": -12.466304,
+  "seconds": 103.8
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Route.wav": {
+  "lowShare": -1.8,
+  "peak": -2.732058,
+  "rms": -16.303975,
+  "seconds": 388.04
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Shadow.wav": {
+  "lowShare": -1.5,
+  "peak": -2.827705,
+  "rms": -15.838278,
+  "seconds": 300.04
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Soundtrack/Boo-Hoo Baby.wav": {
+  "lowShare": -1.4,
+  "peak": -4.323383,
+  "rms": -16.490573,
+  "seconds": 321.72
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Specimen Chamber.wav": {
+  "lowShare": -1.0,
+  "peak": -2.657947,
+  "rms": -17.272168,
+  "seconds": 184.92
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Toxic Corridor.wav": {
+  "lowShare": -0.5,
+  "peak": -3.390286,
+  "rms": -15.410221,
+  "seconds": 465.32
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/Whispers in the Void.wav": {
+  "lowShare": -1.0,
+  "peak": -3.228102,
+  "rms": -21.349232,
+  "seconds": 108.36
+ },
+ "Assets/Resources/Outsource/Horror Sounds/Music/horror amb.wav": {
+  "lowShare": -0.2,
+  "peak": -3.764008,
+  "rms": -13.846583,
+  "seconds": 229.96
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/beltHandle1.ogg": {
+  "lowShare": -53.7,
+  "peak": -3.289124,
+  "rms": -27.485425,
+  "seconds": 0.28
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/beltHandle2.ogg": {
+  "lowShare": -51.3,
+  "peak": -4.712905,
+  "rms": -31.486691,
+  "seconds": 0.48
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/bookClose.ogg": {
+  "lowShare": -6.4,
+  "peak": 0.863532,
+  "rms": -17.753937,
+  "seconds": 0.23
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/bookFlip1.ogg": {
+  "lowShare": -21.8,
+  "peak": 0.473681,
+  "rms": -29.368165,
+  "seconds": 0.77
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/bookFlip2.ogg": {
+  "lowShare": -17.9,
+  "peak": -8.274157,
+  "rms": -36.255396,
+  "seconds": 0.43
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/bookFlip3.ogg": {
+  "lowShare": -28.3,
+  "peak": -4.563812,
+  "rms": -31.35792,
+  "seconds": 0.23
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/bookOpen.ogg": {
+  "lowShare": -2.3,
+  "peak": -11.543589,
+  "rms": -32.154324,
+  "seconds": 0.15
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/bookPlace1.ogg": {
+  "lowShare": -7.0,
+  "peak": 0.764685,
+  "rms": -16.715614,
+  "seconds": 0.28
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/bookPlace2.ogg": {
+  "lowShare": -8.4,
+  "peak": 0.568414,
+  "rms": -17.491752,
+  "seconds": 0.35
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/bookPlace3.ogg": {
+  "lowShare": -8.6,
+  "peak": 1.008983,
+  "rms": -16.682868,
+  "seconds": 0.26
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/chop.ogg": {
+  "lowShare": -24.4,
+  "peak": 0.487496,
+  "rms": -18.355197,
+  "seconds": 0.24
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/cloth1.ogg": {
+  "lowShare": -1.5,
+  "peak": -4.567884,
+  "rms": -23.693857,
+  "seconds": 0.66
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/cloth2.ogg": {
+  "lowShare": -4.1,
+  "peak": -7.93807,
+  "rms": -28.129862,
+  "seconds": 0.42
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/cloth3.ogg": {
+  "lowShare": -1.7,
+  "peak": -10.089432,
+  "rms": -29.276406,
+  "seconds": 0.48
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/cloth4.ogg": {
+  "lowShare": -3.8,
+  "peak": -16.116702,
+  "rms": -33.948606,
+  "seconds": 0.38
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/clothBelt.ogg": {
+  "lowShare": -20.0,
+  "peak": -4.43595,
+  "rms": -31.040337,
+  "seconds": 0.72
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/clothBelt2.ogg": {
+  "lowShare": -14.6,
+  "peak": -7.341062,
+  "rms": -31.166579,
+  "seconds": 0.75
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/creak1.ogg": {
+  "lowShare": -31.4,
+  "peak": -7.352533,
+  "rms": -25.306784,
+  "seconds": 0.66
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/creak2.ogg": {
+  "lowShare": -30.8,
+  "peak": -7.039975,
+  "rms": -26.379099,
+  "seconds": 0.83
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/creak3.ogg": {
+  "lowShare": -25.5,
+  "peak": -8.211316,
+  "rms": -21.835832,
+  "seconds": 0.34
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/doorClose_1.ogg": {
+  "lowShare": -16.2,
+  "peak": 0.773131,
+  "rms": -18.087972,
+  "seconds": 0.68
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/doorClose_2.ogg": {
+  "lowShare": -5.7,
+  "peak": -2.407385,
+  "rms": -17.709104,
+  "seconds": 0.61
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/doorClose_3.ogg": {
+  "lowShare": -7.3,
+  "peak": 1.403059,
+  "rms": -12.203077,
+  "seconds": 0.71
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/doorClose_4.ogg": {
+  "lowShare": -3.3,
+  "peak": 0.348516,
+  "rms": -16.566662,
+  "seconds": 0.6
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/doorOpen_1.ogg": {
+  "lowShare": -5.8,
+  "peak": 0.390375,
+  "rms": -19.043834,
+  "seconds": 0.92
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/doorOpen_2.ogg": {
+  "lowShare": -5.3,
+  "peak": 0.996323,
+  "rms": -21.726161,
+  "seconds": 1.41
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/drawKnife1.ogg": {
+  "lowShare": -29.0,
+  "peak": -24.283526,
+  "rms": -43.9957,
+  "seconds": 0.4
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/drawKnife2.ogg": {
+  "lowShare": -27.4,
+  "peak": -22.949458,
+  "rms": -40.292202,
+  "seconds": 0.45
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/drawKnife3.ogg": {
+  "lowShare": -7.7,
+  "peak": -11.368711,
+  "rms": -37.623549,
+  "seconds": 0.48
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/dropLeather.ogg": {
+  "lowShare": -0.8,
+  "peak": -0.123648,
+  "rms": -19.074712,
+  "seconds": 0.42
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/footstep00.ogg": {
+  "lowShare": -4.4,
+  "peak": 0.331163,
+  "rms": -18.108712,
+  "seconds": 0.25
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/footstep01.ogg": {
+  "lowShare": -4.3,
+  "peak": 0.105344,
+  "rms": -16.686169,
+  "seconds": 0.28
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/footstep02.ogg": {
+  "lowShare": -4.2,
+  "peak": -1.176082,
+  "rms": -20.166056,
+  "seconds": 0.24
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/footstep03.ogg": {
+  "lowShare": -4.6,
+  "peak": 0.441646,
+  "rms": -18.42891,
+  "seconds": 0.27
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/footstep04.ogg": {
+  "lowShare": -5.1,
+  "peak": -3.522518,
+  "rms": -23.394981,
+  "seconds": 0.32
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/footstep05.ogg": {
+  "lowShare": -4.8,
+  "peak": -2.985958,
+  "rms": -23.844645,
+  "seconds": 0.28
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/footstep06.ogg": {
+  "lowShare": -5.0,
+  "peak": -0.259495,
+  "rms": -19.984665,
+  "seconds": 0.24
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/footstep07.ogg": {
+  "lowShare": -6.8,
+  "peak": 0.057042,
+  "rms": -20.034203,
+  "seconds": 0.26
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/footstep08.ogg": {
+  "lowShare": -6.0,
+  "peak": 0.713723,
+  "rms": -15.352442,
+  "seconds": 0.26
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/footstep09.ogg": {
+  "lowShare": -3.6,
+  "peak": -6.085244,
+  "rms": -21.56001,
+  "seconds": 0.22
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/handleCoins.ogg": {
+  "lowShare": -37.1,
+  "peak": 0.192378,
+  "rms": -27.918938,
+  "seconds": 0.85
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/handleCoins2.ogg": {
+  "lowShare": -46.3,
+  "peak": -10.69526,
+  "rms": -32.811215,
+  "seconds": 0.34
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/handleSmallLeather.ogg": {
+  "lowShare": -3.4,
+  "peak": -11.620426,
+  "rms": -34.499384,
+  "seconds": 0.34
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/handleSmallLeather2.ogg": {
+  "lowShare": -15.0,
+  "peak": -16.472232,
+  "rms": -38.801337,
+  "seconds": 0.31
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/knifeSlice.ogg": {
+  "lowShare": -24.9,
+  "peak": -1.324016,
+  "rms": -20.660417,
+  "seconds": 0.6
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/knifeSlice2.ogg": {
+  "lowShare": -25.9,
+  "peak": 0.632748,
+  "rms": -18.252961,
+  "seconds": 0.57
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/metalClick.ogg": {
+  "lowShare": -26.1,
+  "peak": -6.92918,
+  "rms": -33.114936,
+  "seconds": 0.45
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/metalLatch.ogg": {
+  "lowShare": -15.8,
+  "peak": 1.520402,
+  "rms": -19.867876,
+  "seconds": 0.26
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/metalPot1.ogg": {
+  "lowShare": -16.2,
+  "peak": 1.828533,
+  "rms": -14.965236,
+  "seconds": 1.46
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/metalPot2.ogg": {
+  "lowShare": -20.2,
+  "peak": 1.46839,
+  "rms": -13.417911,
+  "seconds": 0.94
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Audio/metalPot3.ogg": {
+  "lowShare": -15.3,
+  "peak": 2.170926,
+  "rms": -11.438032,
+  "seconds": 0.91
+ },
+ "Assets/Resources/Outsource/KenneyRPGAudio/Preview.ogg": {
+  "lowShare": -9.0,
+  "peak": 3.0838,
+  "rms": -18.696762,
+  "seconds": 26.13
  }
 }
