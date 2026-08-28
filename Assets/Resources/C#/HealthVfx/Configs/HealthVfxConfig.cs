@@ -21,7 +21,9 @@ namespace TimeKiller.HealthVfx
         [Range(0f, 1f)] public float criticalVignette = 0.47f;
 
         [Header("Blood overlay")]
-        [Range(0f, 1f)] public float subtleOverlayAlpha = 0.35f;
+        [Tooltip("Blood at 2 of 3 HP. Lowered 0.35 -> 0.18 on 2026-08-28 by the user: bleeding heavily at the LAST point of health is right, but this band fires while he still has two, and it was bleeding almost as hard. The band should say 'you are hurt', not 'you are dying' — the critical band below is what says dying, and it needs somewhere louder to go.")]
+        [Range(0f, 1f)] public float subtleOverlayAlpha = 0.18f;
+        [Tooltip("Blood at 1 HP — the next hit kills. Deliberately left loud: this is the one that should frighten.")]
         [Range(0f, 1f)] public float criticalOverlayAlpha = 0.85f;
 
         [Header("Dread vignette — the heartbeat you can SEE")]
