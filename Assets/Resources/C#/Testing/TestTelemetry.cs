@@ -201,6 +201,8 @@ namespace TimeKiller.Testing
             if (mc != null && mc.Config != null) bloodSightBlockers = mc.Config.sightBlockers;
             EventBus.Subscribe<TimeKiller.Blood.BloodSpilledEvent>(OnBloodSpilled);
             EventBus.Subscribe<PlayerHealthChangedEvent>(OnHealthChanged);
+            ResetComposure();
+            EventBus.Subscribe<TimeKiller.Sanity.ComposureChangedEvent>(OnComposureChanged);
         }
 
         void OnDisable()
@@ -216,6 +218,55 @@ namespace TimeKiller.Testing
             EventBus.Unsubscribe<ClockFixedEvent>(OnClockFixed);
             EventBus.Unsubscribe<TimeKiller.Blood.BloodSpilledEvent>(OnBloodSpilled);
             EventBus.Unsubscribe<PlayerHealthChangedEvent>(OnHealthChanged);
+            EventBus.Unsubscribe<TimeKiller.Sanity.ComposureChangedEvent>(OnComposureChanged);
+        }
+
+        // ---- composure (sanity) ---------------------------------------------
+        //
+        // Recorded because the A/B needed it. Composure's only mechanical output
+        // is a loudness multiplier, so a run where it never moved and a run where
+        // it moved and changed nothing produce the SAME heardSound count. Without
+        // the value itself an inert feature and a harmless one look identical,
+        // which is precisely the question the batch was run to answer.
+
+        /// Lowest composure the run ever reached. 1 = it never dropped.
+        public float MinComposure = 1f;
+        /// Loudest the player was ever made by it. 1 = never louder than normal.
+        public float MaxLoudness = 1f;
+        /// Share of samples spent in what ComposureConfig calls darkness.
+        public float DarkFraction => composureSamples > 0
+            ? (float)composureDarkSamples / composureSamples : 0f;
+
+        int composureSamples;
+        int composureDarkSamples;
+
+        void ResetComposure()
+        {
+            MinComposure = 1f;
+            MaxLoudness = 1f;
+            composureSamples = 0;
+            composureDarkSamples = 0;
+        }
+
+        void OnComposureChanged(TimeKiller.Sanity.ComposureChangedEvent e)
+        {
+            composureSamples++;
+            if (e.InDarkness) composureDarkSamples++;
+            if (e.Composure < MinComposure) MinComposure = e.Composure;
+            if (e.LoudnessMultiplier > MaxLoudness) MaxLoudness = e.LoudnessMultiplier;
+        }
+
+        /// Zero samples means the feature was off (or never ticked) — that is a
+        /// reading, not a gap, so the count ships alongside the values.
+        public string ComposureJson()
+        {
+            var ci = CultureInfo.InvariantCulture;
+            var sb = new StringBuilder("{");
+            sb.Append("\"samples\":").Append(composureSamples);
+            sb.Append(",\"min\":").Append(MinComposure.ToString("0.000", ci));
+            sb.Append(",\"maxLoudness\":").Append(MaxLoudness.ToString("0.00", ci));
+            sb.Append(",\"darkFraction\":").Append(DarkFraction.ToString("0.000", ci));
+            return sb.Append('}').ToString();
         }
 
         void ResetBlood()

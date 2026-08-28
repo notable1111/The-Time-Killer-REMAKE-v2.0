@@ -573,6 +573,9 @@ namespace TimeKiller.Testing
                 // `secondsAtLastHp` — the count alone cannot tell a viable
                 // mechanic from a bot that was never at 1 HP to begin with.
                 sb.Append(",\"blood\":").Append(t.BloodJson());
+                // Composure's own value. See TestTelemetry: without it a null
+                // A/B result cannot be told from a feature that never ticked.
+                sb.Append(",\"composure\":").Append(t.ComposureJson());
             }
             // Exceptions below the budget still get recorded. A run with three
             // stray NREs is probably fine, but it is not nothing, and the only
