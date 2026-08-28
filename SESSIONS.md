@@ -83,6 +83,32 @@ produce a merge mess.
 it. If A or B must write, append **only** a new dated block at the top and never
 reflow anything below it.
 
+### 4a. `git add` then `git commit` is NOT atomic — the index is shared too
+
+Measured 2026-08-27, and it is the fifth shared resource nobody listed. All three
+lanes share one working tree, which means **one `.git/index`**. Staging is not
+private: between your `git add` and your `git commit`, another lane's commit will
+sweep up **everything you have staged** and ship it under **their** message.
+
+It happened exactly that way: a gameplay lane staged the Sanity calibration,
+`CLAUDE.md` and `SESSION_LOCK.md`; the visual lane committed a VFX change a second
+later; and commit `8e7f48a` — "visual: threat goes to the FRAME, not the floor" —
+contains a sanity config, a communication rule and the Editor lock. Nothing was
+lost, but the history now lies: anyone bisecting "when did `darkAtOrBelow` become
+0.40" lands on a commit about sprites.
+
+**The rule: commit paths directly, in one step.**
+
+```bash
+git commit -- path/one path/two    # stages and commits together
+```
+
+Never leave work sitting in the index while you compose a message, run a check,
+or think. If you must `git add` first, commit in the very next command. And if
+your commit reports "no changes added to commit" when you know you staged
+something, do not re-stage blindly — check `git log` first, because your work is
+probably already committed under somebody else's name.
+
 ### 4. Every lane commits its own work — only C pushes
 
 The dangerous verb is **push**, not commit. `push` takes the whole working tree,
