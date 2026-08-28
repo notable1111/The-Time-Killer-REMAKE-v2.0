@@ -50,6 +50,7 @@ spurious-unsaved look identical from git. A dirty scene you did not dirty is a
 stop-and-ask, and discarding is the destructive direction just as much as saving.
 
 
+- 2026-08-28 — Sound: Setup/57 volume migration for the repair pulse (no scene).
 - 2026-08-28 — Sound: play-mode probe of muffle / escalation / world-noise / presence.
 - 2026-08-27 — Sound: Setup/57 re-run for the world-noise voice (no scene).
 - 2026-08-27 — Sound: Setup/57, hiding-muffle + escalation-cue configs (no scene).

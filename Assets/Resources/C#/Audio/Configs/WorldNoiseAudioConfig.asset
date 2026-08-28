@@ -15,7 +15,8 @@ MonoBehaviour:
   enabled: 1
   clips:
   - {fileID: 8300000, guid: b84145189aabcfb48833993a91d79dc9, type: 3}
-  volume: 0.45
+  volume: 0.85
+  loudnessFloor: 0.6
   pitchJitter: 0.07
   minGapSeconds: 0.12
   playAlwaysHeard: 0
