@@ -67,6 +67,9 @@ namespace TimeKiller.HealthVfx
         public float hitPitchJitter = 0.08f;
         [Range(0f, 1f)] public float deathSoundVolume = 0.9f;
 
+        [Tooltip("How much the blood RECEDES while a dread shock is on, 0..1. Measured in the user's own recording 2026-08-28: being spotted correctly drained screen colour to 7.3, but once he was hurt the blood pushed colour to 35-60 against a calm baseline of 12 — so the injury overlay completely buried the dread effect at the exact moment it mattered. The two were fighting: dread drains colour, blood floods it. Blood now steps back while he is being hunted and returns when the moment passes. 0 restores the old fight.")]
+        [Range(0f, 1f)] public float bloodRecedesUnderDread = 0.7f;
+
         [Header("Living motion")]
         [Tooltip("How much the blood layers scale-breathe with the heartbeat (0.03 = 3%).")]
         public float scalePulse = 0.03f;

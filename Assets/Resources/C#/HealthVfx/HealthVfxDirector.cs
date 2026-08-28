@@ -263,11 +263,15 @@ namespace TimeKiller.HealthVfx
                                                          -100f * shockDesat * shock);
             }
 
-            bandGroup.alpha = targetOverlay * s * pulseA;
+            // Blood steps back while dread is on, so the drained look survives the
+            // one moment it is for. Without this the two effects fight: the shock
+            // pulls colour OUT and the blood floods it back IN, and the blood wins.
+            float bloodHold = 1f - config.bloodRecedesUnderDread * shock;
+            bandGroup.alpha = targetOverlay * s * pulseA * bloodHold;
             bandImage.rectTransform.localScale = Vector3.one * (1f + config.scalePulse * beatA * s);
             if (bandGroupB != null)
             {
-                bandGroupB.alpha = targetOverlay * config.layerBWeight * s * pulseB;
+                bandGroupB.alpha = targetOverlay * config.layerBWeight * s * pulseB * bloodHold;
                 bandImageB.rectTransform.localScale = Vector3.one * (1f + config.scalePulse * beatB * s);
             }
 
