@@ -147,7 +147,10 @@ namespace TimeKiller.Sanity
             if (Time.time >= nextSampleAt)
             {
                 nextSampleAt = Time.time + config.sampleInterval;
-                LightLevel = LightSampler2D.LevelAt(PlayerPosition());
+                // The player's own glow must not count as the room being lit.
+                // PlayerPosition() resolves `player` first, so it is safe to pass.
+                var samplePos = PlayerPosition();
+                LightLevel = LightSampler2D.LevelAt(samplePos, player);
                 InDarkness = LightLevel <= config.darkAtOrBelow;
             }
 

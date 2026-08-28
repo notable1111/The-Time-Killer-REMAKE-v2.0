@@ -45,7 +45,28 @@ namespace TimeKiller.Sanity
         /// Approximate 0..1-ish light level at a world position. Can exceed 1
         /// where lights overlap, which is fine — every caller compares against a
         /// low threshold.
-        public static float LevelAt(Vector2 worldPosition)
+        /// <param name="ignoreUnder">Lights parented under this transform are
+        /// skipped. Pass the subject being sampled — see the warning below.</param>
+        ///
+        /// ⚠️ THE SECOND BUG THIS SIGNATURE EXISTS FOR (found 2026-08-28 by a bot
+        /// A/B, and it was live). The scene gives the player a child Light2D
+        /// called PlayerGlow: intensity 0.65, inner radius 0.3. PlayerComposure
+        /// samples at the player's OWN position, so the distance to that light is
+        /// always 0 — inside the inner radius, contributing its full 0.65 forever.
+        /// With CastleWing's 0.32 global light on top, the player read 0.97
+        /// MINIMUM, everywhere, always, against a darkness threshold of 0.4.
+        ///
+        /// So "only genuine darkness drains" could not fire once. Not rarely —
+        /// never, as arithmetic rather than as bad luck. 24 bot runs recorded a
+        /// darkFraction of exactly 0.000 and every run that never hid ended on
+        /// composure exactly 1.000.
+        ///
+        /// It hid behind a number that looked like a reading: an earlier session
+        /// sampled 0.97 and recorded it as a lit spot, when 0.97 is precisely the
+        /// floor the player carries around with them. And the survey that put 55%
+        /// of walkable ground in darkness replayed positions with no player in the
+        /// scene, so it measured a world the game never actually asks about.
+        public static float LevelAt(Vector2 worldPosition, Transform ignoreUnder = null)
         {
             Refresh();
             float total = 0f;
@@ -53,6 +74,9 @@ namespace TimeKiller.Sanity
             {
                 var l = cache[i];
                 if (l == null || !l.isActiveAndEnabled) continue;
+                // IsChildOf is true for the transform itself, so a light placed
+                // on the player root is excluded too, not just one in a child.
+                if (ignoreUnder != null && l.transform.IsChildOf(ignoreUnder)) continue;
                 total += Contribution(l, worldPosition);
             }
             return total;
