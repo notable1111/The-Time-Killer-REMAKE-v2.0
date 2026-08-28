@@ -102,8 +102,12 @@ namespace TimeKiller.Audio
             // it on a repeating timer for the whole length of a repair.
             source.transform.position = evt.Position;
             source.pitch = 1f + Random.Range(-config.pitchJitter, config.pitchJitter);
-            source.PlayOneShot(clip,
-                config.volume * Mathf.Clamp01(evt.Loudness) * AudioMix.GainFor(MixChannel.Effects));
+            // Loudness scales HOW FAR the noise carries, not how loud it is to
+            // someone standing in it — the struct says so and ManiacPerception
+            // uses it as a range multiplier. So it only leans the level, floored,
+            // instead of scaling it raw.
+            float carry = Mathf.Lerp(config.loudnessFloor, 1f, Mathf.Clamp01(evt.Loudness));
+            source.PlayOneShot(clip, config.volume * carry * AudioMix.GainFor(MixChannel.Effects));
             Played++;
         }
     }

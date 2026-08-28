@@ -82,6 +82,26 @@ namespace TimeKiller.Audio
             }
             else report.AppendLine($"   world noise already has {noise.clips.Length} clip(s) — left alone");
 
+            // ONE-TIME MIGRATION, keyed to the exact value it replaces.
+            //
+            // 0.45 was my own first default and it was wrong: measured in a real
+            // session the repair pulse landed 15-20 dB under the player's own
+            // footsteps, because the level was being multiplied by the event's
+            // Loudness (0.3 from ClockRepair) as though that were a volume. It is
+            // not — the struct documents it as scaling the listener's HEARING
+            // RADIUS. Only a config still sitting on that exact old default is
+            // touched, so anything the user has since tuned by ear is left alone.
+            if (Mathf.Approximately(noise.volume, 0.45f))
+            {
+                var so = new SerializedObject(noise);
+                so.FindProperty("volume").floatValue = 0.85f;
+                so.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(noise);
+                report.AppendLine("   world noise volume 0.45 -> 0.85 (migration: the old value was scaled by "
+                                + "Loudness as if it were a volume; +13.1 dB at ClockRepair's 0.3)");
+            }
+            else report.AppendLine($"   world noise volume {noise.volume:0.00} is not the old default — left alone");
+
             ImportAsGameSfx(EscalationClip, report);
             ImportAsGameSfx(NoiseClip, report);
 

@@ -16,8 +16,11 @@ namespace TimeKiller.Audio
         [Tooltip("One is chosen at random. Empty = world noises stay silent, which is the state this shipped in for months.")]
         public AudioClip[] clips;
 
-        [Tooltip("Base level, multiplied by the event's own Loudness.\n\nMEASURED at 0.45: the clock lands about 3 dB above his footsteps in the two bands they share, when he is close enough for reach to be 1. That is coexistence rather than masking — he still has his breath and his voice on top. Push this toward 1 and repairing becomes genuinely deafening, which is a legitimate horror choice (you commit, and you go blind in the ears) but it is a DESIGN decision, not a mix fix. Ask before making it.")]
-        [Range(0f, 1f)] public float volume = 0.45f;
+        [Tooltip("Base level for a noise at full carry. RAISED from 0.45 to 0.85 on 2026-08-28 after a real session measured the pulse firing on schedule but landing 15-20 dB under the player own footsteps; the cause was misusing the event Loudness field, see loudnessFloor. THE LEVEL IS A REFERENCE DECISION, not a taste one: Dead by Daylight, whose loop this game copies, makes a generator plainly audible to the survivor working it, because it is the constant reminder that you are broadcasting - and it does NOT deafen them, the terror radius still cuts through. Prominent, never masking.")]
+        [Range(0f, 1f)] public float volume = 0.85f;
+
+        [Tooltip("What a MINIMUM-carry noise is scaled to, as a fraction of volume. WorldNoiseEvent.Loudness is documented on the struct as scaling the listener HEARING RADIUS, and ManiacPerception uses it exactly that way, as a range multiplier in Reaches(). It is a carry field, not a player-volume field. Multiplying playback by it raw was a mistake: ClockRepair publishes 0.3, so a clock the player was STANDING AT played at 30% while the number only ever meant that it does not travel far. A short-carry noise right next to you is still loud. 1.0 ignores carry entirely; 0.0 restores the old raw multiply.")]
+        [Range(0f, 1f)] public float loudnessFloor = 0.6f;
 
         [Tooltip("Random pitch spread, so a repeating repair noise never sounds like a loop.")]
         [Range(0f, 0.3f)] public float pitchJitter = 0.07f;

@@ -356,6 +356,25 @@ namespace TimeKiller.Recording
                 line.Append(",\"loud\":").Append(
                     TimeKiller.Core.PlayerNoiseDial.Multiplier.ToString("0.00", ci));
             }
+            // The four audio systems added 2026-08-28, logged for the same reason
+            // as composure above and learned the same way. The user recorded a
+            // session to judge them; two of the four could not be verified from it
+            // at all, and the two that could had to be reconstructed by measuring
+            // frequency bands out of audio.wav. These are live values the recorder
+            // can simply write down.
+            //
+            // "muffle" is 0..1 while hidden; "musicGain" is the observable end of
+            // the presence duck, so a reader never has to infer whether the mix
+            // leaned back — it is the number that moved.
+            var muffle = Object.FindAnyObjectByType<TimeKiller.Audio.WorldMuffle>();
+            if (muffle != null) line.Append(",\"muffle\":").Append(muffle.Amount.ToString("0.00", ci));
+            var escalation = Object.FindAnyObjectByType<TimeKiller.Audio.EscalationVoice>();
+            if (escalation != null) line.Append(",\"esc\":").Append(escalation.Played);
+            var worldNoise = Object.FindAnyObjectByType<TimeKiller.Audio.WorldNoiseAudio>();
+            if (worldNoise != null) line.Append(",\"noise\":").Append(worldNoise.Played);
+            line.Append(",\"musicGain\":").Append(
+                TimeKiller.Audio.AudioMix.GainFor(TimeKiller.Audio.MixChannel.Music).ToString("0.000", ci));
+
             line.Append(",\"frame\":").Append(FramesSaved);
             line.Append('}');
 
