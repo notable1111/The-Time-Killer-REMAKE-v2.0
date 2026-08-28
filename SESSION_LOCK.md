@@ -28,10 +28,10 @@ Release the lock in the same session you took it. Minutes, not hours.
 
 | Field | Value |
 |---|---|
-| Status | **FREE** |
-| Lane | — |
-| Doing | — |
-| Taken | — |
+| Status | **HELD** |
+| Lane | A — gameplay programmer |
+| Doing | User reports Sanity "not working". Diagnosing in play mode on CastleWing. No scene will be saved. |
+| Taken | 2026-08-28 |
 
 ## How to claim
 
@@ -50,6 +50,7 @@ spurious-unsaved look identical from git. A dirty scene you did not dirty is a
 stop-and-ask, and discarding is the destructive direction just as much as saving.
 
 
+- 2026-08-28 — Sound: play-mode probe of muffle / escalation / world-noise / presence.
 - 2026-08-27 — Sound: Setup/57 re-run for the world-noise voice (no scene).
 - 2026-08-27 — Sound: Setup/57, hiding-muffle + escalation-cue configs (no scene).
 - 2026-08-27 — B: swing VFX widened to 1.21% coverage. Lock read before claiming,

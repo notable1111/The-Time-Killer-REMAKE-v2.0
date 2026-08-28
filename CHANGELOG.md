@@ -2,6 +2,71 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-08-28 — Four things the player could not hear, and one report nobody read
+
+**The pattern behind all four: a system that worked and that nobody could
+perceive.** Counters said fired, configs said wired, tests said green — and none
+of those instruments can answer "did a human notice".
+
+**Hiding changed your body but not the room.** The heartbeat already boosted 1.3x
+while hidden and the breath was held to 5%, but measured this day the project
+contained **no `AudioLowPassFilter`, no `AudioHighPassFilter`, no
+`AudioReverbFilter` and no AudioMixer asset, anywhere** — so from inside a
+wardrobe the world was byte-identical to the corridor. That costs the mechanic
+its trade: you should be safer AND deafer, so you cannot tell when he has gone.
+`WorldMuffle` low-passes only sources with `spatialBlend >= 0.5` — the line the
+codebase already draws in its own comments, where the heartbeat is "YOUR heart:
+fully 2D" and the drone is "inside your head, not in the room". Verified in play:
+it attached to exactly **5 world sources** (his Footsteps, Breath and Vocal, the
+door Wind, the clock noise) at 900 Hz, left the player's own body untouched, and
+released all 5 to 22000 Hz on unhide.
+
+**Repairing a clock broadcast your position, silently.** `WorldNoiseEvent` had
+exactly one subscriber, `ManiacPerception`. `ClockRepair` publishes one on a timer
+the whole time you work — its own comment says "the clock is loud while you work
+it" — so the maniac heard it and the player did not, and he simply began walking
+at you for no perceivable reason. That is a mechanic lost, not a mood. The clip
+had to avoid one specific trap: the two nearest sources measured **67% and 85% of
+their energy above 2 kHz**, which is the one band the music leaves empty and
+therefore where his footsteps live. A bright click would have masked his approach
+while you are locked in a repair. Pitched down 2.4x from a metal latch: 30.1% in
+460-2k, 27.0% above 2 kHz.
+
+**Escalation was inaudible.** `ManiacEscalatedEvent` fires every time an objective
+completes and he steps up; nothing in audio subscribed. The cue is his own roar
+pitched down and low-passed — **67.6% below 460 Hz and 0.0% above 2 kHz**, against
+the close roar's 60.1% and 0.1%, because distance eats the high end first. It
+reads as him, further away, rather than as a UI sting.
+
+**The music never stepped back for him.** `ManiacFootsteps` outranks Music and
+Ambience on paper but never called `Announce`, and the naive fix was wrong: at
+`strideMeters 0.78` he steps every 0.433s at patrol against ~0.43s clips, so
+announcing per step would have parked the music at a flat -9 dB for as long as he
+was within 11m. `AudioMix.SetPresence` is a claim that lasts instead of expiring
+and applies half the duck. Measured live: music gain **0.850 -> 0.574** with him
+near, back to 0.850 when he leaves.
+
+**Two measurement lessons, both paid for.** A clip that measures correctly in
+isolation can be inaudible in the mix — the first threat SFX moved their own band
+by **+0.9 dB** at real gains, and the fix was not level but *masking*: v1 left
+26.9% of its energy inside the roar's dominant band. Re-cut clear of it, the same
+clip lifts that moment's 2-20 kHz band by **14.9 dB**. And the first "+0.6 dB,
+inaudible" verdict was partly an artifact of averaging across a whole 1.54s
+audition file when the clip occupied only its first 0.62s. **Measure the window a
+sound occupies, not the file it sits in.**
+
+**The audit had never measured the music.** `audit_audio.py` scanned two folders;
+all 22 tracks the director plays live in a third. Real totals are **277 assets,
+not 182**. Baseline blessed 157 -> 279 entries, drift 122 -> 0 — it was reporting
+every music track as "never checked by ear" every run, which is how a report stops
+being read. Of the 99 clips the game actually loads, 45 had never been blessed;
+those are batched into four listening sittings.
+
+Also: per-track music trims, because a layer picks one track at random and the
+pools spanned up to **5.3 dB** — level was carrying information the dice were
+setting. 17 trims, each layer matched to its own median so the layer's centre
+stays where it was tuned by ear.
+
 ## 2026-08-27 — The MCP toolchain was half-upgraded, and the banner only knew about one half
 
 **MCP for Unity is two programs, and updating the one Unity shows you leaves the
