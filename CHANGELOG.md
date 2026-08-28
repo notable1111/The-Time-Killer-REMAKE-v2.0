@@ -108,6 +108,62 @@ one that stops 34 tools forcing an approval prompt on every call. Whether the
 "`read_console` returns 0 entries even when Unity has clearly logged" trap is actually
 cured is **not** verified here — that needs a session to reproduce the old case.
 
+## 2026-08-28 — Sanity, and a light sampler that went blind after every restart
+
+**The dark now costs something.** An unlit corner used to be a pure win. Composure
+(sanity, and never a bar — health here is diegetic and a meter would break that
+language) drains in darkness and while hiding, restores in light and on fixing a
+clock, and its single mechanical output is that low composure makes the player's
+footsteps carry further. Aimed at **hearing** because hearing is the sense the
+player controls: walk instead of run and you are quiet again.
+
+Built to three rulings, each now an assertion rather than a note: only genuine
+darkness drains, there is a floor, it resets each run. It deliberately does not
+touch the heartbeat, the breathing or the audible mix — all finished, ear-tuned
+work.
+
+**The threshold is a measurement and the first one was wrong.** CastleWing has a
+global light, so the minimum level anywhere is **0.32** — there is no total
+darkness to threshold against, and any value under 0.32 makes the feature
+completely inert. Worse, an initial survey reported 77.7% of the map dark; that
+counted **walls and void**. Re-measured over walkable ground only, using the
+maniac's own walkability grid: **55.1% of 3610 walkable samples**. A real number
+describing the wrong surface — the third time in two days.
+
+**A live bug the user's recording found.** `LightSampler2D` caches the scene's
+lights and rebuilds every 5s. A scene reload destroys them all, and the cached
+references survive as Unity fake-null, so every contribution was skipped and the
+player read as being in **total darkness wherever they stood** for up to five
+seconds. `GameFlow` reloads on restart, so every run after the first opened with
+a false dark reading. It hid because a stale cache and an unlit room produce the
+same number; it surfaced only when a spot measured at 0.97 read 0.00 minutes
+later. Now rebuilds on staleness and times on `realtimeSinceStartup`.
+
+**"Sanity is not working" was right in the way that mattered.** It was running
+perfectly: replaying the user's 598 recorded positions through the real lights
+shows **62% of his session in darkness and composure down to 0.32 — ×1.41
+louder** — and nothing told him. Two fixes: the drain went 75s → 40s (justified
+by the corrected 55.1%, not by taste), and **F8 spends composure instantly**,
+because a feature that takes sixty seconds to observe is a feature nobody
+observes.
+
+**The recorder was blind to its own subject.** A session recorded specifically to
+check Sanity contained no sanity at all. `state.jsonl` now carries `comp`,
+`light`, `dark` and `loud` — the value, why it moved, and what it cost.
+
+⚠️ **Still open: composure has no in-game cue.** Nothing subscribes to
+`ComposureChangedEvent`; the player only finds out by dying. Amnesia does sanity
+vision-first, which is the visual lane's channel — flagged, not taken.
+
+**Two standing rules arrived from the user and are now in `CLAUDE.md` §3**, so
+every lane picks them up: *answer it yourself first* (measure before handing a
+check back to him; ask only what genuinely needs playing, and always with an
+example of the right answer), and **the five-line report format** — WHAT IT WAS /
+WHAT I DID / WHAT HAPPENED / CHECK THIS / SHOULD BE. Both exist because reports
+were narrating process instead of saying what changed in the game.
+
+Verified throughout: compiles, `SmokeCheck ok:true`, **66/66 EditMode tests**.
+
 ## 2026-08-27 (last) — Catacombs is a map, not yet a level
 
 **The sweep for dead features found none — and found something bigger.**
