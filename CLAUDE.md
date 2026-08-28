@@ -137,10 +137,28 @@ a measurement, because the reader cannot tell them apart.
   no recap, no options block, no percentage. (Settled 2026-07-28. It used to
   apply to every response, and on a one-line factual answer the ceremony
   outweighed the answer.)
-- **The "What I did" recap** (added 2026-08-02) is a short list — one line per
-  thing changed, in plain language, explaining it briefly. It is a *recap*, not a
-  second explanation: the reader should be able to see the whole delivery at a
-  glance without re-reading the body above it.
+- **THE REPORT FORMAT — every session, every result, no exceptions.**
+  *(User ruling 2026-08-28: "i will not repeat it again remember it and let other
+  sessions using this method always." He had just read a long delivery and said
+  "so i still dont get what you did".)* End every piece of work with exactly
+  these five lines, short, in plain language, in this order:
+
+  ```
+  WHAT IT WAS    — how it behaved before. One line.
+  WHAT I DID     — the change. One line.
+  WHAT HAPPENED  — the result, with the number if there is one. One line.
+  CHECK THIS     — ONE thing for him to do, concrete enough to act on blind.
+  SHOULD BE      — what he will see if it worked. The expected answer.
+  ```
+
+  The failure this replaces: reports that narrate the *process* — what broke, who
+  held which lock, which commit went where — and leave the reader unable to say
+  what changed in the game. He does not read the repo; if the five lines do not
+  say it, it was not said. Detail may follow underneath, but never instead.
+
+  If a delivery covers several things, five lines EACH, not one merged blob.
+  If there is genuinely nothing for him to check, say so on the CHECK line
+  rather than inventing a task.
 - **Unfinished work is reminded unconditionally.** If something was left at 60%
   and attention moved elsewhere, say so with the short to-do until it reaches
   100% — whatever kind of response it is. This is the part that stops work
