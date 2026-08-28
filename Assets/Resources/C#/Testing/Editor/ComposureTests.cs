@@ -30,7 +30,7 @@ namespace TimeKiller.Tests
         {
             var cfg = AssetDatabase.LoadAssetAtPath<ComposureConfig>(ComposurePath);
             if (cfg == null)
-                Assert.Ignore($"No composure config at {ComposurePath} — run TimeKiller/Setup/57. " +
+                Assert.Ignore($"No composure config at {ComposurePath} — run TimeKiller/Setup/58 - Create Composure Config (sanity). " +
                               "Until then the feature is uninstalled, which is a valid state.");
             return cfg;
         }

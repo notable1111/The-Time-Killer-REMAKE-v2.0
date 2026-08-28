@@ -50,6 +50,7 @@ spurious-unsaved look identical from git. A dirty scene you did not dirty is a
 stop-and-ask, and discarding is the destructive direction just as much as saving.
 
 
+- 2026-08-27 — Sound: Setup/57 re-run for the world-noise voice (no scene).
 - 2026-08-27 — Sound: Setup/57, hiding-muffle + escalation-cue configs (no scene).
 - 2026-08-27 — B: swing VFX widened to 1.21% coverage. Lock read before claiming,
   no scene opened or saved, Catacombs left exactly as found (clean, not dirty).
@@ -62,6 +63,9 @@ Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 
 - 2026-08-27 — Sound: Setup/54, per-track music trims into AudioConfig (no scene).
+- 2026-08-27 — A: released. Sanity verified: compiles, Setup/58, 66/66 EditMode
+  tests, and 3685 light samples across CastleWing in EDIT mode (no play mode, no
+  scene saved). The measurement moved two shipped defaults.
 - 2026-08-27 — A: released. Verified today's two fixes compile (by reflection,
   not the compile flag). Ran Setup/40 on Catacombs: it created nothing, correctly
   - that level has NO ObjectiveHudCanvas at all, so my "inactive canvas" theory

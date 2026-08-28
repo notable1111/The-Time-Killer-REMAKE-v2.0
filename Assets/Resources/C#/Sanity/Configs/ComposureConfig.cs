@@ -30,15 +30,32 @@ namespace TimeKiller.Sanity
         [Tooltip("Master switch. Off = the dial stays at 1 and the game is exactly what it was before this feature existed.\n\nThis is a difficulty change and has not had the user's ear yet.")]
         public bool enabled = true;
 
+        // ⚠️ BOTH NUMBERS BELOW WERE SET BY MEASUREMENT, NOT BY TASTE, and the
+        // measurement is the reason they are not what they look like they should be.
+        // Sampled 3685 points across CastleWing on 2026-08-27:
+        //
+        //   the map has a GLOBAL light - the MINIMUM level anywhere is 0.32, so
+        //   there is no total darkness in this castle at all;
+        //   the distribution is bimodal - a 0.30 threshold calls 0% of the map
+        //   dark and 0.40 calls 77.7% of it dark, with nothing in between.
+        //
+        // So an "only total darkness" threshold under 0.32 makes this feature
+        // COMPLETELY INERT, which is the installed-but-does-nothing trap this
+        // project hit three times in one day. 0.40 is the only honest reading of
+        // the ruling on this map: it means NO TORCH REACHES YOU.
+        //
+        // And because 77.7% of the map is out of torch reach, the drain had to
+        // slow down by 3x or the player would sit at the floor permanently and
+        // this would stop being a mechanic and become a flat difficulty change.
         [Header("What counts as dark")]
-        [Tooltip("Light level at or below which the player counts as being in TOTAL darkness.\n\nThis is the user's ruling in one number: dim light must be FREE and only genuine black must cost. Set it too high and a torch-lit corridor starts draining, which turns the whole castle into a cost and makes the torches meaningless. Sampled from the URP 2D lights actually in the scene, so it moves with the level rather than with a guess.")]
-        [Range(0f, 1f)] public float darkAtOrBelow = 0.12f;
+        [Tooltip("Light level at or below which the player counts as being in darkness. MEASURED, not chosen: CastleWing has a global light so its minimum level anywhere is 0.32, and 0.40 is the value that means exactly NO TORCH REACHES YOU. Anything below 0.32 makes this feature inert. See the block comment above for the full sample.")]
+        [Range(0f, 1f)] public float darkAtOrBelow = 0.40f;
 
-        [Tooltip("Seconds of continuous total darkness before composure is fully spent, ignoring the floor.\n\nNot a per-second rate, because the number people actually reason about is 'how long can I stand in the dark'. 25s is roughly two rooms of the servant passage at a walk.")]
-        [Range(2f, 120f)] public float secondsToSpendInDark = 25f;
+        [Tooltip("Seconds of continuous darkness before composure is fully spent, ignoring the floor. Not a per-second rate, because the number people reason about is how long they can stand in the dark. 75s because 77.7% of the map is out of torch reach: at 25s the player would sit at the floor permanently and this would be a flat difficulty change rather than a mechanic.")]
+        [Range(2f, 300f)] public float secondsToSpendInDark = 75f;
 
-        [Tooltip("Seconds hiding in a wardrobe before composure is fully spent.\n\nA wardrobe IS darkness, so this is conceptually the same drain — but it is its own number because sitting in a box should be gentler than standing in a black corridor. It exists to stop 'wait him out' being free: hiding measured as INERT in the bot playtests, and turtling costs nothing today.")]
-        [Range(5f, 300f)] public float secondsToSpendHiding = 70f;
+        [Tooltip("Seconds hiding in a wardrobe before composure is fully spent.\n\nA wardrobe IS darkness, so this is conceptually the same drain - but it is its own number because sitting in a box should be gentler than standing in a black corridor. It exists to stop 'wait him out' being free: hiding measured as INERT in the bot playtests, and turtling costs nothing today.\n\n110s and not 70s because raising the darkness drain to 75s (see the measurement above) INVERTED the relationship and made a wardrobe harsher than a dark corridor. ComposureTests.HidingCostsLessThanTheDark caught that; the two numbers have to move together.")]
+        [Range(5f, 400f)] public float secondsToSpendHiding = 110f;
 
         [Header("What brings it back")]
         [Tooltip("Seconds in light to recover fully from empty. Deliberately faster than the drain — the dark should be a place you visit and leave, not a debt you spend the run repaying.")]
