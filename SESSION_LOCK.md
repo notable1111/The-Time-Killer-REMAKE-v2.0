@@ -41,6 +41,11 @@ protocol — it works because all three sessions share this one file on disk.
 
 ## History
 
+- 2026-08-28 — Gameplay: bot A/B, 5 batches x 24 runs (escalation / composure /
+  blood / composure re-run after the light fix). Play mode only; CastleWingLDtk
+  opened but never saved and left not-dirty. Held ~100 min, which is longer than
+  this file asks for — the estimate was written into the table while it ran.
+
 ⚠️ 2026-08-27 — B claimed this lock WITHOUT re-reading it first and took it from a
 session that already held it, then opened CastleWing and discarded Catacombs'
 unsaved state — nine setup scripts' work, destroyed. The lock only works if it is

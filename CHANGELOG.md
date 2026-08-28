@@ -2,6 +2,93 @@
 
 Newest entries on top. Updated with every push to `main`.
 
+## 2026-08-28 — The darkness mechanic was unreachable arithmetic, and the bot said so
+
+**Three features shipped unjudged; a 5-batch bot A/B judged them.** Per-clock
+escalation, Sanity and blood tracking were all live or ready with nobody's ear or
+eye on them. Five batches of 24 runs on `Bot_average` at 4x, **the same 24 seeds in
+every arm** so each run is compared with its own twin instead of with noise:
+baseline / escalation only / composure only / blood only, then composure again
+after the bug below. 120 runs, 0 harness errors, 0 exceptions.
+
+**Sanity's darkness could never fire. Not rarely — never.** The scene parents a
+`PlayerGlow` Light2D to the player (intensity 0.65, inner radius 0.3).
+`LightSampler2D` sums every active light and `PlayerComposure` samples at the
+player's OWN position, so that light sat at distance zero inside its own inner
+radius and contributed its full 0.65 forever. With CastleWing's 0.32 global light
+the player read **0.97 minimum, everywhere, always**, against a `darkAtOrBelow` of
+**0.40**. The player was carrying a lantern the sampler counted as room light.
+
+The bot proved it before the cause was known: `darkFraction` **0.000 across all 24
+runs**, and every run that never hid ended on composure exactly **1.000**. All
+observed drain came from hiding.
+
+**It hid behind a number that looked like a reading.** The 2026-08-28 entry below
+records sampling **0.97** at a spot and reading it as "lit" — 0.97 is precisely the
+floor the player carries with them, not a property of anywhere. And the survey that
+put **55.1% of walkable ground in darkness** replayed recorded positions with no
+player in the scene, so it measured a world the running game never asks about. Both
+numbers were real; both described the wrong surface. That is the same failure as the
+light survey that counted walls, one layer deeper, and the **third** in two days.
+It also means "Sanity is running perfectly" was wrong and the user's original
+"sanity is not working" was right.
+
+Fixed at the sampler: `LevelAt` takes an optional `ignoreUnder` transform and skips
+lights parented under the subject being sampled; `PlayerComposure` passes the
+player. **`darkAtOrBelow` was NOT touched** — with the carried lamp excluded, the
+environment-only reading is exactly what 0.40 was calibrated against, so the
+shipped number becomes correct rather than needing a retune.
+
+Re-measured after the fix, the mechanic went from inert to live:
+
+| | before fix | after fix |
+|---|---|---|
+| share of samples in darkness | 0.000 | **0.299** |
+| composure events per run | 92 | **825** |
+| lowest composure reached | 0.769 | **0.491** |
+| loudest the player got | 1.14x | **1.32x** |
+
+**New probe `TimeKiller/Verify/Darkness Reachable`.** The invariant that was false
+for a day, as a number anyone can re-run: global light, light carried by the player,
+whether the exclusion is wired, and whether the threshold is reachable at all. It
+prints FAIL with the offending arithmetic when a carried light is being counted.
+Both branches were exercised before it was trusted. It deliberately does NOT rebuild
+the 55.1% survey — reproducing that would reproduce the original mistake in a
+repeatable form.
+
+**What the A/B actually found about difficulty: not much, and that is the finding.**
+Paired deltas vs baseline, 95% CI, n=24 per arm:
+
+| | escalation | composure (fixed) | blood |
+|---|---|---|---|
+| win rate | +4.2 +/-18.6 | +8.3 +/-23.3 | +0.0 +/-20.4 |
+| hits taken | -0.4 +/-0.8 | -0.3 +/-0.8 | +0.1 +/-0.7 |
+| blood leads | 0 | 0 | **+4.8 +/-2.4** |
+
+`heardBlood` is the **only** significant result in the whole matrix. Escalation
+reaches full ramp often (10 of 24 baseline runs fixed all three clocks) and its
+levers do fire (the bot hides ~1.7x a run), so the null is about magnitude, not
+about the feature being unused: 1.15x speed and 1.25x hearing are simply gentle.
+**A 24-run A/B cannot resolve a win-rate change smaller than about 19 points**, so
+the honest claim is "nothing dramatic", never "no effect".
+
+**Blood tracking: the architecture's own condition is now met.** Its header asked
+for exactly this A/B before going live, fearing a homing trail would make the 1-HP
+state "unsurvivable rather than tense". Measured: seconds at the last HP moved
+**+9.6 +/-19.4** — upward, not down. It fires (4.8 leads a run) and changes no
+outcome measurably. Recommended ON; **left OFF**, because which way it ships is the
+user's call and not a side effect of measuring it. The effect is bimodal — 10 of 24
+runs triggered no leads at all, others 6 to 19 — so it is texture, not pressure.
+
+**Telemetry the batch needed and did not have.** Composure's only mechanical output
+is a loudness multiplier, so "it never moved" and "it moved and changed nothing"
+produce an identical `heardSound` count. `state.jsonl` run rows now carry
+`composure` — samples, minimum, peak loudness and dark fraction. Without that field
+this session would have reported "composure does nothing" and been wrong about why.
+
+All 66 EditMode tests pass. Smoke check ok. No scene was opened for editing or
+saved; `CastleWingLDtk` was left not-dirty.
+
 ## 2026-08-28 — Four things the player could not hear, and one report nobody read
 
 **The pattern behind all four: a system that worked and that nobody could
