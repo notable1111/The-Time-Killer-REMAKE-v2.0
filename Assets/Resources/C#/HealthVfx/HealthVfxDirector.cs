@@ -45,6 +45,15 @@ namespace TimeKiller.HealthVfx
 
         float bandStrength, targetStrength;
         float targetVignette, targetOverlay, targetChromatic, targetGrain, targetDesat;
+
+        // THREAT SHOCKS — being seen, being swung at. Pushed in from outside via
+        // PushVisionShock rather than driven here, because this class owns the
+        // Volume and NOTHING ELSE MAY WRITE TO IT. Two components driving one
+        // vignette is exactly the bug that made the heartbeat read as mush
+        // (three oscillators on one parameter, 2026-08-27); a second director
+        // would recreate it at a larger scale.
+        float shockVig, shockDesat, shockChroma;   // the shock's peak amounts
+        float shockAge = 999f, shockAttack, shockRelease;
         // Fear's visual share, pre-scaled by FearConductor. Zero when no
         // conductor is running or fear visuals are switched off, which is why
         // nothing below needs a null check or a feature flag.
@@ -72,6 +81,9 @@ namespace TimeKiller.HealthVfx
 
         void Start()
         {
+            // Claimed here rather than in Awake so a director whose Volume failed
+            // to resolve never becomes the one everyone pushes shocks at.
+            instance = this;
             if (volume != null && volume.profile != null)
             {
                 volume.profile.TryGet(out vignette);
@@ -97,6 +109,7 @@ namespace TimeKiller.HealthVfx
 
         void OnDestroy()
         {
+            if (instance == this) instance = null;
             EventBus.Unsubscribe<PlayerHealthChangedEvent>(OnHealthChanged);
             EventBus.Unsubscribe<PlayerHitEvent>(OnHit);
             EventBus.Unsubscribe<TimeKiller.Heartbeat.HeartbeatPulseEvent>(OnHeartbeat);
@@ -189,6 +202,11 @@ namespace TimeKiller.HealthVfx
             // things on one beat and the result read as mush.
             beatAge += dt;
             float env = BeatEnvelope(beatAge) * beatStrength;
+
+            // Threat shocks ride their own envelope, not the heartbeat's: being
+            // seen does not happen on a beat.
+            shockAge += dt;
+            float shock = ShockEnvelope();
             float heartVig = config.heartVignette * heartIntensity * env;
 
             // Heartbeat: sharp systole, slow diastole (|sin|^3), layer B counter-beats.
@@ -212,7 +230,7 @@ namespace TimeKiller.HealthVfx
             if (vignette != null)
             {
                 float damageVig = targetVignette * s * (1f + config.damageBeatLift * env);
-                float totalVig = damageVig + heartVig + fearVig;
+                float totalVig = damageVig + heartVig + fearVig + shockVig * shock;
                 vignette.intensity.value = totalVig;
 
                 // Red belongs to being HURT. Dread and fear darken instead, so a hunted
@@ -230,7 +248,7 @@ namespace TimeKiller.HealthVfx
                                                        config.vignetteSmoothnessPeak,
                                                        Mathf.Clamp01(totalVig / 0.6f));
             }
-            if (chromatic != null) { chromatic.intensity.overrideState = true; chromatic.intensity.value = targetChromatic * s * pulseA; }
+            if (chromatic != null) { chromatic.intensity.overrideState = true; chromatic.intensity.value = Mathf.Clamp01(targetChromatic * s * pulseA + shockChroma * shock); }
             if (grain != null) { grain.intensity.overrideState = true; grain.intensity.value = targetGrain * s; }
             if (colorAdjust != null)
             {
@@ -238,7 +256,11 @@ namespace TimeKiller.HealthVfx
                 // Both pull the same direction (toward grey), so take whichever is
                 // stronger rather than summing — stacking them would drain the
                 // colour out of the screen entirely at low health during a chase.
-                colorAdjust.saturation.value = Mathf.Min(targetDesat * s, fearDesat);
+                // Three sources pull toward grey. Take the STRONGEST rather than
+                // summing: stacked, a chase at low health would drain the screen
+                // to monochrome and the shock would have nothing left to say.
+                colorAdjust.saturation.value = Mathf.Min(Mathf.Min(targetDesat * s, fearDesat),
+                                                         -100f * shockDesat * shock);
             }
 
             bandGroup.alpha = targetOverlay * s * pulseA;
@@ -267,6 +289,57 @@ namespace TimeKiller.HealthVfx
                 breathing.volume = Mathf.MoveTowards(breathing.volume, 0f, dt);
                 if (breathing.volume <= 0.001f) breathing.Stop();
             }
+        }
+
+        /// A transient hit to the player's VISION — the horror convention, rather
+        /// than a decoration drawn into the world.
+        ///
+        /// Outlast and Amnesia both communicate threat by obscuring or distorting
+        /// what you can see; Dead by Daylight, whose loop this game copies, keeps
+        /// threat feedback on the survivor and on the frame. A sprite on the floor
+        /// is something the player can ignore. A frame that drains and clamps is
+        /// not. (User, 2026-08-28: the sprite versions "looks like cheap, not
+        /// feeling dangerous".)
+        ///
+        /// Callers push a shock; they never touch the Volume. Whoever is loudest
+        /// wins rather than the values summing, so two shocks in quick succession
+        /// cannot black the screen out.
+        ///
+        /// vignette  extra darkness clamping in at the edges  (0..1)
+        /// desat     how far toward grey, 0..1 (1 = fully grey)
+        /// chroma    lens tearing, 0..1
+        /// attack    seconds to reach full — small but never 0; instant is a blink
+        /// release   seconds to fall away afterwards
+        public static void PushVisionShock(float vignette, float desat, float chroma,
+                                           float attack, float release)
+        {
+            if (instance == null) return;
+            // Louder shock wins outright; a quieter one cannot cut a loud one short.
+            float incoming = vignette + desat + chroma;
+            float standing = (instance.shockVig + instance.shockDesat + instance.shockChroma)
+                             * instance.ShockEnvelope();
+            if (incoming < standing) return;
+            instance.shockVig = vignette;
+            instance.shockDesat = desat;
+            instance.shockChroma = chroma;
+            instance.shockAttack = Mathf.Max(0.001f, attack);
+            instance.shockRelease = Mathf.Max(0.02f, release);
+            instance.shockAge = 0f;
+        }
+
+        static HealthVfxDirector instance;
+
+        /// Same shape as the heartbeat envelope: eased swell, exponential fall.
+        /// A body has no instant edges and neither does fear.
+        float ShockEnvelope()
+        {
+            if (shockAge >= 999f) return 0f;
+            if (shockAge < shockAttack)
+            {
+                float t = shockAge / shockAttack;
+                return t * t * (3f - 2f * t);
+            }
+            return Mathf.Exp(-(shockAge - shockAttack) / (shockRelease / 3f));
         }
 
         static float Beat(float phase)

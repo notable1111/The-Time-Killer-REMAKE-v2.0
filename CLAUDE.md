@@ -34,6 +34,30 @@ cases that earned it. The short version:
   example shows a 0–7 slider. Unity 6 clamps it to **0–1**; that example is
   version-stale.
 
+**Corollary — for anything the player FEELS, research the reference before you
+design.** (Added 2026-08-28, the expensive way.) Three threat effects were built
+from geometry and screen-coverage numbers, measured at 1.21% and 2.61% against a
+readability bar, and shipped. The user's verdict: *"looks like cheap, not feeling
+dangerous, not feels like the horror game effect... before adding something you
+should always check other best horror games and then decide."*
+
+The measurement was real and answered the wrong question: it proved the effects
+were VISIBLE, never that they were FRIGHTENING. Coverage is a legibility metric,
+not a mood one, and no amount of it catches a crescent slash being an
+action-game idiom.
+
+What the references actually say, and they agree: horror communicates threat by
+changing the player's VISION — obscuration, distortion, mediation — not by
+drawing decorations into the world. Dead by Daylight, whose loop this game
+copies, makes threat feedback **continuous, proximity-scaled, diegetic and
+directional**: the Red Stain is emitted by the killer and leaks around corners
+to betray where he is; the Terror Radius scales with distance and its visual form
+is a heart beating in the survivor's own chest.
+
+So before building anything a player feels — an effect, a sound, a camera move —
+name the game that already does it well and say what it does. A number cannot
+tell you that a shape belongs to the wrong genre.
+
 **Corollary — if you would eyeball the same question twice, build the
 measurement instead.** `TimeKiller/Verify/VFX Visibility` exists because "does
 this read?" is a number, not an opinion, and a number is repeatable by the next
@@ -89,6 +113,23 @@ a measurement, because the reader cannot tell them apart.
   that had been flagged one message earlier as partly an artifact of our own
   stage-labelling code. Working feel was changed to satisfy a metric already known
   to be unreliable, at n=1.)*
+- **Answer it yourself first; the user is the LAST resort, not the first.**
+  *(User ruling 2026-08-27.)* When a check "touches him" — needs playing, needs
+  an ear, needs eyes on the screen — the order is:
+  1. **Work it out yourself.** Compile it, test it, run the probe, run the bot,
+     read the numbers. Most questions that feel like "he has to play this" are
+     actually a measurement nobody has taken yet.
+  2. **Then just tell him what you did.** He has said plainly this is faster for
+     him than loading the game and hunting for what changed. A clear written
+     account of the change is the deliverable, not an invitation to go looking.
+  3. **Only if it is genuinely impossible without playing, ask.** "Does it feel
+     right" is a real example: no probe answers it.
+- **A question for the user must be checkable and carry its expected answer.**
+  Name the ONE thing to check, and say what it should look like if it is right,
+  in plain language. *"In the dark corridor by the armory, walk for ten seconds:
+  he should start noticing you from further away than usual. Does he?"* — not
+  *"please judge whether composure feels balanced"*. A question he cannot act on
+  without re-deriving the context is the same as no question.
 - **Long tasks:** post short progress updates at milestones, not silence.
 - **After work deliveries** — anything built, fixed, verified or pushed — end with
   a **"What I did"** recap, then a "What's next?" of 2–3 concrete options and a
