@@ -46,11 +46,25 @@ namespace TimeKiller.Player
                     * TimeKiller.Audio.AudioMix.GainFor(TimeKiller.Audio.MixChannel.PlayerFootsteps));
             }
 
+            // Composure makes you louder TO HIM. The dial is a shared static in
+            // Core with a default of 1, so this line is a no-op unless something
+            // is writing it and PlayerFootsteps has never heard of the Sanity
+            // feature — delete Sanity and the dial simply stays at 1.
+            //
+            // Applied to the PUBLISHED loudness only, deliberately NOT to the
+            // PlayOneShot volume above. Making your own footsteps audibly louder
+            // would be the honest feedback cue, but the mix is a finished,
+            // measured balance (peak-sum 6.72 -> 3.01) and footsteps are the one
+            // channel documented as trimmed-but-never-ducked because muting the
+            // feedback you steer by reads as a bug. Reaching into that from a new
+            // feature is the mistake CLAUDE.md §3 was written about. Composure
+            // publishes ComposureChangedEvent instead, and the audio lane can
+            // present it properly on their own terms.
             EventBus.Publish(new PlayerFootstepEvent
             {
                 Position = transform.position,
                 IsRunning = running,
-                Loudness = loudness
+                Loudness = loudness * PlayerNoiseDial.Multiplier
             });
         }
     }
