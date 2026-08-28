@@ -1,13 +1,14 @@
-// Creates and wires the two config assets behind the hiding muffle and the
-// escalation cue. Both features load their config from Resources and DO NOT
-// INSTALL AT ALL when it is missing, so this script IS the install.
+// Creates and wires the config assets behind the self-installing audio
+// features: the hiding muffle, the escalation cue, and the world-noise voice.
+// Each loads its config from Resources and DOES NOT INSTALL AT ALL when that
+// asset is missing, so this script IS the install.
 //
-// NO SCENE IS TOUCHED, deliberately. Both components self-install via
+// NO SCENE IS TOUCHED, deliberately. All three self-install via
 // RuntimeInitializeOnLoadMethod: the scenes here are hand-tuned and protected,
 // three sessions share one Editor, and a feature that needs no scene edit cannot
 // collide with anybody or miss a level. Catacombs spent today missing 23 systems
 // precisely because they were scene-object features that its setup pass never
-// received; these two cannot go the same way.
+// received; these cannot go the same way.
 //
 // Idempotent and non-destructive: an existing asset keeps every value already
 // tuned by ear and only has genuinely empty fields filled in.
@@ -24,13 +25,15 @@ namespace TimeKiller.Audio
         const string MufflePath = ConfigFolder + "/WorldMuffleConfig.asset";
         const string EscalationPath = ConfigFolder + "/EscalationVoiceConfig.asset";
         const string EscalationClip = "Assets/Resources/Assets/Effects/Sfx/maniac_escalate_far.wav";
+        const string NoisePath = ConfigFolder + "/WorldNoiseAudioConfig.asset";
+        const string NoiseClip = "Assets/Resources/Assets/Effects/Sfx/clock_working.wav";
 
-        [MenuItem("TimeKiller/Setup/57 - Hiding muffle + escalation cue (audio)")]
+        [MenuItem("TimeKiller/Setup/57 - Self-installing audio (muffle, escalation, world noise)")]
         public static void Run()
         {
-            if (SetupGuard.Blocked("57 - Hiding muffle + escalation cue")) return;
+            if (SetupGuard.Blocked("57 - Self-installing audio")) return;
 
-            var report = new System.Text.StringBuilder("[TimeKiller Setup] 57 - hiding muffle + escalation cue\n");
+            var report = new System.Text.StringBuilder("[TimeKiller Setup] 57 - self-installing audio\n");
 
             var muffle = FindOrCreate<WorldMuffleConfig>(MufflePath, report);
             report.AppendLine($"   muffle: cutoff {muffle.cutoffHz:0} Hz, close {muffle.closeSeconds:0.00}s, "
@@ -60,10 +63,30 @@ namespace TimeKiller.Audio
             }
             else report.AppendLine($"   escalation already has {escalation.cues.Length} cue(s) — left alone");
 
+            var noise = FindOrCreate<WorldNoiseAudioConfig>(NoisePath, report);
+            if (noise.clips == null || noise.clips.Length == 0)
+            {
+                var clip = AssetDatabase.LoadAssetAtPath<AudioClip>(NoiseClip);
+                if (clip == null) report.AppendLine($"   MISSING noise clip at {NoiseClip} — world noises stay silent.");
+                else
+                {
+                    var so = new SerializedObject(noise);
+                    var clips = so.FindProperty("clips");
+                    clips.arraySize = 1;
+                    clips.GetArrayElementAtIndex(0).objectReferenceValue = clip;
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                    EditorUtility.SetDirty(noise);
+                    report.AppendLine($"   world noise <- {clip.name} ({clip.length:0.00}s) at volume {noise.volume:0.00}, "
+                                    + $"AlwaysHeard skipped ({(noise.playAlwaysHeard ? "OFF" : "ON")}: ExitDoor voices itself)");
+                }
+            }
+            else report.AppendLine($"   world noise already has {noise.clips.Length} clip(s) — left alone");
+
             ImportAsGameSfx(EscalationClip, report);
+            ImportAsGameSfx(NoiseClip, report);
 
             AssetDatabase.SaveAssets();
-            report.AppendLine("   No scene touched: both features self-install from Resources at runtime.");
+            report.AppendLine("   No scene touched: all three self-install from Resources at runtime.");
             Debug.LogWarning(report.ToString());
         }
 
@@ -99,17 +122,17 @@ namespace TimeKiller.Audio
             }
         }
 
-        [MenuItem("TimeKiller/Setup/57b - Remove hiding muffle + escalation cue")]
+        [MenuItem("TimeKiller/Setup/57b - Remove the self-installing audio features")]
         public static void Clear()
         {
-            if (SetupGuard.Blocked("57b - Remove hiding muffle + escalation cue")) return;
+            if (SetupGuard.Blocked("57b - Remove the self-installing audio features")) return;
             var removed = new List<string>();
-            foreach (var path in new[] { MufflePath, EscalationPath })
+            foreach (var path in new[] { MufflePath, EscalationPath, NoisePath })
                 if (AssetDatabase.LoadAssetAtPath<ScriptableObject>(path) != null
                     && AssetDatabase.DeleteAsset(path)) removed.Add(System.IO.Path.GetFileName(path));
             AssetDatabase.SaveAssets();
             Debug.LogWarning("[TimeKiller Setup] 57b - deleted " + (removed.Count == 0 ? "nothing" : string.Join(", ", removed))
-                + ". Both features check for their config at startup, so neither will install now.");
+                + ". Each feature checks for its config at startup, so none of them will install now.");
         }
     }
 }
