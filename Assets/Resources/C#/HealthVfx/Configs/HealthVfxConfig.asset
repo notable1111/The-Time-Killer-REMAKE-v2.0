@@ -17,7 +17,7 @@ MonoBehaviour:
   vignetteColor: {r: 0.45, g: 0, b: 0, a: 1}
   subtleVignette: 0.28
   criticalVignette: 0.47
-  subtleOverlayAlpha: 0.35
+  subtleOverlayAlpha: 0.18
   criticalOverlayAlpha: 0.85
   heartVignette: 0.1
   heartVignetteAttack: 0.1
@@ -34,6 +34,7 @@ MonoBehaviour:
   hitSoundVolume: 0.85
   hitPitchJitter: 0.08
   deathSoundVolume: 0.9
+  bloodRecedesUnderDread: 0.7
   scalePulse: 0.03
   layerBPhase: 0.45
   layerBWeight: 0.7
