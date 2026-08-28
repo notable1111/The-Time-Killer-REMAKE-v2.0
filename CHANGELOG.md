@@ -62,6 +62,27 @@ every music track as "never checked by ear" every run, which is how a report sto
 being read. Of the 99 clips the game actually loads, 45 had never been blessed;
 those are batched into four listening sittings.
 
+**The repair pulse was firing and nearly inaudible, and the cause was a misread
+field.** Measured in the user's own 152-second session: the pulses land at 119.0,
+120.0, 121.25, 122.75, 123.75, 125.0 and 126.25s — a mean gap of **~1.2s against
+`repairNoiseInterval` of exactly 1.2** — but 15-20 dB under the player's own
+footsteps. `WorldNoiseEvent.Loudness` is documented on the struct as *"scales the
+listener's HEARING RADIUS"* and `ManiacPerception` uses it that way, as a range
+multiplier in `Reaches()`. It is a **carry** field. Multiplying playback volume by
+it raw meant `ClockRepair`'s 0.3 made a clock the player was *standing at* play at
+30%. Now floored rather than scaled, and the level itself was set from a
+reference rather than taste: Dead by Daylight makes a generator plainly audible to
+the survivor working it without deafening them, so **prominent, never masking**.
+Net **+13.1 dB**, verified at runtime rather than on disk.
+
+**Two of the four could not be judged from that recording at all**, and that is
+why `SessionRecorder` now logs `muffle`, `esc`, `noise` and `musicGain`.
+Escalation never fired (no clock was completed) and the presence duck never had
+the chance (**zero** PatrolState samples with him inside 6u). Establishing both
+took measuring frequency bands out of `audio.wav` by hand — for live values the
+recorder could simply write down. The same lesson the composure fields beside them
+learned the same day, from the same session.
+
 Also: per-track music trims, because a layer picks one track at random and the
 pools spanned up to **5.3 dB** — level was carrying information the dice were
 setting. 17 trims, each layer matched to its own median so the layer's centre
