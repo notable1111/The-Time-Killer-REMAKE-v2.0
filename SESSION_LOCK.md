@@ -59,6 +59,9 @@ stop-and-ask, and discarding is the destructive direction just as much as saving
   No scene saved. NOTE: another session drove play mode and scene loads while
   this lock was held by B - the Editor bounced to MainMenu mid-measurement.
 
+- 2026-08-28 — B: ThreatVision compiled, config created, old sprites unhooked,
+  recorded in play. No scene saved; CastleWing left as found.
+
 Newest on top. One line each, so a session can see what the Editor was last used
 for without reading the scene diff.
 
